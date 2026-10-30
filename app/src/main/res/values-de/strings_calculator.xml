@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_calculator">Rechner</string>
+
+    <string name="calc_expression">Eingabe</string>
+    <string name="calc_result">Ergebnis</string>
+    <string name="calc_result_preview">Vorschau des Ergebnisses</string>
+    <string name="calc_empty_hint">Rechnung eingeben</string>
+    <string name="calc_equals">Ist gleich</string>
+    <string name="calc_clear">Löschen</string>
+    <string name="calc_backspace">Letztes Zeichen löschen</string>
+    <string name="calc_cursor_left">Cursor nach links</string>
+    <string name="calc_cursor_right">Cursor nach rechts</string>
+    <string name="calc_copy_result">Tippen kopiert das Ergebnis</string>
+
+    <string name="calc_functions">Wissenschaftliche Funktionen</string>
+    <string name="calc_second">2nd</string>
+    <string name="calc_second_description">Zweite Funktionsebene</string>
+    <string name="calc_angle_description">Winkeleinheit: %1$s. Tippen zum Wechseln.</string>
+    <string name="calc_angle_deg">Grad</string>
+    <string name="calc_angle_rad">Bogenmaß</string>
+    <string name="calc_angle_grad">Gon</string>
+    <string name="calc_memory_value">Speicher: %1$s</string>
+    <string name="calc_memory_clear">Speicher löschen</string>
+    <string name="calc_memory_recall">Speicherwert einfügen</string>
+    <string name="calc_memory_add">Zum Speicher addieren</string>
+    <string name="calc_memory_subtract">Vom Speicher subtrahieren</string>
+    <string name="calc_answer">Vorheriges Ergebnis</string>
+
+    <string name="calc_history">Verlauf</string>
+    <string name="calc_history_empty">Noch keine Rechnungen.</string>
+    <string name="calc_history_hint">Ausdruck antippen: wiederverwenden. Ergebnis antippen: einfügen.</string>
+    <string name="calc_history_clear">Verlauf löschen</string>
+    <string name="calc_history_close">Schließen</string>
+
+    <string name="calc_error_syntax">Unvollständiger oder ungültiger Ausdruck</string>
+    <string name="calc_error_divide">Division durch null</string>
+    <string name="calc_error_domain">Für diesen Wert nicht definiert</string>
+    <string name="calc_error_overflow">Ergebnis zu groß</string>
+
+    <string name="search_action_open_calculator">Im Rechner öffnen</string>
+    <string name="search_action_open_calculator_hint">%1$s in der Scope „Rechner“ fortsetzen</string>
+</resources>

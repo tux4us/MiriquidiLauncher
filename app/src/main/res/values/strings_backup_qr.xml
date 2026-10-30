@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="settings_backup_qr_show">Show as QR code</string>
+    <string name="settings_backup_qr_scan">Import via QR code</string>
+    <string name="settings_backup_qr_note">QR code: transfer directly between two devices. Large backups are split into several codes.</string>
+
+    <string name="backup_qr_show_title">Backup as QR code</string>
+    <string name="backup_qr_show_hint">On the other device: Settings, Backup, \"Import via QR code\", then scan all codes shown here. With several codes, the order does not matter.</string>
+    <string name="backup_qr_contacts_in">Favorite contacts are included (names and phone numbers).</string>
+    <string name="backup_qr_contacts_out">Favorite contacts are not included.</string>
+    <string name="backup_qr_password_check">Protect with password</string>
+    <string name="backup_qr_password_label">Password (at least %1$d characters)</string>
+    <string name="backup_qr_password_hint">Without a password, anyone who sees or photographs the screen can read the contents. The password is not stored and not part of the code; it has to be entered on the other device.</string>
+    <string name="backup_qr_create">Show code</string>
+    <string name="backup_qr_creating">Creating code …</string>
+    <string name="backup_qr_too_large">The backup is too large for QR codes (more than %1$d codes). Leave out contacts or use the file transfer.</string>
+    <string name="backup_qr_failed">The code could not be created.</string>
+    <string name="backup_qr_part">Code %1$d of %2$d</string>
+    <string name="backup_qr_part_description">QR code %1$d of %2$d</string>
+    <string name="backup_qr_prev">Back</string>
+    <string name="backup_qr_next">Next</string>
+    <string name="backup_qr_auto">Switch automatically</string>
+    <string name="backup_qr_secure_note">The screen stays on; screenshots are blocked for this view.</string>
+
+    <string name="backup_qr_scan_title">Scan backup code</string>
+    <string name="backup_qr_scan_hint">Point the camera at the code on the other device. With several codes, scan them all one after another.</string>
+    <string name="backup_qr_scan_progress">Read: %1$d of %2$d codes</string>
+    <string name="backup_qr_scan_missing">Still missing: %1$s</string>
+    <string name="backup_qr_scan_foreign">This code is not a MiriquidiLauncher backup.</string>
+    <string name="backup_qr_scan_new_set">Code of a different backup detected. The codes read so far were discarded.</string>
+    <string name="backup_qr_scan_corrupt">The codes are damaged. Please scan again.</string>
+    <string name="backup_qr_password_needed">The backup is password protected.</string>
+    <string name="backup_qr_password_wrong">Wrong password.</string>
+    <string name="backup_qr_decrypt">Decrypt</string>
+    <string name="backup_qr_confirm_text">The existing favorites will be replaced by the contents of the scanned codes.</string>
+    <string name="backup_qr_contents">Contains: %1$d favorite apps, %2$s, %3$d weather places.</string>
+</resources>

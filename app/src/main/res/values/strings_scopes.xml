@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_app_favorites">App favorites</string>
+    <string name="scope_contact_favorites">Contact favorites</string>
+    <string name="scope_app_groups">App groups</string>
+
+    <string name="app_favorites_empty">No favorites yet. Use “Add”, or long-press an app in the app list.</string>
+    <string name="scope_add">Add</string>
+    <string name="scope_done">Done</string>
+    <string name="scope_cancel">Cancel</string>
+    <string name="scope_move_earlier">Move earlier</string>
+    <string name="scope_move_later">Move later</string>
+    <string name="scope_remove">Remove</string>
+    <string name="scope_search_apps">Search apps</string>
+    <string name="scope_no_apps_found">No apps found</string>
+
+    <string name="contact_favorites_empty">No favorite contacts yet. Use “Add contact” to pick someone from your address book.</string>
+    <string name="contact_add">Add contact</string>
+    <string name="contact_ways_title">%1$s</string>
+    <string name="contact_ways_loading">Looking for ways to reach this contact …</string>
+    <string name="contact_ways_open_contact">Open contact</string>
+    <string name="contact_ways_call">Call</string>
+    <string name="contact_ways_sms">SMS</string>
+    <string name="contact_ways_email">Email</string>
+    <string name="contact_ways_hint_no_permission">Without access to your contacts only calls and SMS to the saved number are possible. Messengers such as Signal or Telegram appear once access is allowed.</string>
+    <string name="contact_ways_allow">Allow access</string>
+    <string name="contact_ways_failed">Could not open this option</string>
+    <string name="contact_remove_favorite_title">Remove %1$s from contact favorites?</string>
+
+    <string name="groups_empty">No groups yet. Use “Create group” to add e.g. “Messengers” or “Finance” and put apps in them.</string>
+    <string name="group_create">Create group</string>
+    <string name="group_create_title">New group</string>
+    <string name="group_rename_title">Rename group</string>
+    <string name="group_name_hint">Group name</string>
+    <string name="group_name_blank">Please enter a name</string>
+    <string name="group_name_taken">This name already exists</string>
+    <string name="group_limit_reached">The maximum number of groups is reached</string>
+    <string name="group_save">Save</string>
+    <string name="group_rename">Rename</string>
+    <string name="group_delete">Delete group</string>
+    <string name="group_delete_title">Delete group “%1$s”?</string>
+    <string name="group_delete_text">The apps stay installed; only the group is removed.</string>
+    <string name="group_empty">No apps in this group yet</string>
+    <string name="group_add_apps">Add apps</string>
+    <string name="group_apps_count">%1$d apps</string>
+    <string name="group_expand">Open group</string>
+    <string name="group_collapse">Close group</string>
+    <string name="group_pick_title">Apps for “%1$s”</string>
+    <string name="group_move_earlier">Move group up</string>
+    <string name="group_move_later">Move group down</string>
+</resources>

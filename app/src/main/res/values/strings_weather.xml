@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="weather_title">Weather</string>
+    <string name="weather_refresh">Refresh</string>
+    <string name="weather_search_hint">Search place</string>
+    <string name="weather_search_clear">Clear search</string>
+    <string name="weather_use_location">Use current location</string>
+    <string name="weather_favorites">Favorites</string>
+    <string name="weather_favorite_add">Save as favorite</string>
+    <string name="weather_favorite_remove">Remove from favorites</string>
+    <string name="weather_no_place">Choose a place or use your approximate location.</string>
+    <string name="weather_search_no_results">No places found</string>
+    <string name="weather_search_failed">Search failed. Check your internet connection.</string>
+    <string name="weather_searching">Searching …</string>
+    <string name="weather_loading">Loading weather …</string>
+    <string name="weather_error_network">Could not load weather data. Check your internet connection.</string>
+    <string name="weather_error_data">The weather service returned unreadable data.</string>
+    <string name="weather_error_location">Location unavailable. Is location turned on?</string>
+    <string name="weather_error_permission">Without location permission only the place search is available.</string>
+    <string name="weather_stale_notice">Showing last loaded data (as of %1$s).</string>
+    <string name="weather_updated">Updated %1$s</string>
+    <string name="weather_feels_like">Feels like %1$s°</string>
+    <string name="weather_humidity_value">Humidity %1$d%%</string>
+    <string name="weather_pressure_value">Pressure %1$s hPa</string>
+    <string name="weather_precip_value">Precipitation %1$s mm</string>
+    <string name="weather_wind_value">%1$s from %2$s, %3$s km/h (Bft %4$d)</string>
+    <string name="weather_gusts_value">Gusts up to %1$s km/h</string>
+    <string name="weather_uv_value">UV index %1$s (%2$s)</string>
+    <string name="weather_section_hourly">Next 24 hours</string>
+    <string name="weather_section_daily">7-day forecast (tap for details)</string>
+    <string name="weather_section_thunder">Thunderstorms (next 12 hours)</string>
+    <string name="weather_section_air">Air quality and pollen</string>
+    <string name="weather_section_bio">Bio-weather</string>
+    <string name="weather_chart_temperature">Temperature (°C)</string>
+    <string name="weather_chart_precipitation">Precipitation (mm)</string>
+    <string name="weather_today">Today</string>
+    <string name="weather_precip_probability">%1$d%%</string>
+    <string name="weather_thunder_none">No elevated thunderstorm risk in the next 12 hours.</string>
+    <string name="weather_thunder_summary">Highest thunderstorm risk: %1$s, around %2$s.</string>
+    <string name="weather_thunder_line">%1$s: %2$s (CAPE %3$s J/kg, rain probability %4$d%%)</string>
+    <string name="weather_thunder_note">CAPE only describes the potential for thunderstorms, not whether they form. Based on a coarse weather model.</string>
+    <string name="weather_air_pm25">Fine particles PM2.5: %1$s µg/m³</string>
+    <string name="weather_air_pm10">Particles PM10: %1$s µg/m³</string>
+    <string name="weather_air_no2">Nitrogen dioxide: %1$s µg/m³</string>
+    <string name="weather_air_ozone">Ozone: %1$s µg/m³</string>
+    <string name="weather_air_unavailable">No air data available for this place.</string>
+    <string name="weather_pollen_title">Pollen</string>
+    <string name="weather_pollen_none">No pollen data for this place (Europe only) or no pollen at the moment.</string>
+    <string name="weather_bio_pressure">Pressure change</string>
+    <string name="weather_bio_humidity">Mugginess</string>
+    <string name="weather_bio_heat">Heat stress</string>
+    <string name="weather_bio_cold">Cold stress</string>
+    <string name="weather_bio_thermal_neutral">Thermal stress</string>
+    <string name="weather_bio_cape">Thunderstorm potential</string>
+    <string name="weather_bio_pressure_value">%1$s hPa in 3 h</string>
+    <string name="weather_bio_pressure_unknown">Not enough data</string>
+    <string name="weather_bio_humidity_value">Dew point %1$s °C</string>
+    <string name="weather_bio_heat_value">Heat index %1$s °C</string>
+    <string name="weather_bio_cold_value">Wind chill %1$s °C</string>
+    <string name="weather_bio_cape_value">CAPE %1$s J/kg</string>
+    <string name="weather_bio_neutral_value">Comfortable temperature range</string>
+    <string name="weather_bio_neutral_text">No special thermal stress.</string>
+    <string name="weather_bio_summary_none">Favorable bio-weather, no notable influences.</string>
+    <string name="weather_bio_summary">Bio-weather load: %1$s</string>
+    <string name="weather_bio_disclaimer">Guide values derived from weather data, not a substitute for medical advice.</string>
+    <string name="weather_sunrise">Sunrise %1$s</string>
+    <string name="weather_sunset">Sunset %1$s</string>
+    <string name="weather_sunshine">Sunshine today: %1$s h</string>
+    <string name="weather_moon_illumination">Illumination %1$s%%</string>
+    <string name="weather_moon_age">Moon age %1$s days</string>
+    <string name="weather_attr_open_meteo">Weather data: Open-Meteo.com (CC BY 4.0)</string>
+    <string name="weather_attr_cams">Air quality and pollen: CAMS (Copernicus Atmosphere Monitoring Service) via Open-Meteo</string>
+    <string name="weather_attr_osm">Place names: © OpenStreetMap contributors (ODbL)</string>
+    <string name="weather_privacy_note">Coordinates or search terms are sent to Open-Meteo (or your own weather server) and Nominatim when loading.</string>
+    <string name="weather_permission_location_button">Grant location permission</string>
+    <string name="weather_section_hours">Hourly values (tap for details)</string>
+    <string name="weather_section_wind">Wind (24 hours)</string>
+    <string name="weather_wind_hour_speed">%1$s km/h</string>
+    <string name="weather_wind_hour_gust">Gusts %1$s</string>
+    <string name="weather_section_sun">Sun</string>
+    <string name="weather_section_daylight">Daylight and twilight</string>
+    <string name="weather_section_moon">Moon</string>
+    <string name="weather_sunrise_azimuth">Sunrise %1$s, azimuth %2$s° (%3$s)</string>
+    <string name="weather_sunset_azimuth">Sunset %1$s, azimuth %2$s° (%3$s)</string>
+    <string name="weather_sun_position">Now: elevation %1$s° (%2$s), azimuth %3$s° (%4$s)</string>
+    <string name="weather_shadow_title">Shadow lengths</string>
+    <string name="weather_shadow_person">Person (%1$s m): shadow %2$s m</string>
+    <string name="weather_shadow_object">Object (%1$s m): shadow %2$s m</string>
+    <string name="weather_shadow_none">Sun below the horizon: no shadow.</string>
+    <string name="weather_shadow_edit">Adjust heights</string>
+    <string name="weather_shadow_dialog_title">Heights for shadow length</string>
+    <string name="weather_shadow_height_person">Person height (m)</string>
+    <string name="weather_shadow_height_object">Object height (m)</string>
+    <string name="weather_shadow_invalid">Enter values between 0.3 and 2.5 m (person) and 0.1 and 10 m (object).</string>
+    <string name="weather_save">Save</string>
+    <string name="weather_cancel">Cancel</string>
+    <string name="weather_close">Close</string>
+    <string name="weather_sunshine_week">Sunshine per day (hours)</string>
+    <string name="weather_uv_hourly_title">UV index by hour (tap for details)</string>
+    <string name="weather_uv_none_today">No relevant UV index today.</string>
+    <string name="weather_uv_dialog_title">%1$s: UV %2$s (%3$s)</string>
+    <string name="weather_uv_peak">Peak today: UV %1$s at %2$s</string>
+    <string name="weather_daylight_duration">Day length: %1$d h %2$d min</string>
+    <string name="weather_dawn">Dawn: %1$s</string>
+    <string name="weather_dusk">Dusk: %1$s</string>
+    <string name="weather_daylight_longer">Trend: %1$d min longer than yesterday</string>
+    <string name="weather_daylight_shorter">Trend: %1$d min shorter than yesterday</string>
+    <string name="weather_daylight_same">Trend: same length as yesterday</string>
+    <string name="weather_light_sunrise_soon">Sunrise in %1$d min</string>
+    <string name="weather_light_dark_morning">Still dark, sunrise in more than an hour.</string>
+    <string name="weather_light_sunset_soon">Sunset in %1$d min</string>
+    <string name="weather_light_dark_evening">The sun has set.</string>
+    <string name="weather_golden_hour">Golden hour (soft light for photos)
+Morning: %1$s – %2$s
+Evening: %3$s – %4$s</string>
+    <string name="weather_moon_event_today">%1$s: today</string>
+    <string name="weather_moon_event_tomorrow">%1$s: tomorrow</string>
+    <string name="weather_moon_event_in_days">%1$s: in %2$d days</string>
+    <string name="weather_moon_full_label">Full moon</string>
+    <string name="weather_moon_new_label">New moon</string>
+    <string name="weather_moon_zodiac">Moon sign (approximation): %1$s</string>
+    <string name="weather_detail_hour_title">%1$s – %2$s</string>
+    <string name="weather_detail_temp">Temperature: %1$s° (feels like %2$s°)</string>
+    <string name="weather_detail_precip">Precipitation: %1$s mm, probability %2$d%%</string>
+    <string name="weather_detail_wind">Wind: %1$s km/h from %2$s, gusts up to %3$s km/h (Bft %4$d)</string>
+    <string name="weather_detail_uv">UV index: %1$s (%2$s)</string>
+    <string name="weather_detail_pressure">Pressure: %1$s hPa</string>
+    <string name="weather_detail_cape">CAPE: %1$s J/kg</string>
+    <string name="weather_detail_minmax">Temperature: %1$s° to %2$s°</string>
+    <string name="weather_detail_wind_max">Wind up to %1$s km/h, gusts up to %2$s km/h</string>
+    <string name="weather_detail_sunshine">Sunshine: %1$s h</string>
+    <string name="weather_detail_sun">Sun: %1$s – %2$s</string>
+    <string-array name="weather_codes">
+        <item>Clear</item>
+        <item>Mostly clear</item>
+        <item>Partly cloudy</item>
+        <item>Overcast</item>
+        <item>Fog</item>
+        <item>Rime fog</item>
+        <item>Light drizzle</item>
+        <item>Drizzle</item>
+        <item>Heavy drizzle</item>
+        <item>Freezing drizzle</item>
+        <item>Heavy freezing drizzle</item>
+        <item>Light rain</item>
+        <item>Rain</item>
+        <item>Heavy rain</item>
+        <item>Freezing rain</item>
+        <item>Heavy freezing rain</item>
+        <item>Light snow</item>
+        <item>Snow</item>
+        <item>Heavy snow</item>
+        <item>Snow grains</item>
+        <item>Light rain showers</item>
+        <item>Rain showers</item>
+        <item>Violent rain showers</item>
+        <item>Light snow showers</item>
+        <item>Snow showers</item>
+        <item>Thunderstorm</item>
+        <item>Thunderstorm with slight hail</item>
+        <item>Thunderstorm with heavy hail</item>
+    </string-array>
+    <string-array name="weather_wind_dirs">
+        <item>north</item>
+        <item>northeast</item>
+        <item>east</item>
+        <item>southeast</item>
+        <item>south</item>
+        <item>southwest</item>
+        <item>west</item>
+        <item>northwest</item>
+    </string-array>
+    <string-array name="weather_beaufort">
+        <item>Calm</item>
+        <item>Light air</item>
+        <item>Light breeze</item>
+        <item>Gentle breeze</item>
+        <item>Moderate breeze</item>
+        <item>Fresh breeze</item>
+        <item>Strong breeze</item>
+        <item>Near gale</item>
+        <item>Gale</item>
+        <item>Strong gale</item>
+        <item>Storm</item>
+        <item>Violent storm</item>
+        <item>Hurricane</item>
+    </string-array>
+    <string-array name="weather_aqi_levels">
+        <item>Very good</item>
+        <item>Good</item>
+        <item>Fair</item>
+        <item>Poor</item>
+        <item>Very poor</item>
+        <item>Extremely poor</item>
+    </string-array>
+    <string-array name="weather_pollen_levels">
+        <item>None</item>
+        <item>Low</item>
+        <item>Moderate</item>
+        <item>High</item>
+        <item>Very high</item>
+    </string-array>
+    <string-array name="weather_pollen_types">
+        <item>Birch</item>
+        <item>Grass</item>
+        <item>Alder</item>
+        <item>Mugwort</item>
+        <item>Olive</item>
+        <item>Ragweed</item>
+    </string-array>
+    <string-array name="weather_uv_levels">
+        <item>Minimal</item>
+        <item>Low</item>
+        <item>Moderate</item>
+        <item>High</item>
+        <item>Very high</item>
+        <item>Extreme</item>
+    </string-array>
+    <string-array name="weather_moon_phases">
+        <item>New moon</item>
+        <item>Waxing crescent</item>
+        <item>First quarter</item>
+        <item>Waxing gibbous</item>
+        <item>Full moon</item>
+        <item>Waning gibbous</item>
+        <item>Last quarter</item>
+        <item>Waning crescent</item>
+    </string-array>
+    <string-array name="weather_bio_levels">
+        <item>None</item>
+        <item>Low</item>
+        <item>Moderate</item>
+        <item>High</item>
+        <item>Extreme</item>
+    </string-array>
+    <string-array name="weather_thunder_levels">
+        <item>Low</item>
+        <item>Elevated</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="weather_bio_pressure_text">
+        <item>Stable pressure, no weather-sensitivity effects expected.</item>
+        <item>Slight pressure change. Very sensitive people may notice mild tiredness.</item>
+        <item>Noticeable pressure change. Headaches, irritability or poor concentration are possible for weather-sensitive people.</item>
+        <item>Strong pressure change. Weather sensitivity likely: migraine, joint pain or circulation problems are possible. Plan rest breaks.</item>
+        <item>Extreme pressure change. Physically demanding, especially for chronically ill, elderly or weather-sensitive people. Reduce exertion.</item>
+    </string-array>
+    <string-array name="weather_bio_humidity_text">
+        <item>Comfortably dry, no mugginess effect.</item>
+        <item>Slightly humid, comfortable.</item>
+        <item>Noticeably muggy. Sweating cools less effectively, performance during activity is slightly reduced.</item>
+        <item>Clearly muggy. Circulation is under more strain. Drink enough and move activity to cooler hours.</item>
+        <item>Extremely muggy. Heat exhaustion possible. Strongly limit activity, drink a lot, seek shade.</item>
+    </string-array>
+    <string-array name="weather_bio_heat_text">
+        <item>Pleasant warmth, no heat stress.</item>
+        <item>Slight heat stress possible during sustained physical activity.</item>
+        <item>Moderate heat stress. Drink plenty and avoid midday heat.</item>
+        <item>Strong heat stress. Avoid intense activity, stay in the shade, drink enough.</item>
+        <item>Extreme heat stress. Risk of heat stroke. Reduce activity to a minimum.</item>
+    </string-array>
+    <string-array name="weather_bio_cold_text">
+        <item>Cool, but no critical cold stress.</item>
+        <item>Slight cold stress. Dress warmly.</item>
+        <item>Noticeable cold stress. Warm clothing needed, protect hands, head and feet.</item>
+        <item>Strong cold stress. Frostbite risk in wind without protective clothing. Limit time outdoors.</item>
+        <item>Extreme cold. Frostbite on bare skin is possible within minutes.</item>
+    </string-array>
+    <string-array name="weather_bio_cape_text">
+        <item>Low thunderstorm potential, no effect on well-being.</item>
+        <item>Elevated thunderstorm potential. Atmospheric instability can increase restlessness and discomfort.</item>
+        <item>High thunderstorm potential. Mood swings and circulation complaints are possible.</item>
+    </string-array>
+    <string-array name="weather_compass16">
+        <item>N</item>
+        <item>NNE</item>
+        <item>NE</item>
+        <item>ENE</item>
+        <item>E</item>
+        <item>ESE</item>
+        <item>SE</item>
+        <item>SSE</item>
+        <item>S</item>
+        <item>SSW</item>
+        <item>SW</item>
+        <item>WSW</item>
+        <item>W</item>
+        <item>WNW</item>
+        <item>NW</item>
+        <item>NNW</item>
+    </string-array>
+    <string-array name="weather_sun_elevation_levels">
+        <item>below the horizon</item>
+        <item>very low</item>
+        <item>low</item>
+        <item>medium</item>
+        <item>high</item>
+    </string-array>
+    <string-array name="weather_uv_advice">
+        <item>No relevant UV radiation, no sun protection needed.</item>
+        <item>Low UV exposure. No protection needed for most people.</item>
+        <item>Moderate UV exposure. Use sun protection during longer stays outdoors.</item>
+        <item>High UV exposure. Sun protection, hat and sunglasses recommended, avoid midday sun.</item>
+        <item>Very high UV exposure. Prefer shade, do not stay in the sun for long between 11 and 16.</item>
+        <item>Extreme UV exposure. Keep time outdoors as short as possible, full protection needed.</item>
+    </string-array>
+    <string-array name="weather_moon_astronomy">
+        <item>The moon is between Earth and Sun, its lit side faces away from Earth. It is not visible.</item>
+        <item>A thin crescent appears in the west shortly after sunset and sets soon after.</item>
+        <item>First quarter: the right half is lit. Moonrise around noon, moonset around midnight.</item>
+        <item>More than half is lit. The moon rises in the afternoon and stays visible into the night.</item>
+        <item>Earth is between Sun and Moon. The whole visible side is lit. Moonrise at sunset, moonset at sunrise.</item>
+        <item>The moon is waning and rises later each night. It is still in the sky in the morning.</item>
+        <item>Last quarter: the left half is lit. Moonrise around midnight, moonset around noon.</item>
+        <item>A thin crescent is visible in the east shortly before sunrise. A new cycle begins soon.</item>
+    </string-array>
+    <string-array name="weather_zodiac_signs">
+        <item>♈ Aries</item>
+        <item>♉ Taurus</item>
+        <item>♊ Gemini</item>
+        <item>♋ Cancer</item>
+        <item>♌ Leo</item>
+        <item>♍ Virgo</item>
+        <item>♎ Libra</item>
+        <item>♏ Scorpio</item>
+        <item>♐ Sagittarius</item>
+        <item>♑ Capricorn</item>
+        <item>♒ Aquarius</item>
+        <item>♓ Pisces</item>
+    </string-array>
+
+    <string name="weather_server_title">Weather server</string>
+    <string name="weather_server_hint">Optional: your own Open-Meteo-compatible server (self-hosted or subscription). Leave all fields empty to use the public Open-Meteo addresses.</string>
+    <string name="weather_server_forecast">Forecast server (HTTPS)</string>
+    <string name="weather_server_air">Air quality server (optional, otherwise the same server)</string>
+    <string name="weather_server_key">API key (optional)</string>
+    <string name="weather_server_privacy">The API key is stored encrypted and sent only to your own server, never to the public addresses. Place search always uses the public Open-Meteo geocoding service. The key is not part of the backup.</string>
+    <string name="weather_server_error_forecast_https">The forecast server address must start with https://.</string>
+    <string name="weather_server_error_forecast">Please enter a valid forecast server address. It is required for an air quality address or a key.</string>
+    <string name="weather_server_error_air_https">The air quality server address must start with https://.</string>
+    <string name="weather_server_error_air">Please enter a valid air quality server address.</string>
+    <string name="weather_server_error_key">The key must not contain spaces and may have at most 200 characters.</string>
+    <string name="weather_server_error_store">Could not save securely on this device.</string>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="qr_title">Scan QR code</string>
+    <string name="qr_hint">Hold the QR code inside the frame</string>
+    <string name="qr_close">Close</string>
+    <string name="qr_torch_on">Light on</string>
+    <string name="qr_torch_off">Light off</string>
+    <string name="qr_from_image">Read from image</string>
+    <string name="qr_no_code_in_image">No QR code found in this image</string>
+    <string name="qr_camera_permission">The camera is only used to read QR codes. Images are not stored or sent anywhere.</string>
+    <string name="qr_camera_grant">Allow camera</string>
+    <string name="qr_camera_settings">App settings</string>
+    <string name="qr_type_url">Link</string>
+    <string name="qr_type_phone">Phone number</string>
+    <string name="qr_type_sms">Text message</string>
+    <string name="qr_type_email">E-mail</string>
+    <string name="qr_type_geo">Location</string>
+    <string name="qr_type_wifi">Wi-Fi network</string>
+    <string name="qr_type_vcard">Contact card</string>
+    <string name="qr_type_text">Text</string>
+    <string name="qr_link_warning">The link is not opened automatically. Check the address before opening it.</string>
+    <string name="qr_open_link">Open link</string>
+    <string name="qr_call">Open dialer</string>
+    <string name="qr_sms">Write text message</string>
+    <string name="qr_email">Write e-mail</string>
+    <string name="qr_map">Show on map</string>
+    <string name="qr_copy_password">Copy password</string>
+    <string name="qr_search_web">Search the web</string>
+    <string name="qr_copy_text">Copy text</string>
+    <string name="qr_save_file">Save as file …</string>
+    <string name="qr_scan_again">Scan again</string>
+    <string name="qr_saved">File saved</string>
+    <string name="qr_save_failed">File could not be saved</string>
+    <string name="qr_no_app">No app available for this action</string>
+    <string name="qr_wifi_network">Network: %1$s</string>
+    <string name="qr_wifi_password">Password: %1$s</string>
+    <string name="qr_wifi_security">Security: %1$s</string>
+    <string name="qr_wifi_hidden">Hidden network</string>
+    <string name="qr_vcard_hint">Save the file to import it in your contacts app.</string>
+    <string name="qr_binary_hint">The code contains binary data. It can be saved as a file.</string>
+</resources>

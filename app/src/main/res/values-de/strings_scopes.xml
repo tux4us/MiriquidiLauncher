@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_app_favorites">App-Favoriten</string>
+    <string name="scope_contact_favorites">Kontakt-Favoriten</string>
+    <string name="scope_app_groups">App-Gruppen</string>
+
+    <string name="app_favorites_empty">Noch keine Favoriten. Über „Hinzufügen“ oder per langem Drücken auf eine App in der App-Liste.</string>
+    <string name="scope_add">Hinzufügen</string>
+    <string name="scope_done">Fertig</string>
+    <string name="scope_cancel">Abbrechen</string>
+    <string name="scope_move_earlier">Nach vorn</string>
+    <string name="scope_move_later">Nach hinten</string>
+    <string name="scope_remove">Entfernen</string>
+    <string name="scope_search_apps">Apps suchen</string>
+    <string name="scope_no_apps_found">Keine Apps gefunden</string>
+
+    <string name="contact_favorites_empty">Noch keine Kontakt-Favoriten. Über „Kontakt hinzufügen“ einen Kontakt aus dem Adressbuch wählen.</string>
+    <string name="contact_add">Kontakt hinzufügen</string>
+    <string name="contact_ways_title">%1$s</string>
+    <string name="contact_ways_loading">Kontaktwege werden gesucht …</string>
+    <string name="contact_ways_open_contact">Kontakt öffnen</string>
+    <string name="contact_ways_call">Anrufen</string>
+    <string name="contact_ways_sms">SMS</string>
+    <string name="contact_ways_email">E-Mail</string>
+    <string name="contact_ways_hint_no_permission">Ohne Zugriff auf die Kontakte sind nur Anruf und SMS mit der gespeicherten Nummer möglich. Messenger wie Signal oder Telegram erscheinen, sobald der Zugriff erlaubt ist.</string>
+    <string name="contact_ways_allow">Zugriff erlauben</string>
+    <string name="contact_ways_failed">Der Weg konnte nicht geöffnet werden</string>
+    <string name="contact_remove_favorite_title">%1$s aus den Kontakt-Favoriten entfernen?</string>
+
+    <string name="groups_empty">Noch keine Gruppen. Mit „Gruppe anlegen“ z. B. „Messenger“ oder „Finanzen“ erstellen und Apps hineinlegen.</string>
+    <string name="group_create">Gruppe anlegen</string>
+    <string name="group_create_title">Neue Gruppe</string>
+    <string name="group_rename_title">Gruppe umbenennen</string>
+    <string name="group_name_hint">Name der Gruppe</string>
+    <string name="group_name_blank">Bitte einen Namen eingeben</string>
+    <string name="group_name_taken">Diesen Namen gibt es schon</string>
+    <string name="group_limit_reached">Die Höchstzahl an Gruppen ist erreicht</string>
+    <string name="group_save">Speichern</string>
+    <string name="group_rename">Umbenennen</string>
+    <string name="group_delete">Gruppe löschen</string>
+    <string name="group_delete_title">Gruppe „%1$s“ löschen?</string>
+    <string name="group_delete_text">Die Apps selbst bleiben installiert; es wird nur die Gruppe entfernt.</string>
+    <string name="group_empty">Noch keine Apps in dieser Gruppe</string>
+    <string name="group_add_apps">Apps hinzufügen</string>
+    <string name="group_apps_count">%1$d Apps</string>
+    <string name="group_expand">Gruppe öffnen</string>
+    <string name="group_collapse">Gruppe schließen</string>
+    <string name="group_pick_title">Apps für „%1$s“</string>
+    <string name="group_move_earlier">Gruppe nach oben</string>
+    <string name="group_move_later">Gruppe nach unten</string>
+</resources>

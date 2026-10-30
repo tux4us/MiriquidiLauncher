@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Pfade, für die der FileProvider Freigaben erzeugen darf: der gesamte Dateibaum, weil der Dateimanager Dateien
+     auf jedem Speicher öffnet und teilt. Freigaben entstehen nur auf ausdrückliche Aktion des Nutzers. -->
+<paths>
+    <root-path name="root" path="" />
+</paths>

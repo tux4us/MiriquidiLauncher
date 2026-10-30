@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="qr_title">QR-Code scannen</string>
+    <string name="qr_hint">QR-Code in den Rahmen halten</string>
+    <string name="qr_close">Schließen</string>
+    <string name="qr_torch_on">Licht an</string>
+    <string name="qr_torch_off">Licht aus</string>
+    <string name="qr_from_image">Aus Bild lesen</string>
+    <string name="qr_no_code_in_image">Im Bild wurde kein QR-Code gefunden</string>
+    <string name="qr_camera_permission">Die Kamera wird nur zum Lesen von QR-Codes verwendet. Bilder werden weder gespeichert noch gesendet.</string>
+    <string name="qr_camera_grant">Kamera erlauben</string>
+    <string name="qr_camera_settings">App-Einstellungen</string>
+    <string name="qr_type_url">Link</string>
+    <string name="qr_type_phone">Telefonnummer</string>
+    <string name="qr_type_sms">SMS</string>
+    <string name="qr_type_email">E-Mail</string>
+    <string name="qr_type_geo">Standort</string>
+    <string name="qr_type_wifi">WLAN-Netzwerk</string>
+    <string name="qr_type_vcard">Kontaktkarte</string>
+    <string name="qr_type_text">Text</string>
+    <string name="qr_link_warning">Der Link wird nicht automatisch geöffnet. Prüfe die Adresse, bevor du sie öffnest.</string>
+    <string name="qr_open_link">Link öffnen</string>
+    <string name="qr_call">Wähl-App öffnen</string>
+    <string name="qr_sms">SMS schreiben</string>
+    <string name="qr_email">E-Mail schreiben</string>
+    <string name="qr_map">Auf Karte zeigen</string>
+    <string name="qr_copy_password">Passwort kopieren</string>
+    <string name="qr_search_web">Im Web suchen</string>
+    <string name="qr_copy_text">Text kopieren</string>
+    <string name="qr_save_file">Als Datei speichern …</string>
+    <string name="qr_scan_again">Erneut scannen</string>
+    <string name="qr_saved">Datei gespeichert</string>
+    <string name="qr_save_failed">Datei konnte nicht gespeichert werden</string>
+    <string name="qr_no_app">Keine App für diese Aktion vorhanden</string>
+    <string name="qr_wifi_network">Netzwerk: %1$s</string>
+    <string name="qr_wifi_password">Passwort: %1$s</string>
+    <string name="qr_wifi_security">Sicherheit: %1$s</string>
+    <string name="qr_wifi_hidden">Verstecktes Netzwerk</string>
+    <string name="qr_vcard_hint">Speichere die Datei, um sie in der Kontakte-App zu importieren.</string>
+    <string name="qr_binary_hint">Der Code enthält Binärdaten. Sie lassen sich als Datei speichern.</string>
+</resources>

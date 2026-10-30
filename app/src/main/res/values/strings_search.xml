@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="settings_target_wifi">Wi-Fi</string>
+    <string name="settings_target_bluetooth">Bluetooth</string>
+    <string name="settings_target_airplane">Airplane mode</string>
+    <string name="settings_target_mobile_network">Mobile network and SIM</string>
+    <string name="settings_target_wireless">Network and connections</string>
+    <string name="settings_target_vpn">VPN</string>
+    <string name="settings_target_nfc">NFC</string>
+    <string name="settings_target_display">Display</string>
+    <string name="settings_target_sound">Sound and volume</string>
+    <string name="settings_target_battery">Battery</string>
+    <string name="settings_target_battery_saver">Battery saver</string>
+    <string name="settings_target_storage">Storage</string>
+    <string name="settings_target_apps">Manage apps</string>
+    <string name="settings_target_default_apps">Default apps</string>
+    <string name="settings_target_home">Default launcher</string>
+    <string name="settings_target_location">Location</string>
+    <string name="settings_target_privacy">Privacy</string>
+    <string name="settings_target_security">Security and screen lock</string>
+    <string name="settings_target_accessibility">Accessibility</string>
+    <string name="settings_target_language">Language</string>
+    <string name="settings_target_keyboard">Keyboard</string>
+    <string name="settings_target_date">Date and time</string>
+    <string name="settings_target_accounts">Accounts and sync</string>
+    <string name="settings_target_print">Printing</string>
+    <string name="settings_target_developer">Developer options</string>
+    <string name="settings_target_about">About phone</string>
+    <string name="settings_target_settings">Settings</string>
+    <string name="search_action_settings_hint">Android settings</string>
+    <string name="search_action_copy_hint">Tap to copy the result</string>
+    <string name="search_action_copied">Copied</string>
+    <string name="search_action_call">Call: %1$s</string>
+    <string name="search_action_sms">Text %1$s</string>
+    <string name="search_action_email">Email %1$s</string>
+    <string name="search_action_open_url">Open: %1$s</string>
+    <string name="search_action_web">Search the web: %1$s</string>
+</resources>

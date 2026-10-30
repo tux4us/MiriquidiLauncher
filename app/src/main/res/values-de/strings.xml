@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="app_name">MiriquidiLauncher</string>
+
+    <string name="search_hint">In Apps, Kontakten und im Web suchen</string>
+    <string name="search_clear">Suche leeren</string>
+    <string name="search_no_results">Keine Treffer</string>
+    <string name="search_enable_contacts">Kontaktsuche erlauben</string>
+    <string name="search_contacts_rationale">Kontakte werden ausschließlich auf diesem Gerät durchsucht und nirgendwohin übertragen.</string>
+
+    <string name="quick_menu">Schnellmenü</string>
+    <string name="quick_menu_empty">Noch keine Favoriten. App in der App-Liste lange drücken.</string>
+    <string name="quick_menu_contacts">Anruf-Schnellmenü</string>
+    <string name="quick_menu_contacts_empty">Noch keine Favoriten-Kontakte. Kurz auf den Anruf-Button tippen, um welche hinzuzufügen.</string>
+    <string name="quick_menu_add_contact">Kontakt hinzufügen</string>
+    <string name="quick_menu_scopes">Scopes</string>
+    <string name="scope_settings">Einstellungen</string>
+    <string name="scope_weather">Wetter</string>
+    <string name="scope_home">Zurück zur Startseite</string>
+    <string name="scope_calendar">Kalender</string>
+    <string name="scope_feed">FeedReader</string>
+
+    <string name="calendar_mode_day">Tag</string>
+    <string name="calendar_mode_week">Woche</string>
+    <string name="calendar_mode_month">Monat</string>
+    <string name="calendar_today">Heute</string>
+    <string name="calendar_previous">Zurück</string>
+    <string name="calendar_next">Weiter</string>
+    <string name="calendar_permission_text">Kalendertermine werden nur auf diesem Gerät gelesen und nirgendwohin gesendet.</string>
+    <string name="calendar_permission_action">Kalenderzugriff erlauben</string>
+    <string name="calendar_permission_settings">App-Einstellungen</string>
+    <string name="calendar_no_events">Keine Termine</string>
+    <string name="calendar_all_day">Ganztägig</string>
+    <string name="calendar_untitled">(Ohne Titel)</string>
+    <string name="calendar_open">Im Kalender öffnen</string>
+    <string name="calendar_close">Schließen</string>
+    <string name="call_title">%1$s anrufen?</string>
+    <string name="call_action">Anrufen</string>
+    <string name="call_action_dial">Telefon-App öffnen</string>
+    <string name="call_cancel">Abbrechen</string>
+    <string name="call_failed">Anruf konnte nicht gestartet werden</string>
+    <string name="contact_pick_failed">Keine Kontaktauswahl verfügbar</string>
+    <string name="contact_remove_title">%1$s aus dem Anruf-Menü entfernen?</string>
+    <string name="contact_remove">Entfernen</string>
+    <string name="all_apps">Alle Apps</string>
+
+    <string name="menu_add_favorite">Zu Favoriten hinzufügen</string>
+    <string name="menu_remove_favorite">Aus Favoriten entfernen</string>
+    <string name="menu_app_info">App-Info</string>
+    <string name="menu_uninstall">Deinstallieren</string>
+
+    <string name="launch_failed">App konnte nicht gestartet werden</string>
+
+    <string name="calendar_new">Neu</string>
+    <string name="calendar_edit">Bearbeiten</string>
+    <string name="calendar_delete">Löschen</string>
+    <string name="calendar_save">Speichern</string>
+    <string name="calendar_cancel">Abbrechen</string>
+    <string name="calendar_editor_new">Neuer Termin</string>
+    <string name="calendar_editor_edit">Termin bearbeiten</string>
+    <string name="calendar_field_title">Titel</string>
+    <string name="calendar_field_calendar">Kalender</string>
+    <string name="calendar_field_start">Beginn</string>
+    <string name="calendar_field_end">Ende</string>
+    <string name="calendar_field_repeat">Wiederholung</string>
+    <string name="calendar_field_reminder">Erinnerung</string>
+    <string name="calendar_field_location">Ort</string>
+    <string name="calendar_field_description">Beschreibung</string>
+    <string name="calendar_choose">Kalender wählen</string>
+    <string name="calendar_fixed_calendar">Der Kalender eines bestehenden Termins kann nicht geändert werden.</string>
+    <string name="calendar_none_writable">Kein beschreibbarer Kalender gefunden. Lege einen lokalen Kalender auf diesem Gerät an oder richte einen Nextcloud-Kalender mit DAVx5 oder ICSx5 ein.</string>
+    <string name="calendar_create_local">Lokalen Kalender anlegen</string>
+    <string name="calendar_repeat_none">Keine Wiederholung</string>
+    <string name="calendar_repeat_daily">Täglich</string>
+    <string name="calendar_repeat_weekly">Wöchentlich</string>
+    <string name="calendar_repeat_monthly">Monatlich</string>
+    <string name="calendar_repeat_yearly">Jährlich</string>
+    <string name="calendar_repeat_keep">Bestehende Regel beibehalten</string>
+    <string name="calendar_reminder_none">Keine Erinnerung</string>
+    <string name="calendar_reminder_at_start">Zum Beginn</string>
+    <string name="calendar_reminder_hour">1 Stunde vorher</string>
+    <string name="calendar_reminder_two_hours">2 Stunden vorher</string>
+    <string name="calendar_reminder_day">1 Tag vorher</string>
+    <string name="calendar_reminder_minutes">%1$d Minuten vorher</string>
+    <string name="calendar_series_hint">Änderungen gelten für die gesamte Serie.</string>
+    <string name="calendar_error_end">Das Ende darf nicht vor dem Beginn liegen.</string>
+    <string name="calendar_error_no_calendar">Bitte einen Kalender wählen.</string>
+    <string name="calendar_delete_title">Termin löschen?</string>
+    <string name="calendar_delete_text">„%1$s“ wird aus dem Kalender gelöscht. Bei wiederkehrenden Terminen wird die gesamte Serie gelöscht.</string>
+    <string name="calendar_notice_saved">Termin gespeichert</string>
+    <string name="calendar_notice_deleted">Termin gelöscht</string>
+    <string name="calendar_notice_save_failed">Termin konnte nicht gespeichert werden</string>
+    <string name="calendar_notice_delete_failed">Termin konnte nicht gelöscht werden</string>
+    <string name="calendar_notice_load_failed">Termin konnte nicht geladen werden</string>
+    <string name="calendar_notice_calendar_created">Lokaler Kalender angelegt</string>
+    <string name="calendar_notice_calendar_failed">Kalender konnte nicht angelegt werden</string>
+</resources>

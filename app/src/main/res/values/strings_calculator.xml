@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_calculator">Calculator</string>
+
+    <string name="calc_expression">Expression</string>
+    <string name="calc_result">Result</string>
+    <string name="calc_result_preview">Result preview</string>
+    <string name="calc_empty_hint">Enter a calculation</string>
+    <string name="calc_equals">Equals</string>
+    <string name="calc_clear">Clear</string>
+    <string name="calc_backspace">Delete last character</string>
+    <string name="calc_cursor_left">Cursor left</string>
+    <string name="calc_cursor_right">Cursor right</string>
+    <string name="calc_copy_result">Tap to copy the result</string>
+
+    <string name="calc_functions">Scientific functions</string>
+    <string name="calc_second">2nd</string>
+    <string name="calc_second_description">Second function layer</string>
+    <string name="calc_angle_description">Angle unit: %1$s. Tap to change.</string>
+    <string name="calc_angle_deg">degrees</string>
+    <string name="calc_angle_rad">radians</string>
+    <string name="calc_angle_grad">gradians</string>
+    <string name="calc_memory_value">Memory: %1$s</string>
+    <string name="calc_memory_clear">Clear memory</string>
+    <string name="calc_memory_recall">Insert memory value</string>
+    <string name="calc_memory_add">Add to memory</string>
+    <string name="calc_memory_subtract">Subtract from memory</string>
+    <string name="calc_answer">Previous result</string>
+
+    <string name="calc_history">History</string>
+    <string name="calc_history_empty">No calculations yet.</string>
+    <string name="calc_history_hint">Tap the expression to reuse it, tap the result to insert it.</string>
+    <string name="calc_history_clear">Clear history</string>
+    <string name="calc_history_close">Close</string>
+
+    <string name="calc_error_syntax">Incomplete or invalid expression</string>
+    <string name="calc_error_divide">Division by zero</string>
+    <string name="calc_error_domain">Not defined for this value</string>
+    <string name="calc_error_overflow">Result too large</string>
+
+    <string name="search_action_open_calculator">Open in Calculator</string>
+    <string name="search_action_open_calculator_hint">Continue %1$s in the Calculator scope</string>
+</resources>

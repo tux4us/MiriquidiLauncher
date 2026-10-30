@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Optional: Kontaktsuche. Wird erst zur Laufzeit auf Wunsch des Nutzers angefragt. -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- Optional: Anruf-Schnellmenü. Mit CALL_PHONE wird direkt gewählt (nach Bestätigung), sonst öffnet sich
+         die Telefon-App mit der vorbelegten Nummer. READ_PHONE_STATE dient nur dazu, bei mehreren SIM-Karten
+         die Auswahl anzubieten. Beide werden erst bei der ersten Nutzung angefragt. -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <!-- Netzwerknutzung des Launchers, nur auf Wunsch des Nutzers und nur über HTTPS:
+         - Wetterseite: Vorhersage und Ortssuche (Open-Meteo, Nominatim); übertragen werden nur Koordinaten
+           bzw. der eingegebene Ortsname.
+         - FeedReader: Abruf der Artikel von der eigenen Nextcloud (News-App) mit Benutzername und App-Passwort;
+           Vorschaubilder und die Leseansicht laden Bilder von den Servern der Feed-Quellen (abschaltbar).
+         - Podcast-Seite: Abruf der abonnierten Feeds, Suche im gewählten Verzeichnis (Apple Podcasts oder fyyd),
+           Streaming und Download der Folgen von den Servern der Podcast-Anbieter. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Podcast-Wiedergabe als Vordergrunddienst vom Typ "mediaPlayback" (Benachrichtigung mit Steuerung,
+         Sperrbildschirm, Kopfhörertasten). POST_NOTIFICATIONS (ab Android 13) wird beim ersten Abspielen
+         angefragt; ohne sie läuft die Wiedergabe weiter, nur die Benachrichtigung fehlt. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Optional: grober Standort für die Wetterseite, wird erst beim Tippen auf "Aktuellen Standort verwenden"
+         angefragt. Der Standort verlässt das Gerät nur als gerundete Koordinaten beim Wetterabruf. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <!-- Optional: Kalenderseite (Scope "Kalender"). Termine werden nur gelesen und nur auf dem Gerät angezeigt;
+         die Berechtigung wird erst beim Tippen auf "Kalender freigeben" angefragt. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <!-- Optional: Termine im Gerätekalender anlegen, ändern und löschen. Wird erst beim Tippen auf "Neu",
+         "Bearbeiten" oder "Löschen" angefragt. Nextcloud-Kalender funktionieren über DAVx5/ICSx5, die sie
+         in den Gerätekalender synchronisieren; die App selbst spricht kein CalDAV. -->
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <!-- Nur bis Android 10: Backup-Export in den öffentlichen Download-Ordner (bis Android 9) und Scope "Dateien"
+         (bis Android 10, mit requestLegacyExternalStorage). Ab Android 11 genügt dort MANAGE_EXTERNAL_STORAGE. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <!-- Erforderlich für ACTION_DELETE (App deinstallieren) ab Android 9. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
+    <!-- Optional: Scope "System", Karten "Cache je App" und "Speicherbaum". Beide Zugriffe sind Spezialzugriffe, die
+         der Nutzer in den Systemeinstellungen selbst erteilt; ohne sie bleiben die Karten bei einem Hinweis.
+         - PACKAGE_USAGE_STATS (Nutzungszugriff): nur um die Daten- und Cachegrößen anderer Apps zu lesen
+           (StorageStatsManager). Die Nutzungsdaten selbst (welche App wann lief) werden nicht gelesen.
+         - MANAGE_EXTERNAL_STORAGE (Zugriff auf alle Dateien, ab Android 11) bzw. READ_EXTERNAL_STORAGE (bis Android 10):
+           auch die Grundlage der Scope "Dateien" (Dateimanager), die Dateien nur auf Befehl des Nutzers liest und ändert;
+           nur um Ordnergrößen im gemeinsamen Speicher zu summieren. Dateiinhalte werden nicht gelesen. -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+
+    <!-- Optional: Scope "Galerie". Liest Fotos und Videos nur über die Mediathek des Geräts (MediaStore) und nur,
+         solange die Seite geöffnet ist. Ab Android 13 getrennte Medienrechte, ab Android 14 auch die vom Nutzer
+         ausgewählten Medien (READ_MEDIA_VISUAL_USER_SELECTED); bis Android 12 gilt READ_EXTERNAL_STORAGE (oben).
+         Löschen, Verschieben und der Papierkorb nutzen MANAGE_EXTERNAL_STORAGE (oben). Kein Netzwerkzugriff. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+    <!-- Optional: QR-Scanner im Suchfeld und Scope "Kamera". Die Kamera wird erst beim Öffnen des Scanners bzw. der
+         Kamera-Seite angefragt. Der Scanner liest nur QR-Codes (Dekodierung auf dem Gerät mit ZXing) und speichert
+         oder sendet keine Bilder. Die Kamera-Seite speichert Fotos und Videos nur in der Mediathek des Geräts
+         (Pictures/Movies, Ordner MiriquidiLauncher); es werden weder Standortdaten abgefragt noch Aufnahmen gesendet. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <!-- Optional: Ton bei Videoaufnahmen in der Scope "Kamera". Wird erst beim Wechsel in den Videomodus angefragt;
+         ohne die Berechtigung wird ohne Ton aufgenommen. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
+    <!-- Paketsichtbarkeit (Android 11+) ohne QUERY_ALL_PACKAGES: nur Apps mit Launcher-Aktivität. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <!-- Kamera-Apps für den Kamera-Button neben dem Suchfeld. -->
+        <intent>
+            <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:localeConfig="@xml/locales_config"
+        android:theme="@style/Theme.MiriquidiLauncher">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:stateNotNeeded="true"
+            android:taskAffinity=""
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Öffnen und Teilen von Dateien aus der Scope "Dateien": Der Provider ist nicht exportiert; jede Freigabe
+             gilt nur für die Dateien, die ein Intent der App ausdrücklich nennt. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Podcast-Wiedergabe (Media3). exported="true" mit dem Media3-Intent-Filter ist nötig, damit Systemoberfläche,
+             Bluetooth und Kopfhörertasten die Mediensitzung steuern können. -->
+        <service
+            android:name=".podcasts.PlaybackService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>

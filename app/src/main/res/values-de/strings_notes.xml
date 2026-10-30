@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_notes">Notizen</string>
+    <string name="notes_permission_text">Die Notizen liegen als Markdown-Dateien im Ordner Documents/MiriquidiNotes. Dafür braucht die App den Zugriff auf alle Dateien. Android fragt dies in den Systemeinstellungen ab; es werden nur die Notizen gelesen und geändert.</string>
+    <string name="notes_permission_grant">Zugriff erteilen</string>
+    <string name="notes_tab_all">Alle</string>
+    <string name="notes_tab_favorites">Favoriten</string>
+    <string name="notes_tab_trash">Papierkorb</string>
+    <string name="notes_new">Neue Notiz</string>
+    <string name="notes_search">Suchen</string>
+    <string name="notes_search_hint">In Notizen suchen</string>
+    <string name="notes_search_close">Schließen</string>
+    <string name="notes_sort_modified">Geändert</string>
+    <string name="notes_sort_title">Titel</string>
+    <string name="notes_category_all">Alle Kategorien</string>
+    <string name="notes_category">Kategorie</string>
+    <string name="notes_category_hint">Kategorie (z. B. Arbeit/Projekte, leer = keine)</string>
+    <string name="notes_apply">Übernehmen</string>
+    <string name="notes_selected">Ausgewählt: %1$d</string>
+    <string name="notes_favorite">Favorit</string>
+    <string name="notes_unfavorite">Kein Favorit</string>
+    <string name="notes_trash">In den Papierkorb</string>
+    <string name="notes_cancel">Abbrechen</string>
+    <string name="notes_close">Schließen</string>
+    <string name="notes_empty">Noch keine Notizen.</string>
+    <string name="notes_empty_favorites">Noch keine Favoriten.</string>
+    <string name="notes_empty_search">Keine Treffer.</string>
+    <string name="notes_back">‹ Zurück</string>
+    <string name="notes_edit">Bearbeiten</string>
+    <string name="notes_preview">Vorschau</string>
+    <string name="notes_share">Teilen</string>
+    <string name="notes_untitled">Neue Notiz</string>
+    <string name="notes_placeholder">Erste Zeile = Titel. Markdown: # Überschrift, **fett**, - [ ] Aufgabe</string>
+    <string name="notes_saved">gespeichert</string>
+    <string name="notes_unsaved">wird gespeichert …</string>
+    <string name="notes_trash_info">Gelöschte Notizen bleiben %1$d Tage im Papierkorb und werden danach endgültig entfernt.</string>
+    <string name="notes_trash_none">Der Papierkorb ist leer.</string>
+    <string name="notes_trash_restore_all">Alle wiederherstellen</string>
+    <string name="notes_trash_restore_selected">Auswahl wiederherstellen</string>
+    <string name="notes_trash_purge">Endgültig löschen</string>
+    <string name="notes_trash_purge_confirm">Anzahl der Notizen: %1$d. Endgültig löschen? Das lässt sich nicht rückgängig machen.</string>
+    <string name="notes_nextcloud">Nextcloud</string>
+    <string name="notes_nextcloud_connect">Mit Nextcloud verbinden</string>
+    <string name="notes_sync">Abgleichen</string>
+    <string name="notes_logout">Abmelden</string>
+    <string name="notes_never">noch nie</string>
+    <string name="notes_last_sync">Letzter Abgleich: %1$s</string>
+    <string name="notes_account_hint">Beim Abmelden bleiben alle Notizen auf diesem Gerät erhalten; nur Zugangsdaten und Zuordnung werden gelöscht.</string>
+    <string name="notes_login_hint">Nextcloud-Adresse, Benutzername und ein App-Passwort (Nextcloud: Einstellungen → Sicherheit). Die Notes-App muss auf dem Server installiert sein. Nur HTTPS.</string>
+    <string name="notes_login_server">Server (https://…)</string>
+    <string name="notes_login_user">Benutzername</string>
+    <string name="notes_login_password">App-Passwort</string>
+    <string name="notes_login_action">Anmelden</string>
+    <string name="notes_login_from_feed">Zugang vom FeedReader übernehmen</string>
+    <string name="notes_login_invalid_url">Die Serveradresse ist ungültig.</string>
+    <string name="notes_login_not_https">Nur HTTPS-Adressen sind erlaubt.</string>
+    <string name="notes_login_auth">Benutzername oder App-Passwort wurde abgelehnt.</string>
+    <string name="notes_login_not_found">Die Notes-App wurde auf dem Server nicht gefunden.</string>
+    <string name="notes_login_network">Der Server ist nicht erreichbar.</string>
+    <string name="notes_login_keystore">Das Passwort lässt sich auf diesem Gerät nicht sicher speichern.</string>
+    <string name="notes_feed_account_missing">Im FeedReader ist kein Nextcloud-Zugang gespeichert.</string>
+    <string name="notes_sync_done">Abgleich fertig: %1$d geladen, %2$d gesendet, %3$d gelöscht.</string>
+    <string name="notes_sync_conflicts">Konflikte: %1$d (beide Fassungen bleiben erhalten).</string>
+    <string name="notes_sync_failed_count">Fehlgeschlagen: %1$d.</string>
+    <string name="notes_sync_auth">Abgleich abgelehnt: Zugangsdaten prüfen.</string>
+    <string name="notes_sync_not_found">Die Notes-App wurde auf dem Server nicht gefunden.</string>
+    <string name="notes_sync_network">Abgleich fehlgeschlagen: Server nicht erreichbar.</string>
+    <string name="notes_save_failed">Speichern fehlgeschlagen.</string>
+    <string name="notes_move_failed">Verschieben fehlgeschlagen.</string>
+    <string name="notes_no_app">Keine passende App gefunden.</string>
+    <string name="notes_done_trash">In den Papierkorb verschoben: %1$d</string>
+    <string name="notes_done_restore">Wiederhergestellt: %1$d</string>
+    <string name="notes_done_purge">Endgültig gelöscht: %1$d</string>
+    <string name="notes_partly_failed">Erledigt: %1$d, fehlgeschlagen: %2$d</string>
+    <string name="notes_notice_dismiss">OK</string>
+</resources>

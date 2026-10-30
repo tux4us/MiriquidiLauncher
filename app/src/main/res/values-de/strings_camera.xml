@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="camera_open">Kamera öffnen</string>
+    <string name="camera_none">Keine Kamera-App gefunden</string>
+    <string name="camera_failed">Die Kamera-App konnte nicht gestartet werden</string>
+    <string name="camera_choose_title">Kamera-App wählen</string>
+    <string name="camera_choose_hint">„Einmal“ startet die App jetzt. „Immer“ merkt sie sich für diesen Button. Die Auswahl lässt sich durch langes Drücken auf den Button ändern.</string>
+    <string name="camera_once">Einmal</string>
+    <string name="camera_always">Immer</string>
+    <string name="camera_reset">Standard zurücksetzen</string>
+    <string name="camera_cancel">Abbrechen</string>
+    <string name="camera_saved_marker">%1$s (Standard)</string>
+</resources>

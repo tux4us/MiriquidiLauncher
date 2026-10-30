@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="feed_title">FeedReader</string>
+    <string name="feed_refresh">Refresh</string>
+    <string name="feed_account">Account</string>
+    <string name="feed_filter_unread">Unread</string>
+    <string name="feed_filter_all">All</string>
+    <string name="feed_updated">Updated %1$s</string>
+    <string name="feed_empty_unread">No unread articles</string>
+    <string name="feed_empty_all">No articles</string>
+    <string name="feed_load_more">Load more</string>
+    <string name="feed_retry">Try again</string>
+    <string name="feed_untitled">(No title)</string>
+    <string name="feed_back">Back</string>
+    <string name="feed_open_browser">Open in browser</string>
+    <string name="feed_close">Close</string>
+
+    <string name="feed_login_title">Connect to Nextcloud News</string>
+    <string name="feed_login_text">Articles come from the News app of your Nextcloud. Use an app password (Nextcloud: Settings → Security → Devices &amp; sessions → Create new app password), not your main password. The password is stored encrypted on this device and sent only to your server.</string>
+    <string name="feed_server_label">Server address</string>
+    <string name="feed_user_label">User name</string>
+    <string name="feed_password_label">App password</string>
+    <string name="feed_login_action">Sign in</string>
+
+    <string name="feed_account_title">Nextcloud account</string>
+    <string name="feed_account_server">Server: %1$s</string>
+    <string name="feed_account_user">User: %1$s</string>
+    <string name="feed_load_images">Load images</string>
+    <string name="feed_load_images_hint">Images are fetched directly from the servers of the feed sources, which can see your IP address.</string>
+    <string name="feed_logout">Sign out</string>
+
+    <string name="feed_problem_network">Server not reachable. The last saved articles are shown.</string>
+    <string name="feed_problem_auth">Sign-in rejected. Check the user name and the app password.</string>
+    <string name="feed_problem_not_found">News app not found on this server. Check the address and that the News app is installed.</string>
+    <string name="feed_problem_server">The server reported an error.</string>
+    <string name="feed_problem_data">The response could not be read. Is this a Nextcloud with the News app?</string>
+    <string name="feed_problem_storage">The password could not be stored securely on this device.</string>
+    <string name="feed_problem_url_empty">Enter the server address.</string>
+    <string name="feed_problem_url_not_https">Only HTTPS addresses are supported, because the password is sent to the server.</string>
+    <string name="feed_problem_url_invalid">The server address is invalid.</string>
+    <string name="feed_problem_input_missing">Enter the user name and the app password.</string>
+
+    <string name="feed_local_title">Without Nextcloud</string>
+    <string name="feed_local_text">Add feeds yourself: enter the address of a feed or of a website, or import an OPML or JSON Feed file. The app fetches the feeds directly over HTTPS; the read status stays on this device.</string>
+    <string name="feed_add_label">Feed or website address</string>
+    <string name="feed_add_action">Add</string>
+    <string name="feed_import_file">Import file (OPML / JSON Feed)</string>
+    <string name="feed_sources_title">Feed sources</string>
+    <string name="feed_sources_list">Subscriptions (%1$d)</string>
+    <string name="feed_source_remove">Remove %1$s</string>
+    <string name="feed_source_static">Imported collection, not updated</string>
+    <string name="feed_source_failed">Could not be loaded</string>
+    <string name="feed_use_nextcloud">Sign in to Nextcloud instead</string>
+    <string name="feed_cancel">Cancel</string>
+
+    <string name="feed_import_added">Feeds added: %1$d</string>
+    <string name="feed_import_duplicates">Already subscribed: %1$d</string>
+    <string name="feed_import_skipped">Skipped (no HTTPS or invalid): %1$d</string>
+    <string name="feed_import_over_limit">Over the limit: %1$d</string>
+
+    <string name="feed_problem_feed_url_empty">Enter a feed or website address.</string>
+    <string name="feed_problem_feed_url_not_https">Only HTTPS addresses are supported.</string>
+    <string name="feed_problem_feed_url_invalid">The address is invalid.</string>
+    <string name="feed_problem_feed_not_found">No feed found at this address (HTTP 404).</string>
+    <string name="feed_problem_not_a_feed">No readable feed found (RSS, Atom, JSON Feed or OPML).</string>
+    <string name="feed_problem_file_read">The file could not be read.</string>
+    <string name="feed_problem_already_added">This feed is already subscribed.</string>
+    <string name="feed_problem_limit">The maximum number of feeds is reached.</string>
+    <string name="feed_problem_partial">Some feeds could not be loaded. Details under Feed sources.</string>
+    <string name="feed_subscriptions">Subscriptions</string>
+    <string name="feed_subscription_all">All subscriptions</string>
+</resources>

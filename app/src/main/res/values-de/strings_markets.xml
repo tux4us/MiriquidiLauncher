@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_markets">Kurse</string>
+
+    <string name="markets_refresh">Aktualisieren</string>
+    <string name="markets_loading">Kurse werden geladen …</string>
+    <string name="markets_updated">Stand: %1$s</string>
+    <string name="markets_stale_notice">Anzeige aus dem Zwischenspeicher, letzter Stand: %1$s</string>
+    <string name="markets_error_network">Daten konnten nicht geladen werden. Prüfe die Internetverbindung.</string>
+    <string name="markets_error_data">Die Antwort des Dienstes war unlesbar.</string>
+    <string name="markets_error_rate_limit">Der Dienst begrenzt die Anfragen. Neuer Abruf ab %1$s.</string>
+    <string name="markets_error_bitcoin">Bitcoin-Daten: %1$s</string>
+    <string name="markets_no_data">Noch keine Daten vorhanden.</string>
+
+    <string name="markets_bitcoin">Bitcoin</string>
+    <string name="markets_price_time">Kurs vom %1$s</string>
+    <string name="markets_change_24h">24 Std.</string>
+    <string name="markets_change_7d">7 Tage</string>
+    <string name="markets_change_30d">30 Tage</string>
+    <string name="markets_sats_per_usd">Satoshi je Dollar</string>
+    <string name="markets_sats_per_eur">Satoshi je Euro</string>
+    <string name="markets_market_cap">Marktkapitalisierung (theoretisch)</string>
+    <string name="markets_supply">Umlaufmenge (theoretisch)</string>
+    <string name="markets_supply_note">Berechnet aus der Blockhöhe und den Blockbelohnungen; nicht beanspruchte Belohnungen und verlorene Coins sind nicht abgezogen.</string>
+
+    <string name="markets_chart">Kursverlauf</string>
+    <string name="markets_chart_empty">Kein Kursverlauf verfügbar.</string>
+    <string name="markets_chart_description">Kursverlauf in %1$s von %2$s bis %3$s</string>
+
+    <string name="markets_network">Netzwerk</string>
+    <string name="markets_block_height">Blockhöhe</string>
+    <string name="markets_last_block">Letzter Block</string>
+    <string name="markets_last_block_value">%1$s · %2$s Transaktionen</string>
+    <string name="markets_hashrate">Hashrate</string>
+    <string name="markets_difficulty">Difficulty</string>
+    <string name="markets_mempool_count">Wartende Transaktionen</string>
+    <string name="markets_mempool_size">Größe des Mempools</string>
+
+    <string name="markets_fees">Gebühren</string>
+    <string name="markets_fee_fastest">Schnell (nächster Block)</string>
+    <string name="markets_fee_half_hour">Mittel (ca. 30 Min.)</string>
+    <string name="markets_fee_hour">Niedrig (ca. 1 Std.)</string>
+    <string name="markets_fee_economy">Sparsam</string>
+    <string name="markets_fee_minimum">Minimum</string>
+    <string name="markets_fee_value">%1$s sat/vB · ca. %2$s</string>
+    <string name="markets_fee_note">Umgerechnet für eine typische Transaktion von %1$d vB zum aktuellen Kurs.</string>
+
+    <string name="markets_difficulty_adjustment">Difficulty-Anpassung</string>
+    <string name="markets_difficulty_progress">Fortschritt</string>
+    <string name="markets_difficulty_remaining">Verbleibende Blöcke</string>
+    <string name="markets_difficulty_expected">Erwartete Änderung</string>
+    <string name="markets_difficulty_date">Voraussichtlich am</string>
+    <string name="markets_difficulty_previous">Letzte Änderung</string>
+
+    <string name="markets_halving">Halving</string>
+    <string name="markets_halving_subsidy">Aktuelle Blockbelohnung</string>
+    <string name="markets_halving_height">Nächstes Halving bei Block</string>
+    <string name="markets_halving_remaining">Verbleibende Blöcke</string>
+    <string name="markets_halving_date">Voraussichtlich um</string>
+    <string name="markets_halving_progress">Fortschritt der Periode</string>
+    <string name="markets_halving_note">Das Datum ist eine Schätzung bei zehn Minuten je Block.</string>
+
+    <string name="markets_lightning">Lightning-Netzwerk</string>
+    <string name="markets_lightning_channels">Kanäle</string>
+    <string name="markets_lightning_nodes">Knoten</string>
+    <string name="markets_lightning_capacity">Gesamtkapazität</string>
+
+    <string name="markets_price_pair">%1$s · %2$s</string>
+    <string name="markets_gold_silver_ratio">Gold-Silber-Verhältnis</string>
+    <string name="markets_btc_in_gold">1 Bitcoin in Gold</string>
+    <string name="markets_ounces_value">%1$s Unzen</string>
+
+    <string name="markets_source">Datenquellen</string>
+    <string name="markets_source_default">Öffentliche Instanz (mempool.space)</string>
+    <string name="markets_source_custom">Eigene Instanz</string>
+    <string name="markets_source_url_hint">Adresse, z. B. https://mempool.example.org</string>
+    <string name="markets_source_apply">Übernehmen</string>
+    <string name="markets_source_error_empty">Bitte eine Adresse eingeben</string>
+    <string name="markets_source_error_not_https">Nur HTTPS-Adressen sind erlaubt</string>
+    <string name="markets_source_error_invalid">Die Adresse ist ungültig</string>
+    <string name="markets_source_note">Die Instanz muss die mempool-Schnittstelle (/api/…) anbieten. Kursverlauf, Lightning- und Hashrate-Daten liefern nicht alle Instanzen; fehlende Teile bleiben leer.</string>
+    <string name="markets_source_active">Aktive Quelle: %1$s</string>
+
+    <string name="markets_attr_mempool">Bitcoin-Daten: mempool.space</string>
+    <string name="markets_attr_frankfurter">Euro-Kurs: Frankfurter (Referenzkurse von Zentralbanken)</string>
+    <string name="markets_disclaimer">Ohne Gewähr, keine Anlageberatung. Die Kurse können von Preisen bei Händlern und Börsen abweichen.</string>
+    <string name="markets_privacy_note">Bei jedem Abruf erhalten die genannten Dienste technisch bedingt die IP-Adresse; Kennungen oder Nutzerdaten werden nicht gesendet, außer der gesuchten WKN/ISIN (an Yahoo Finance) und, wenn Stooq eingeschaltet ist, dem eigenen API-Schlüssel (an Stooq). Abgerufen wird nur, solange diese Seite geöffnet ist.</string>
+
+    <string-array name="markets_compact_units">
+        <item>Tsd.</item>
+        <item>Mio.</item>
+        <item>Mrd.</item>
+        <item>Bio.</item>
+    </string-array>
+
+    <string name="markets_holdings">Eigene Werte</string>
+    <string name="markets_holdings_show">Einblenden</string>
+    <string name="markets_holdings_hide">Ausblenden</string>
+    <string name="markets_holdings_expanded">Eingeblendet</string>
+    <string name="markets_holdings_collapsed">Ausgeblendet</string>
+    <string name="markets_holdings_save">Speichern</string>
+    <string name="markets_holdings_remove">Entfernen</string>
+    <string name="markets_holdings_invalid">Eine Zahl größer als 0 eingeben, z. B. 0,25</string>
+    <string name="markets_holdings_empty">Noch keine Werte eingetragen.</string>
+    <string name="markets_holdings_total_eur">Gesamt (EUR)</string>
+    <string name="markets_holdings_total_usd">Gesamt (USD)</string>
+    <string name="markets_holdings_unavailable">nicht verfügbar</string>
+    <string name="markets_holdings_note">Die Mengen werden nur auf diesem Gerät gespeichert. Die Werte beruhen auf den oben gezeigten Kursen: Aktien mit dem aktuellen Wechselkurs, Rohstoffe als Terminkurse in ihrer Handelseinheit (z. B. Feinunzen), Bitcoin aus der Bitcoin-Quelle, übrige Krypto-Werte von CoinGecko. Steuern und Gebühren sind nicht enthalten.</string>
+    <string name="markets_indices">Weltweite Börsenindizes</string>
+    <string name="markets_indices_note">Veränderung zum Vortagesschluss. Daten von %1$s, ggf. verzögert. Abgerufen %2$s.</string>
+    <string name="markets_fx">Wechselkurse</string>
+    <string name="markets_fx_amount">Betrag</string>
+    <string name="markets_fx_from">Von</string>
+    <string name="markets_fx_to">Nach</string>
+    <string name="markets_fx_swap">Währungen tauschen</string>
+    <string name="markets_fx_result">%1$s %2$s = %3$s %4$s</string>
+    <string name="markets_fx_rate">1 %1$s = %2$s %3$s</string>
+    <string name="markets_fx_loading">Wechselkurse werden geladen …</string>
+    <string name="markets_fx_note">Referenzkurse der Europäischen Zentralbank über Frankfurter, abgerufen %1$s. Nicht die Kurse von Banken oder Kartenanbietern.</string>
+    <string name="markets_sec_title">Aktien, ETFs, Fonds</string>
+    <string name="markets_sec_source_off">Die Quelle Yahoo Finance ist ausgeschaltet; Aktien lassen sich daher weder suchen noch bewerten. Unter „Datenquellen“ lässt sie sich einschalten.</string>
+    <string name="markets_sec_ident">WKN oder ISIN</string>
+    <string name="markets_sec_search">Suchen</string>
+    <string name="markets_sec_searching">Suche läuft …</string>
+    <string name="markets_sec_invalid">Das ist weder eine gültige ISIN (12 Zeichen) noch eine WKN (6 Zeichen).</string>
+    <string name="markets_sec_not_found">Nichts gefunden. Eine ISIN funktioniert meist besser als eine WKN, besonders bei ausländischen Wertpapieren.</string>
+    <string name="markets_sec_rate_limit">Der Dienst begrenzt die Anfragen. Bitte später erneut versuchen.</string>
+    <string name="markets_sec_pick">Passende Notierung wählen:</string>
+    <string name="markets_sec_quantity">Stückzahl</string>
+    <string name="markets_sec_add">Hinzufügen</string>
+    <string name="markets_error_quotes">Indizes und Rohstoffe: %1$s</string>
+    <string name="markets_error_securities">Wertpapiere: %1$s</string>
+    <string name="markets_error_fx">Wechselkurse: %1$s</string>
+    <string name="markets_source_stooq">Stooq (optional, braucht einen eigenen API-Schlüssel)</string>
+    <string name="markets_source_yahoo">Yahoo Finance (Indizes, Rohstoffe, Aktien)</string>
+    <string name="markets_source_switch_note">Jede Quelle lässt sich ausschalten. Yahoo Finance ist eine inoffizielle Schnittstelle ohne Gewähr. Fällt sie aus, wird Stooq verwendet, wenn es eingeschaltet und ein Schlüssel eingetragen ist. Ethereum und Stablecoins kommen von CoinGecko.</string>
+    <string name="markets_attr_stooq">Optional: Stooq</string>
+    <string name="markets_attr_yahoo">Indizes, Rohstoffe, Aktien: Yahoo Finance (inoffizielle Schnittstelle)</string>
+    <string name="markets_commodities">Rohstoffe</string>
+    <string name="markets_commodities_note">Terminkurse (nächster Kontrakt), keine Spotpreise und ohne Händleraufschlag. Euro-Werte sind aus dem Dollarpreis umgerechnet (1 € = %1$s $). Daten von %2$s, ggf. verzögert. Abgerufen %3$s.</string>
+    <string name="markets_commodities_note_no_rate">Terminkurse (nächster Kontrakt), keine Spotpreise und ohne Händleraufschlag. Euro-Werte sind nicht verfügbar, solange der Euro-Kurs fehlt. Daten von %1$s, ggf. verzögert. Abgerufen %2$s.</string>
+    <string name="markets_range_1d">1T</string>
+    <string name="markets_range_1w">1W</string>
+    <string name="markets_range_1m">1M</string>
+    <string name="markets_range_1y">1J</string>
+    <string name="markets_range_5y">5J</string>
+    <string name="markets_series_loading">Diagramm wird geladen …</string>
+    <string name="markets_series_error">Diagramm nicht verfügbar: %1$s</string>
+    <string name="markets_series_change">Veränderung im Zeitraum: %1$s</string>
+    <string name="markets_series_description">Kursverlauf von %1$s, Tief %2$s, Hoch %3$s</string>
+    <string name="markets_series_month_note">Tagesschlusskurse der letzten Handelstage</string>
+    <string name="markets_selected">Ausgewählt</string>
+    <string name="markets_per_unit">je %1$s</string>
+    <string name="markets_ethereum">Ethereum</string>
+    <string name="markets_stablecoins">Stablecoins</string>
+    <string name="markets_stablecoins_note">Stablecoins sind an eine Währung gebunden, können diese Bindung aber verlieren. Die Abweichung vergleicht den Marktpreis mit 1,00 der gebundenen Währung. Die Marktkapitalisierung ist die vom Datendienst veröffentlichte Angabe.</string>
+    <string name="markets_peg">Bindung: %1$s</string>
+    <string name="markets_peg_deviation">Abweichung von der Bindung: %1$s</string>
+    <string name="markets_crypto_note">Daten von CoinGecko, ggf. verzögert. Abgerufen %1$s.</string>
+    <string name="markets_crypto_change_note">Veränderung in 24 Stunden</string>
+    <string name="markets_error_crypto">Ethereum und Stablecoins: %1$s</string>
+    <string name="markets_error_key">Stooq hat den API-Schlüssel abgelehnt (fehlt, ungültig oder Kontingent ausgeschöpft)</string>
+    <string name="markets_stooq_key">Stooq-API-Schlüssel</string>
+    <string name="markets_stooq_key_save">Schlüssel speichern</string>
+    <string name="markets_stooq_key_remove">Schlüssel entfernen</string>
+    <string name="markets_stooq_key_note">Stooq verlangt für Downloads einen persönlichen Schlüssel. Er wird auf stooq.com erzeugt (siehe Hinweis auf der Download-Seite des Dienstes), nur auf diesem Gerät gespeichert und ist nicht Teil von Sicherungen des Launchers.</string>
+    <string name="markets_stooq_key_missing">Kein Schlüssel eingetragen: Stooq wird nicht verwendet.</string>
+    <string name="markets_attr_coingecko">Ethereum und Stablecoins: Daten von CoinGecko</string>
+    <string name="markets_own_kind_stock">Aktie</string>
+    <string name="markets_own_kind_commodity">Rohstoff</string>
+    <string name="markets_own_kind_crypto">Krypto</string>
+    <string name="markets_own_pick_commodity">Rohstoff</string>
+    <string name="markets_own_pick_crypto">Krypto-Wert</string>
+    <string name="markets_own_amount">Menge</string>
+    <string name="markets_own_add">Hinzufügen</string>
+    <string name="markets_own_price">Kurs: %1$s</string>
+    <string name="markets_commodity_brent">Rohöl Brent</string>
+    <string name="markets_commodity_wti">Rohöl WTI</string>
+    <string name="markets_commodity_gas">Erdgas</string>
+    <string name="markets_commodity_heating">Heizöl</string>
+    <string name="markets_commodity_gold">Gold</string>
+    <string name="markets_commodity_silver">Silber</string>
+    <string name="markets_commodity_platinum">Platin</string>
+    <string name="markets_commodity_palladium">Palladium</string>
+    <string name="markets_commodity_copper">Kupfer</string>
+    <string name="markets_commodity_aluminium">Aluminium</string>
+    <string name="markets_commodity_wheat">Weizen</string>
+    <string name="markets_commodity_corn">Mais</string>
+    <string name="markets_commodity_coffee">Kaffee</string>
+    <string name="markets_commodity_sugar">Zucker</string>
+</resources>

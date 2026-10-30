@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="settings_target_wifi">WLAN</string>
+    <string name="settings_target_bluetooth">Bluetooth</string>
+    <string name="settings_target_airplane">Flugmodus</string>
+    <string name="settings_target_mobile_network">Mobilfunknetz und SIM</string>
+    <string name="settings_target_wireless">Netzwerk und Verbindungen</string>
+    <string name="settings_target_vpn">VPN</string>
+    <string name="settings_target_nfc">NFC</string>
+    <string name="settings_target_display">Display</string>
+    <string name="settings_target_sound">Ton und Lautstärke</string>
+    <string name="settings_target_battery">Akku</string>
+    <string name="settings_target_battery_saver">Energiesparmodus</string>
+    <string name="settings_target_storage">Speicher</string>
+    <string name="settings_target_apps">Apps verwalten</string>
+    <string name="settings_target_default_apps">Standard-Apps</string>
+    <string name="settings_target_home">Standard-Launcher</string>
+    <string name="settings_target_location">Standort</string>
+    <string name="settings_target_privacy">Datenschutz</string>
+    <string name="settings_target_security">Sicherheit und Bildschirmsperre</string>
+    <string name="settings_target_accessibility">Bedienungshilfen</string>
+    <string name="settings_target_language">Sprache</string>
+    <string name="settings_target_keyboard">Tastatur</string>
+    <string name="settings_target_date">Datum und Uhrzeit</string>
+    <string name="settings_target_accounts">Konten und Synchronisierung</string>
+    <string name="settings_target_print">Drucken</string>
+    <string name="settings_target_developer">Entwickleroptionen</string>
+    <string name="settings_target_about">Über das Telefon</string>
+    <string name="settings_target_settings">Einstellungen</string>
+    <string name="search_action_settings_hint">Android-Einstellungen</string>
+    <string name="search_action_copy_hint">Tippen kopiert das Ergebnis</string>
+    <string name="search_action_copied">Kopiert</string>
+    <string name="search_action_call">Anrufen: %1$s</string>
+    <string name="search_action_sms">SMS an %1$s</string>
+    <string name="search_action_email">E-Mail an %1$s</string>
+    <string name="search_action_open_url">Öffnen: %1$s</string>
+    <string name="search_action_web">Im Web suchen: %1$s</string>
+</resources>

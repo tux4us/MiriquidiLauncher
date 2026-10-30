@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="weather_title">Wetter</string>
+    <string name="weather_refresh">Aktualisieren</string>
+    <string name="weather_search_hint">Ort suchen</string>
+    <string name="weather_search_clear">Suche leeren</string>
+    <string name="weather_use_location">Aktuellen Standort verwenden</string>
+    <string name="weather_favorites">Favoriten</string>
+    <string name="weather_favorite_add">Als Favorit speichern</string>
+    <string name="weather_favorite_remove">Aus Favoriten entfernen</string>
+    <string name="weather_no_place">Wähle einen Ort oder nutze deinen groben Standort.</string>
+    <string name="weather_search_no_results">Keine Orte gefunden</string>
+    <string name="weather_search_failed">Suche nicht möglich. Prüfe die Internetverbindung.</string>
+    <string name="weather_searching">Suche …</string>
+    <string name="weather_loading">Wetter wird geladen …</string>
+    <string name="weather_error_network">Wetterdaten konnten nicht geladen werden. Prüfe die Internetverbindung.</string>
+    <string name="weather_error_data">Die Antwort des Wetterdienstes war unlesbar.</string>
+    <string name="weather_error_location">Standort nicht verfügbar. Ist die Ortung eingeschaltet?</string>
+    <string name="weather_error_permission">Ohne Standortberechtigung ist nur die Ortssuche möglich.</string>
+    <string name="weather_stale_notice">Zeige zuletzt geladene Daten (Stand %1$s Uhr).</string>
+    <string name="weather_updated">Stand %1$s Uhr</string>
+    <string name="weather_feels_like">Gefühlt %1$s°</string>
+    <string name="weather_humidity_value">Luftfeuchtigkeit %1$d %%</string>
+    <string name="weather_pressure_value">Luftdruck %1$s hPa</string>
+    <string name="weather_precip_value">Niederschlag %1$s mm</string>
+    <string name="weather_wind_value">%1$s aus %2$s, %3$s km/h (Bft %4$d)</string>
+    <string name="weather_gusts_value">Böen bis %1$s km/h</string>
+    <string name="weather_uv_value">UV-Index %1$s (%2$s)</string>
+    <string name="weather_section_hourly">Nächste 24 Stunden</string>
+    <string name="weather_section_daily">7-Tage-Vorhersage (antippen für Details)</string>
+    <string name="weather_section_thunder">Gewitter (nächste 12 Stunden)</string>
+    <string name="weather_section_air">Luftqualität und Pollen</string>
+    <string name="weather_section_bio">Biowetter</string>
+    <string name="weather_chart_temperature">Temperatur (°C)</string>
+    <string name="weather_chart_precipitation">Niederschlag (mm)</string>
+    <string name="weather_today">Heute</string>
+    <string name="weather_precip_probability">%1$d %%</string>
+    <string name="weather_thunder_none">Kein erhöhtes Gewitterrisiko in den nächsten 12 Stunden erkennbar.</string>
+    <string name="weather_thunder_summary">Höchstes Gewitterrisiko: %1$s, gegen %2$s Uhr.</string>
+    <string name="weather_thunder_line">%1$s Uhr: %2$s (CAPE %3$s J/kg, Regenwahrscheinlichkeit %4$d %%)</string>
+    <string name="weather_thunder_note">CAPE beschreibt nur das Potenzial für Gewitter, nicht ob sie entstehen. Grundlage ist ein grobes Wettermodell.</string>
+    <string name="weather_air_pm25">Feinstaub PM2,5: %1$s µg/m³</string>
+    <string name="weather_air_pm10">Feinstaub PM10: %1$s µg/m³</string>
+    <string name="weather_air_no2">Stickstoffdioxid: %1$s µg/m³</string>
+    <string name="weather_air_ozone">Ozon: %1$s µg/m³</string>
+    <string name="weather_air_unavailable">Für diesen Ort liegen keine Luftdaten vor.</string>
+    <string name="weather_pollen_title">Pollenflug</string>
+    <string name="weather_pollen_none">Keine Pollendaten für diesen Ort (nur in Europa verfügbar) oder aktuell kein Flug.</string>
+    <string name="weather_bio_pressure">Luftdruckwechsel</string>
+    <string name="weather_bio_humidity">Schwüle</string>
+    <string name="weather_bio_heat">Wärmebelastung</string>
+    <string name="weather_bio_cold">Kältebelastung</string>
+    <string name="weather_bio_thermal_neutral">Thermische Belastung</string>
+    <string name="weather_bio_cape">Gewitterpotenzial</string>
+    <string name="weather_bio_pressure_value">%1$s hPa in 3 h</string>
+    <string name="weather_bio_pressure_unknown">Zu wenige Daten</string>
+    <string name="weather_bio_humidity_value">Taupunkt %1$s °C</string>
+    <string name="weather_bio_heat_value">Hitze-Index %1$s °C</string>
+    <string name="weather_bio_cold_value">Windchill %1$s °C</string>
+    <string name="weather_bio_cape_value">CAPE %1$s J/kg</string>
+    <string name="weather_bio_neutral_value">Angenehmer Temperaturbereich</string>
+    <string name="weather_bio_neutral_text">Keine thermische Sonderbelastung.</string>
+    <string name="weather_bio_summary_none">Günstige Biowetterlage, keine nennenswerten Einflüsse.</string>
+    <string name="weather_bio_summary">Biowetter-Belastung: %1$s</string>
+    <string name="weather_bio_disclaimer">Orientierungswerte aus Wetterdaten, kein Ersatz für ärztlichen Rat.</string>
+    <string name="weather_sunrise">Sonnenaufgang %1$s</string>
+    <string name="weather_sunset">Sonnenuntergang %1$s</string>
+    <string name="weather_sunshine">Sonnenscheindauer heute: %1$s h</string>
+    <string name="weather_moon_illumination">Beleuchtung %1$s %%</string>
+    <string name="weather_moon_age">Mondalter %1$s Tage</string>
+    <string name="weather_attr_open_meteo">Wetterdaten: Open-Meteo.com (CC BY 4.0)</string>
+    <string name="weather_attr_cams">Luftqualität und Pollen: CAMS (Copernicus Atmosphere Monitoring Service) über Open-Meteo</string>
+    <string name="weather_attr_osm">Ortsnamen: © OpenStreetMap contributors (ODbL)</string>
+    <string name="weather_privacy_note">Beim Abruf werden Koordinaten bzw. Suchbegriff an Open-Meteo (bzw. deinen eigenen Wetterserver) und Nominatim gesendet.</string>
+    <string name="weather_permission_location_button">Standortberechtigung erteilen</string>
+    <string name="weather_section_hours">Stundenwerte (antippen für Details)</string>
+    <string name="weather_section_wind">Wind (24 Stunden)</string>
+    <string name="weather_wind_hour_speed">%1$s km/h</string>
+    <string name="weather_wind_hour_gust">Böen %1$s</string>
+    <string name="weather_section_sun">Sonne</string>
+    <string name="weather_section_daylight">Tageslicht und Dämmerung</string>
+    <string name="weather_section_moon">Mond</string>
+    <string name="weather_sunrise_azimuth">Sonnenaufgang %1$s Uhr, Azimut %2$s° (%3$s)</string>
+    <string name="weather_sunset_azimuth">Sonnenuntergang %1$s Uhr, Azimut %2$s° (%3$s)</string>
+    <string name="weather_sun_position">Aktuell: Höhe %1$s° (%2$s), Azimut %3$s° (%4$s)</string>
+    <string name="weather_shadow_title">Schattenlängen</string>
+    <string name="weather_shadow_person">Person (%1$s m): Schatten %2$s m</string>
+    <string name="weather_shadow_object">Objekt (%1$s m): Schatten %2$s m</string>
+    <string name="weather_shadow_none">Sonne unter dem Horizont: kein Schatten.</string>
+    <string name="weather_shadow_edit">Höhen anpassen</string>
+    <string name="weather_shadow_dialog_title">Höhen für Schattenlänge</string>
+    <string name="weather_shadow_height_person">Größe Person (m)</string>
+    <string name="weather_shadow_height_object">Höhe Objekt (m)</string>
+    <string name="weather_shadow_invalid">Bitte Werte zwischen 0,3 und 2,5 m (Person) bzw. 0,1 und 10 m (Objekt) eingeben.</string>
+    <string name="weather_save">Speichern</string>
+    <string name="weather_cancel">Abbrechen</string>
+    <string name="weather_close">Schließen</string>
+    <string name="weather_sunshine_week">Sonnenscheindauer pro Tag (Stunden)</string>
+    <string name="weather_uv_hourly_title">UV-Index nach Stunden (antippen für Details)</string>
+    <string name="weather_uv_none_today">Heute kein relevanter UV-Index.</string>
+    <string name="weather_uv_dialog_title">%1$s Uhr: UV %2$s (%3$s)</string>
+    <string name="weather_uv_peak">Spitzenwert heute: UV %1$s um %2$s Uhr</string>
+    <string name="weather_daylight_duration">Tageslänge: %1$d h %2$d min</string>
+    <string name="weather_dawn">Morgendämmerung: %1$s Uhr</string>
+    <string name="weather_dusk">Abenddämmerung: %1$s Uhr</string>
+    <string name="weather_daylight_longer">Tendenz: %1$d min länger als gestern</string>
+    <string name="weather_daylight_shorter">Tendenz: %1$d min kürzer als gestern</string>
+    <string name="weather_daylight_same">Tendenz: gleich lang wie gestern</string>
+    <string name="weather_light_sunrise_soon">Sonnenaufgang in %1$d min</string>
+    <string name="weather_light_dark_morning">Noch dunkel, Sonnenaufgang in mehr als einer Stunde.</string>
+    <string name="weather_light_sunset_soon">Sonnenuntergang in %1$d min</string>
+    <string name="weather_light_dark_evening">Die Sonne ist untergegangen.</string>
+    <string name="weather_golden_hour">Goldene Stunde (weiches Licht für Fotos)
+Morgens: %1$s – %2$s
+Abends: %3$s – %4$s</string>
+    <string name="weather_moon_event_today">%1$s: heute</string>
+    <string name="weather_moon_event_tomorrow">%1$s: morgen</string>
+    <string name="weather_moon_event_in_days">%1$s: in %2$d Tagen</string>
+    <string name="weather_moon_full_label">Vollmond</string>
+    <string name="weather_moon_new_label">Neumond</string>
+    <string name="weather_moon_zodiac">Mondzeichen (Näherung): %1$s</string>
+    <string name="weather_detail_hour_title">%1$s Uhr – %2$s</string>
+    <string name="weather_detail_temp">Temperatur: %1$s° (gefühlt %2$s°)</string>
+    <string name="weather_detail_precip">Niederschlag: %1$s mm, Wahrscheinlichkeit %2$d %%</string>
+    <string name="weather_detail_wind">Wind: %1$s km/h aus %2$s, Böen bis %3$s km/h (Bft %4$d)</string>
+    <string name="weather_detail_uv">UV-Index: %1$s (%2$s)</string>
+    <string name="weather_detail_pressure">Luftdruck: %1$s hPa</string>
+    <string name="weather_detail_cape">CAPE: %1$s J/kg</string>
+    <string name="weather_detail_minmax">Temperatur: %1$s° bis %2$s°</string>
+    <string name="weather_detail_wind_max">Wind bis %1$s km/h, Böen bis %2$s km/h</string>
+    <string name="weather_detail_sunshine">Sonnenschein: %1$s h</string>
+    <string name="weather_detail_sun">Sonne: %1$s – %2$s Uhr</string>
+    <string-array name="weather_codes">
+        <item>Klar</item>
+        <item>Überwiegend klar</item>
+        <item>Teils bewölkt</item>
+        <item>Bedeckt</item>
+        <item>Nebel</item>
+        <item>Reifnebel</item>
+        <item>Leichter Nieselregen</item>
+        <item>Nieselregen</item>
+        <item>Starker Nieselregen</item>
+        <item>Gefrierender Nieselregen</item>
+        <item>Starker gefrierender Nieselregen</item>
+        <item>Leichter Regen</item>
+        <item>Regen</item>
+        <item>Starker Regen</item>
+        <item>Gefrierender Regen</item>
+        <item>Starker gefrierender Regen</item>
+        <item>Leichter Schneefall</item>
+        <item>Schneefall</item>
+        <item>Starker Schneefall</item>
+        <item>Schneegriesel</item>
+        <item>Leichte Regenschauer</item>
+        <item>Regenschauer</item>
+        <item>Heftige Regenschauer</item>
+        <item>Leichte Schneeschauer</item>
+        <item>Schneeschauer</item>
+        <item>Gewitter</item>
+        <item>Gewitter mit leichtem Hagel</item>
+        <item>Gewitter mit starkem Hagel</item>
+    </string-array>
+    <string-array name="weather_wind_dirs">
+        <item>Nord</item>
+        <item>Nordost</item>
+        <item>Ost</item>
+        <item>Südost</item>
+        <item>Süd</item>
+        <item>Südwest</item>
+        <item>West</item>
+        <item>Nordwest</item>
+    </string-array>
+    <string-array name="weather_beaufort">
+        <item>Windstille</item>
+        <item>Leiser Zug</item>
+        <item>Leichte Brise</item>
+        <item>Schwache Brise</item>
+        <item>Mäßige Brise</item>
+        <item>Frische Brise</item>
+        <item>Starker Wind</item>
+        <item>Steifer Wind</item>
+        <item>Stürmischer Wind</item>
+        <item>Sturm</item>
+        <item>Schwerer Sturm</item>
+        <item>Orkanartiger Sturm</item>
+        <item>Orkan</item>
+    </string-array>
+    <string-array name="weather_aqi_levels">
+        <item>Sehr gut</item>
+        <item>Gut</item>
+        <item>Mäßig</item>
+        <item>Schlecht</item>
+        <item>Sehr schlecht</item>
+        <item>Extrem schlecht</item>
+    </string-array>
+    <string-array name="weather_pollen_levels">
+        <item>Keine</item>
+        <item>Gering</item>
+        <item>Mäßig</item>
+        <item>Hoch</item>
+        <item>Sehr hoch</item>
+    </string-array>
+    <string-array name="weather_pollen_types">
+        <item>Birke</item>
+        <item>Gräser</item>
+        <item>Erle</item>
+        <item>Beifuß</item>
+        <item>Olive</item>
+        <item>Ambrosia</item>
+    </string-array>
+    <string-array name="weather_uv_levels">
+        <item>Minimal</item>
+        <item>Gering</item>
+        <item>Mittel</item>
+        <item>Hoch</item>
+        <item>Sehr hoch</item>
+        <item>Extrem</item>
+    </string-array>
+    <string-array name="weather_moon_phases">
+        <item>Neumond</item>
+        <item>Zunehmende Sichel</item>
+        <item>Erstes Viertel</item>
+        <item>Zunehmender Mond</item>
+        <item>Vollmond</item>
+        <item>Abnehmender Mond</item>
+        <item>Letztes Viertel</item>
+        <item>Abnehmende Sichel</item>
+    </string-array>
+    <string-array name="weather_bio_levels">
+        <item>Keine</item>
+        <item>Gering</item>
+        <item>Mäßig</item>
+        <item>Hoch</item>
+        <item>Extrem</item>
+    </string-array>
+    <string-array name="weather_thunder_levels">
+        <item>Gering</item>
+        <item>Erhöht</item>
+        <item>Hoch</item>
+    </string-array>
+    <string-array name="weather_bio_pressure_text">
+        <item>Stabiler Luftdruck, kein Einfluss durch Wetterfühligkeit zu erwarten.</item>
+        <item>Leichter Druckwechsel. Sehr empfindliche Personen bemerken möglicherweise leichte Müdigkeit.</item>
+        <item>Merklicher Druckwechsel. Kopfschmerzen, Reizbarkeit oder Konzentrationsschwäche sind bei wetterfühligen Personen möglich.</item>
+        <item>Starker Druckwechsel. Wetterfühligkeit wahrscheinlich: Migräne, Gelenkschmerzen oder Kreislaufprobleme sind möglich. Ruhepausen einplanen.</item>
+        <item>Extremer Druckwechsel. Körperlich belastend, besonders für chronisch Kranke, ältere oder wetterempfindliche Personen. Belastungen reduzieren.</item>
+    </string-array>
+    <string-array name="weather_bio_humidity_text">
+        <item>Angenehm trocken, kein Schwüleeinfluss.</item>
+        <item>Leicht feucht, angenehm.</item>
+        <item>Spürbar schwül. Schwitzen kühlt weniger effektiv, Leistungsfähigkeit bei Aktivität leicht reduziert.</item>
+        <item>Deutlich schwül. Kreislauf stärker belastet. Ausreichend trinken, Aktivitäten in kühlere Stunden verlegen.</item>
+        <item>Extrem schwül. Hitzeerschöpfung möglich. Aktivität stark einschränken, viel trinken, Schatten aufsuchen.</item>
+    </string-array>
+    <string-array name="weather_bio_heat_text">
+        <item>Angenehme Wärme, kein Hitzestress.</item>
+        <item>Leichter Hitzestress bei anhaltender körperlicher Aktivität möglich.</item>
+        <item>Mäßiger Hitzestress. Viel trinken, Mittagshitze meiden.</item>
+        <item>Starker Hitzestress. Intensive Aktivität meiden, Schatten aufsuchen, ausreichend trinken.</item>
+        <item>Extremer Hitzestress. Gefahr eines Hitzschlags. Aktivität auf ein Minimum reduzieren.</item>
+    </string-array>
+    <string-array name="weather_bio_cold_text">
+        <item>Kühl, aber kein kritischer Kältestress.</item>
+        <item>Leichter Kältestress. Auf warme Kleidung achten.</item>
+        <item>Spürbarer Kältestress. Warme Kleidung nötig, Hände, Kopf und Füße schützen.</item>
+        <item>Starke Kältebelastung. Erfrierungsgefahr bei Wind ohne Schutzkleidung. Aufenthalt begrenzen.</item>
+        <item>Extreme Kälte. Erfrierungen auf unbedeckter Haut sind innerhalb von Minuten möglich.</item>
+    </string-array>
+    <string-array name="weather_bio_cape_text">
+        <item>Geringes Gewitterpotenzial, kein Einfluss auf das Wohlbefinden.</item>
+        <item>Erhöhtes Gewitterpotenzial. Atmosphärische Instabilität kann Unruhe und Unwohlsein verstärken.</item>
+        <item>Hohes Gewitterpotenzial. Stimmungsschwankungen und Kreislaufbeschwerden sind möglich.</item>
+    </string-array>
+    <string-array name="weather_compass16">
+        <item>N</item>
+        <item>NNO</item>
+        <item>NO</item>
+        <item>ONO</item>
+        <item>O</item>
+        <item>OSO</item>
+        <item>SO</item>
+        <item>SSO</item>
+        <item>S</item>
+        <item>SSW</item>
+        <item>SW</item>
+        <item>WSW</item>
+        <item>W</item>
+        <item>WNW</item>
+        <item>NW</item>
+        <item>NNW</item>
+    </string-array>
+    <string-array name="weather_sun_elevation_levels">
+        <item>unter dem Horizont</item>
+        <item>sehr flach</item>
+        <item>niedrig</item>
+        <item>mittel</item>
+        <item>hoch</item>
+    </string-array>
+    <string-array name="weather_uv_advice">
+        <item>Kein relevanter UV-Anteil, kein Sonnenschutz nötig.</item>
+        <item>Geringe UV-Belastung. Für die meisten Menschen ist kein Schutz nötig.</item>
+        <item>Mittlere UV-Belastung. Bei längerem Aufenthalt im Freien Sonnenschutz verwenden.</item>
+        <item>Hohe UV-Belastung. Sonnenschutz, Kopfbedeckung und Sonnenbrille empfohlen, Mittagssonne meiden.</item>
+        <item>Sehr hohe UV-Belastung. Schatten bevorzugen, zwischen 11 und 16 Uhr nicht dauerhaft in der Sonne aufhalten.</item>
+        <item>Extreme UV-Belastung. Aufenthalt im Freien so kurz wie möglich, vollständiger Schutz nötig.</item>
+    </string-array>
+    <string-array name="weather_moon_astronomy">
+        <item>Der Mond steht zwischen Erde und Sonne, seine beleuchtete Seite zeigt von der Erde weg. Er ist nicht sichtbar.</item>
+        <item>Eine schmale Sichel erscheint kurz nach Sonnenuntergang im Westen und geht bald unter.</item>
+        <item>Erstes Viertel: Die rechte Hälfte ist beleuchtet. Aufgang gegen Mittag, Untergang gegen Mitternacht.</item>
+        <item>Mehr als die Hälfte ist beleuchtet. Der Mond geht am Nachmittag auf und ist bis in die Nacht sichtbar.</item>
+        <item>Die Erde liegt zwischen Sonne und Mond. Die ganze sichtbare Seite ist beleuchtet. Aufgang bei Sonnenuntergang, Untergang bei Sonnenaufgang.</item>
+        <item>Der Mond nimmt ab und geht zunehmend später auf. Morgens steht er noch am Himmel.</item>
+        <item>Letztes Viertel: Die linke Hälfte ist beleuchtet. Aufgang gegen Mitternacht, Untergang gegen Mittag.</item>
+        <item>Eine schmale Sichel ist kurz vor Sonnenaufgang im Osten sichtbar. Bald beginnt ein neuer Zyklus.</item>
+    </string-array>
+    <string-array name="weather_zodiac_signs">
+        <item>♈ Widder</item>
+        <item>♉ Stier</item>
+        <item>♊ Zwillinge</item>
+        <item>♋ Krebs</item>
+        <item>♌ Löwe</item>
+        <item>♍ Jungfrau</item>
+        <item>♎ Waage</item>
+        <item>♏ Skorpion</item>
+        <item>♐ Schütze</item>
+        <item>♑ Steinbock</item>
+        <item>♒ Wassermann</item>
+        <item>♓ Fische</item>
+    </string-array>
+
+    <string name="weather_server_title">Wetterserver</string>
+    <string name="weather_server_hint">Optional: eigener Open-Meteo-kompatibler Server (selbst betrieben oder im Abonnement). Alle Felder leer lassen, um die öffentlichen Open-Meteo-Adressen zu verwenden.</string>
+    <string name="weather_server_forecast">Server für die Vorhersage (HTTPS)</string>
+    <string name="weather_server_air">Server für die Luftqualität (optional, sonst derselbe Server)</string>
+    <string name="weather_server_key">API-Schlüssel (optional)</string>
+    <string name="weather_server_privacy">Der API-Schlüssel wird verschlüsselt gespeichert und nur an deinen eigenen Server gesendet, nie an die öffentlichen Adressen. Die Ortssuche nutzt immer den öffentlichen Open-Meteo-Geokodierungsdienst. Der Schlüssel ist nicht Teil des Backups.</string>
+    <string name="weather_server_error_forecast_https">Die Adresse des Vorhersage-Servers muss mit https:// beginnen.</string>
+    <string name="weather_server_error_forecast">Bitte eine gültige Adresse für den Vorhersage-Server eingeben. Für eine Luftqualitäts-Adresse oder einen Schlüssel ist sie erforderlich.</string>
+    <string name="weather_server_error_air_https">Die Adresse des Luftqualitäts-Servers muss mit https:// beginnen.</string>
+    <string name="weather_server_error_air">Bitte eine gültige Adresse für den Luftqualitäts-Server eingeben.</string>
+    <string name="weather_server_error_key">Der Schlüssel darf keine Leerzeichen enthalten und höchstens 200 Zeichen lang sein.</string>
+    <string name="weather_server_error_store">Auf diesem Gerät konnte nicht sicher gespeichert werden.</string>
+</resources>

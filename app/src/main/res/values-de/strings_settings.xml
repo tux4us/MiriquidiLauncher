@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_section_order">Reihenfolge der Favoriten</string>
+    <string name="settings_order_hint">Mit den Pfeilen verschieben. Der erste Eintrag steht in den Scopes App-Favoriten bzw. Kontakt-Favoriten.</string>
+    <string name="settings_order_apps">Apps</string>
+    <string name="settings_order_contacts">Kontakte</string>
+    <string name="settings_order_empty_apps">Keine Favoriten-Apps. Langer Druck auf eine App fügt sie hinzu.</string>
+    <string name="settings_order_empty_contacts">Keine Favoriten-Kontakte. In der Scope Kontakt-Favoriten lassen sie sich hinzufügen.</string>
+    <string name="settings_move_up">%1$s nach oben verschieben</string>
+    <string name="settings_move_down">%1$s nach unten verschieben</string>
+    <string name="settings_section_backup">Backup</string>
+    <string name="settings_backup_hint">Sichert die Favoriten (Apps, Kontakte, Wetterorte) und die Schattenhöhen als JSON-Datei im Ordner Downloads/MiriquidiLauncher. Enthalten sind auch die Notizen aus Documents/MiriquidiNotes (nur mit Zugriff auf alle Dateien, im Klartext) sowie die Daten der Podcast-Seite (Abos, Favoriten, Positionen, Gehört-Markierungen) und der Kurse-Seite (Bestand, Auswahl, Quellen), ebenfalls im Klartext. Heruntergeladene Folgen, Passwörter und API-Schlüssel werden nie gesichert. QR-Codes enthalten nichts davon.</string>
+    <string name="settings_backup_include_contacts">Favoriten-Kontakte einschließen</string>
+    <string name="settings_backup_contacts_warning">Die Datei enthält dann Namen und Telefonnummern im Klartext.</string>
+    <string name="settings_backup_export">Backup exportieren</string>
+    <string name="settings_backup_import">Backup importieren</string>
+    <string name="settings_backup_import_note">Beim Import werden die vorhandenen Favoriten durch den Inhalt der Datei ersetzt.</string>
+    <string name="settings_backup_import_confirm_title">Backup einspielen?</string>
+    <string name="settings_backup_import_confirm_text">Die vorhandenen Favoriten werden durch den Inhalt der gewählten Datei ersetzt. Notizen werden nur ergänzt; vorhandene Notizen bleiben unverändert. Podcast- und Kursdaten aus der Datei ersetzen die vorhandenen; heruntergeladene Folgen bleiben erhalten.</string>
+    <string name="settings_backup_import_confirm_action">Einspielen</string>
+    <string name="settings_backup_exported">Backup gespeichert: Downloads/%1$s</string>
+    <string name="settings_backup_export_failed">Das Backup konnte nicht gespeichert werden.</string>
+    <string name="settings_backup_imported">Backup eingespielt: %1$d Favoriten-Apps, %2$s, %3$d Wetterorte.</string>
+    <string name="settings_backup_imported_notes">Notizen: %1$d.</string>
+    <string name="settings_backup_imported_podcasts">Podcast-Abos: %1$d.</string>
+    <string name="settings_backup_imported_markets">Kurse-Bestand: %1$d Werte.</string>
+    <string name="settings_backup_imported_contacts">%1$d Kontakte</string>
+    <string name="settings_backup_imported_no_contacts">Kontakte unverändert</string>
+    <string name="settings_backup_invalid">Die Datei ist kein gültiges MiriquidiLauncher-Backup.</string>
+    <string name="settings_backup_read_failed">Die Datei konnte nicht gelesen werden.</string>
+    <string name="settings_storage_denied">Ohne Speicherberechtigung ist auf diesem Android-Stand kein Export möglich.</string>
+    <string name="settings_section_language">Sprache</string>
+    <string name="settings_language_text">Der Launcher folgt der Systemsprache (Deutsch oder Englisch).</string>
+    <string name="settings_language_button">App-Sprache in den Systemeinstellungen ändern</string>
+
+    <string name="settings_order_count">%1$s (%2$d)</string>
+    <string name="settings_expand">Ausklappen</string>
+    <string name="settings_collapse">Einklappen</string>
+    <string name="settings_section_home">Startseite</string>
+    <string name="settings_agenda_title">Termine des nächsten Tages anzeigen</string>
+    <string name="settings_agenda_text">Zeigt auf der Startseite eine Card mit den noch ausstehenden Terminen von heute und ab 20 Uhr mit den Terminen von morgen. Tippen öffnet den Tag im Kalender. Die Termine werden nur auf diesem Gerät gelesen.</string>
+    <string name="settings_agenda_permission_missing">Der Kalenderzugriff fehlt, daher können keine Termine angezeigt werden.</string>
+    <string name="settings_agenda_permission_action">Kalenderzugriff erlauben</string>
+    <string name="settings_agenda_permission_settings">App-Einstellungen</string>
+    <string name="agenda_today">Heute</string>
+    <string name="agenda_tomorrow">Morgen</string>
+    <string name="agenda_none">Keine Termine</string>
+    <string name="agenda_more">+%1$d weitere</string>
+    <string name="agenda_ongoing">Fortlaufend</string>
+    <string name="settings_section_about">Info und Lizenzen</string>
+    <string name="settings_license_text">MiriquidiLauncher ist freie Software unter der GNU General Public License, Version 3 oder später, ohne jede Gewährleistung.</string>
+    <string name="settings_version">Version %1$s (Build %2$d)</string>
+    <string name="settings_license_notices">Open-Source-Lizenzen</string>
+    <string name="settings_license_close">Schließen</string>
+    <string name="settings_section_scopes">Scopes</string>
+    <string name="settings_scopes_text">Scopes mit Häkchen werden angezeigt. Ausgeblendete Scopes verschwinden aus der Wischreihenfolge und aus dem Scopes-Menü. Startseite und Einstellungen bleiben immer erreichbar.</string>
+</resources>
