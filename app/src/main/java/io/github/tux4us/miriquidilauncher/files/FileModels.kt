@@ -25,6 +25,12 @@ data class SortOrder(val field: SortField = SortField.NAME, val ascending: Boole
 /** Fortschritt eines Vorgangs. [totalBytes] ist 0, solange die Größe noch ermittelt wird. */
 data class FileProgress(val doneBytes: Long, val totalBytes: Long, val currentName: String)
 
+/** Art eines Vorgangs auf Dateien oder Medien. */
+enum class OpKind { COPY, MOVE, DELETE, TRASH, RESTORE, ZIP, UNZIP, EMPTY_TRASH }
+
+/** Zustand eines laufenden Vorgangs für die Oberfläche. */
+data class OperationUi(val kind: OpKind, val progress: FileProgress? = null)
+
 /** Ergebnis eines Vorgangs auf mehreren Einträgen: Zahl der erledigten Einträge und die Namen der fehlgeschlagenen. */
 data class OpResult(val done: Int, val failed: List<String>, val skipped: Int = 0) {
     val ok: Boolean get() = failed.isEmpty()

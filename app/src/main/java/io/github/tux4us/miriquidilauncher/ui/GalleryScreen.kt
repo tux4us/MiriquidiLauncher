@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.ui
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build
 import android.text.format.Formatter
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -70,11 +71,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.tux4us.miriquidilauncher.R
-import io.github.tux4us.miriquidilauncher.files.FileKind
-import io.github.tux4us.miriquidilauncher.files.FileTrash
-import io.github.tux4us.miriquidilauncher.files.FileTypes
 import io.github.tux4us.miriquidilauncher.files.OpKind
-import io.github.tux4us.miriquidilauncher.files.TrashItem
 import io.github.tux4us.miriquidilauncher.gallery.Album
 import io.github.tux4us.miriquidilauncher.gallery.GalleryIntents
 import io.github.tux4us.miriquidilauncher.gallery.GalleryLogic
@@ -124,7 +121,17 @@ fun GalleryScreen(viewModel: GalleryViewModel, active: Boolean, modifier: Modifi
     }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { viewModel.onActive() }
     val grantMedia = { permissionLauncher.launch(GalleryRepository.permissions()) }
-    val grantAllFiles = { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) openAllFilesSettings(context) }
+    // Systemdialog der Mediathek („Erlauben?“) für Papierkorb, Löschen, Umbenennen und Verschieben.
+    val consentRequest by viewModel.consentRequest.collectAsStateWithLifecycle()
+    val consentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        viewModel.onConsentResult(result.resultCode == Activity.RESULT_OK)
+    }
+    LaunchedEffect(consentRequest) {
+        consentRequest?.let {
+            viewModel.consentLaunched()
+            consentLauncher.launch(IntentSenderRequest.Builder(it).build())
+        }
+    }
 
     val canGoBack = state.viewerIndex != null || state.selection.isNotEmpty() || state.trashSelection.isNotEmpty() ||
         state.searchQuery != null || state.tab != GalleryTab.ALL
@@ -132,12 +139,12 @@ fun GalleryScreen(viewModel: GalleryViewModel, active: Boolean, modifier: Modifi
 
     ScopePage(title = stringResource(R.string.scope_gallery), modifier = modifier) {
         Column(Modifier.fillMaxSize()) {
-            state.notice?.let { GalleryNoticeBanner(it, grantAllFiles, viewModel::consumeNotice) }
+            state.notice?.let { GalleryNoticeBanner(it, viewModel::consumeNotice) }
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 when (state.mediaAccess) {
                     null -> CircularProgressIndicator(Modifier.align(Alignment.Center), color = WeatherText)
-                    false -> GalleryPermissionCard(grantMedia, grantAllFiles)
-                    true -> GalleryContent(state, viewModel, context, grantAllFiles) { dialog = it }
+                    false -> GalleryPermissionCard(grantMedia)
+                    true -> GalleryContent(state, viewModel, context) { dialog = it }
                 }
             }
             Spacer(Modifier.height(ScopeBottomClearance))
@@ -151,27 +158,21 @@ fun GalleryScreen(viewModel: GalleryViewModel, active: Boolean, modifier: Modifi
 // region Berechtigung und Hinweise --------------------------------------------------------------
 
 @Composable
-private fun GalleryPermissionCard(onGrantMedia: () -> Unit, onGrantAllFiles: () -> Unit) {
+private fun GalleryPermissionCard(onGrantMedia: () -> Unit) {
     GlassCard(stringResource(R.string.scope_gallery)) {
         Text(stringResource(R.string.gallery_permission_text), color = WeatherTextMuted, style = MaterialTheme.typography.bodyMedium)
         PodcastButton(stringResource(R.string.gallery_permission_grant), onGrantMedia)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            PodcastTextButton(stringResource(R.string.gallery_permission_all_files), onGrantAllFiles)
-        }
     }
 }
 
 @Composable
-private fun GalleryNoticeBanner(notice: GalleryNotice, onGrantAllFiles: () -> Unit, onDismiss: () -> Unit) {
+private fun GalleryNoticeBanner(notice: GalleryNotice, onDismiss: () -> Unit) {
     val failed = notice.kind != GalleryNoticeKind.DONE && notice.kind != GalleryNoticeKind.CANCELLED
     Row(
         Modifier.fillMaxWidth().padding(bottom = 8.dp).glass(RoundedCornerShape(14.dp)).padding(start = 14.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(galleryNoticeText(notice), color = if (failed) GalleryError else WeatherText, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-        if (notice.kind == GalleryNoticeKind.NEEDS_ALL_FILES) {
-            PodcastTextButton(stringResource(R.string.gallery_notice_allow)) { onDismiss(); onGrantAllFiles() }
-        }
         PodcastTextButton(stringResource(R.string.gallery_notice_dismiss), onDismiss)
     }
 }
@@ -188,7 +189,7 @@ internal fun galleryNoticeText(n: GalleryNotice): String = when (n.kind) {
     }
     GalleryNoticeKind.PARTLY_FAILED -> stringResource(R.string.gallery_notice_partly, n.count, n.other)
     GalleryNoticeKind.CANCELLED -> stringResource(R.string.gallery_notice_cancelled)
-    GalleryNoticeKind.NEEDS_ALL_FILES -> stringResource(R.string.gallery_notice_needs_all_files)
+    GalleryNoticeKind.NEEDS_ANDROID_11 -> stringResource(R.string.gallery_notice_needs_android11)
     GalleryNoticeKind.NAME_INVALID -> stringResource(R.string.gallery_notice_name_invalid)
     GalleryNoticeKind.NAME_EXISTS -> stringResource(R.string.gallery_notice_name_exists)
     GalleryNoticeKind.RENAME_FAILED -> stringResource(R.string.gallery_notice_rename_failed)
@@ -205,7 +206,6 @@ private fun GalleryContent(
     state: GalleryUiState,
     viewModel: GalleryViewModel,
     context: Context,
-    onGrantAllFiles: () -> Unit,
     onDialog: (GalleryDialog) -> Unit,
 ) {
     val selecting = state.selection.isNotEmpty()
@@ -221,7 +221,7 @@ private fun GalleryContent(
         Spacer(Modifier.height(4.dp))
         Box(Modifier.weight(1f).fillMaxWidth()) {
             when {
-                state.tab == GalleryTab.TRASH -> TrashPage(state, viewModel, onGrantAllFiles, onDialog)
+                state.tab == GalleryTab.TRASH -> TrashPage(state, viewModel, onDialog)
                 state.loading && state.items.isEmpty() -> CircularProgressIndicator(Modifier.align(Alignment.Center), color = WeatherText)
                 state.tab == GalleryTab.ALBUMS && state.albumOpen == null -> AlbumsGrid(state, viewModel)
                 state.visible.isEmpty() -> ScopeEmptyHint(
@@ -468,11 +468,10 @@ private fun AlbumCard(album: Album, hidden: Boolean, onOpen: () -> Unit, onToggl
 // region Papierkorb -----------------------------------------------------------------------------
 
 @Composable
-private fun TrashPage(state: GalleryUiState, viewModel: GalleryViewModel, onGrantAllFiles: () -> Unit, onDialog: (GalleryDialog) -> Unit) {
-    if (!state.allFilesAccess) {
+private fun TrashPage(state: GalleryUiState, viewModel: GalleryViewModel, onDialog: (GalleryDialog) -> Unit) {
+    if (!state.canManage) {
         GlassCard(stringResource(R.string.gallery_tab_trash)) {
-            Text(stringResource(R.string.gallery_trash_needs_all_files), color = WeatherTextMuted, style = MaterialTheme.typography.bodyMedium)
-            PodcastButton(stringResource(R.string.gallery_permission_all_files), onGrantAllFiles)
+            Text(stringResource(R.string.gallery_trash_needs_android11), color = WeatherTextMuted, style = MaterialTheme.typography.bodyMedium)
         }
         return
     }
@@ -486,7 +485,7 @@ private fun TrashPage(state: GalleryUiState, viewModel: GalleryViewModel, onGran
             }
         }
         Text(
-            stringResource(R.string.gallery_trash_info, FileTrash.RETENTION_DAYS),
+            stringResource(R.string.gallery_trash_info, GalleryLogic.TRASH_RETENTION_DAYS),
             color = WeatherTextMuted,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
@@ -500,8 +499,8 @@ private fun TrashPage(state: GalleryUiState, viewModel: GalleryViewModel, onGran
                 horizontalArrangement = Arrangement.spacedBy(3.dp),
                 verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
-                items(state.trashItems, key = { it.item.absolutePath }) { item ->
-                    TrashThumb(item, selected = item.item.absolutePath in state.trashSelection, locale = locale) { viewModel.toggleTrashSelect(item) }
+                items(state.trashItems, key = { it.key }) { item ->
+                    TrashThumb(item, selected = item.key in state.trashSelection, locale = locale) { viewModel.toggleTrashSelect(item) }
                 }
                 item(span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(8.dp)) }
             }
@@ -510,19 +509,21 @@ private fun TrashPage(state: GalleryUiState, viewModel: GalleryViewModel, onGran
 }
 
 @Composable
-private fun TrashThumb(item: TrashItem, selected: Boolean, locale: Locale, onClick: () -> Unit) {
-    val video = remember(item) { FileTypes.kindOf(item.displayName, false) == FileKind.VIDEO }
-    val bitmap by produceState<Bitmap?>(null, item.item.absolutePath) { value = GalleryThumbnails.loadFile(item.item, video) }
+private fun TrashThumb(item: MediaEntry, selected: Boolean, locale: Locale, onClick: () -> Unit) {
+    val context = LocalContext.current
+    val bitmap by produceState<Bitmap?>(null, item.key) { value = GalleryThumbnails.load(context, item) }
     Box(Modifier.aspectRatio(1f).clip(RoundedCornerShape(6.dp)).background(Color(0x22FFFFFF)).clickable(onClick = onClick)) {
-        bitmap?.let { Image(it.asImageBitmap(), contentDescription = item.displayName, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
+        bitmap?.let { Image(it.asImageBitmap(), contentDescription = item.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
         if (selected) Box(Modifier.fillMaxSize().background(Color(0x66000000)))
-        Text(
-            formatDateTime(item.deletedAtMillis, locale),
-            color = Color.White,
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 1,
-            modifier = Modifier.align(Alignment.BottomStart).padding(3.dp).background(Color(0x99000000), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp, vertical = 1.dp),
-        )
+        if (item.expiresMillis > 0) {
+            Text(
+                formatDateTime(item.expiresMillis, locale),
+                color = Color.White,
+                style = MaterialTheme.typography.labelSmall,
+                maxLines = 1,
+                modifier = Modifier.align(Alignment.BottomStart).padding(3.dp).background(Color(0x99000000), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp, vertical = 1.dp),
+            )
+        }
         Checkbox(
             checked = selected,
             onCheckedChange = null,

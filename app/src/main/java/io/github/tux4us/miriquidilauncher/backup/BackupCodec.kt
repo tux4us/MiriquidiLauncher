@@ -13,8 +13,6 @@ import io.github.tux4us.miriquidilauncher.feed.FeedSnapshot
 import io.github.tux4us.miriquidilauncher.feed.FeedText
 import io.github.tux4us.miriquidilauncher.feed.LocalFeeds
 import io.github.tux4us.miriquidilauncher.feed.ServerUrl
-import io.github.tux4us.miriquidilauncher.files.SortField
-import io.github.tux4us.miriquidilauncher.files.SortOrder
 import io.github.tux4us.miriquidilauncher.markets.BaseUrlCheck
 import io.github.tux4us.miriquidilauncher.markets.ChartChoice
 import io.github.tux4us.miriquidilauncher.markets.ChartCurrency
@@ -134,9 +132,6 @@ object BackupCodec {
             sb.append("], \"hiddenBuckets\": [").append(g.hiddenBuckets.sorted().joinToString(", "))
             sb.append("], \"ascending\": ${g.ascending}, \"showHidden\": ${g.showHidden}}")
         }
-        data.files?.let { f ->
-            sb.append(",\n  \"files\": {\"sort\": ${str(f.sort.field.name)}, \"ascending\": ${f.sort.ascending}, \"showHidden\": ${f.showHidden}}")
-        }
         data.calculator?.let { sb.append(",\n  \"calculator\": ").append(str(CalcCodec.encode(it))) }
         data.camera?.let { c ->
             sb.append(",\n  \"camera\": {\"settings\": ").append(str(CameraSettingsCodec.encode(c.settings)))
@@ -227,7 +222,6 @@ object BackupCodec {
             weatherServer = root["weatherServer"].asObject()?.let { parseWeatherServer(it) },
             feed = root["feed"].asObject()?.let { parseFeed(it) },
             gallery = root["gallery"].asObject()?.let { parseGallery(it) },
-            files = root["files"].asObject()?.let { parseFiles(it) },
             calculator = root["calculator"].asString()?.takeIf { it.length <= MAX_CODEC_TEXT }?.let { CalcCodec.decode(it) },
             camera = root["camera"].asObject()?.let { parseCamera(it) },
             notesSettings = root["notesSettings"].asObject()?.let { parseNotesSettings(it) },
@@ -309,11 +303,6 @@ object BackupCodec {
         val buckets = o["hiddenBuckets"].asArray().orEmpty().mapNotNull { it.asDouble()?.takeIf { d -> d.isFinite() }?.toLong() }
             .take(MAX_GALLERY_ENTRIES).toSet()
         return BackupGallery(favorites, buckets, o["ascending"] as? Boolean ?: false, o["showHidden"] as? Boolean ?: false)
-    }
-
-    private fun parseFiles(o: Map<String, Any?>): BackupFiles {
-        val field = SortField.entries.firstOrNull { it.name == o["sort"].asString() } ?: SortField.NAME
-        return BackupFiles(SortOrder(field, o["ascending"] as? Boolean ?: true), o["showHidden"] as? Boolean ?: false)
     }
 
     private val PACKAGE_NAME = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")

@@ -3,18 +3,17 @@ package io.github.tux4us.miriquidilauncher.gallery
 
 import android.Manifest
 import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
+import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import androidx.annotation.RequiresApi
 import android.provider.MediaStore
 import androidx.core.content.ContextCompat
-import io.github.tux4us.miriquidilauncher.files.FileVolumes
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeoutOrNull
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.coroutines.resume
+import java.io.IOException
 
 /** Lesen der Mediathek (MediaStore) und Zugriffsprüfung. Es gibt keinen Netzwerkzugriff. */
 object GalleryRepository {
@@ -32,12 +31,8 @@ object GalleryRepository {
     private fun granted(context: Context, permission: String) =
         ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 
-    /**
-     * Darf die Galerie die Mediathek lesen? Mit „Zugriff auf alle Dateien“ ist das ohne weitere Berechtigung der Fall;
-     * sonst zählt die Medienberechtigung (ab Android 14 auch die eingeschränkte Auswahl).
-     */
+    /** Darf die Galerie die Mediathek lesen? Es zählt die Medienberechtigung (ab Android 14 auch die eingeschränkte Auswahl). */
     fun hasMediaAccess(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && FileVolumes.hasAllFilesAccess(context)) return true
         return when {
             Build.VERSION.SDK_INT >= 34 ->
                 granted(context, Manifest.permission.READ_MEDIA_IMAGES) || granted(context, Manifest.permission.READ_MEDIA_VIDEO) ||
@@ -54,16 +49,100 @@ object GalleryRepository {
             entry.id,
         )
 
-    /** Alle Fotos und Videos der Mediathek. Läuft auf dem Aufrufer-Thread; bitte nicht auf dem Hauptthread. */
-    fun load(context: Context): List<MediaEntry> {
+    /**
+     * Änderungen an fremden Medien (Papierkorb, Löschen, Umbenennen, Verschieben) bieten Android ab Version 11 über
+     * Systemdialoge an; ohne diese Version sind sie nicht möglich.
+     */
+    val canManage: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
+    /**
+     * Alle Fotos und Videos der Mediathek, mit [trashed] nur die im Papierkorb der Mediathek (ab Android 11).
+     * Läuft auf dem Aufrufer-Thread; bitte nicht auf dem Hauptthread.
+     */
+    fun load(context: Context, trashed: Boolean = false): List<MediaEntry> {
         val out = ArrayList<MediaEntry>()
-        query(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, video = false, out)
-        query(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, video = true, out)
+        if (trashed && !canManage) return out
+        query(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, video = false, trashed, out)
+        query(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, video = true, trashed, out)
         return out
     }
 
+    private fun urisOf(entries: List<MediaEntry>): List<Uri> = entries.map { uriOf(it) }
+
+    /** Systemdialog zum Verschieben in den Papierkorb ([trash]) bzw. zum Wiederherstellen. Ab Android 11. */
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun trashRequest(context: Context, entries: List<MediaEntry>, trash: Boolean): IntentSender =
+        MediaStore.createTrashRequest(context.contentResolver, urisOf(entries), trash).intentSender
+
+    /** Systemdialog zum endgültigen Löschen. Ab Android 11. */
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun deleteRequest(context: Context, entries: List<MediaEntry>): IntentSender =
+        MediaStore.createDeleteRequest(context.contentResolver, urisOf(entries)).intentSender
+
+    /** Systemdialog für Schreibzugriff (Umbenennen, Verschieben). Ab Android 11. */
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun writeRequest(context: Context, entries: List<MediaEntry>): IntentSender =
+        MediaStore.createWriteRequest(context.contentResolver, urisOf(entries)).intentSender
+
+    /** Benennt [entry] um; wirkt erst, nachdem der Nutzer den Schreibzugriff erlaubt hat. */
+    fun rename(context: Context, entry: MediaEntry, newName: String): Boolean {
+        val values = ContentValues().apply { put(MediaStore.MediaColumns.DISPLAY_NAME, newName) }
+        return try {
+            context.contentResolver.update(uriOf(entry), values, null, null) > 0
+        } catch (e: RuntimeException) {
+            false
+        }
+    }
+
+    /** Verschiebt [entry] in den Ordner [relativePath] (`Pictures/Urlaub/`); wirkt erst nach erlaubtem Schreibzugriff. */
+    fun moveToFolder(context: Context, entry: MediaEntry, relativePath: String): Boolean {
+        val values = ContentValues().apply { put("relative_path", relativePath) }
+        return try {
+            context.contentResolver.update(uriOf(entry), values, null, null) > 0
+        } catch (e: RuntimeException) {
+            false
+        }
+    }
+
+    /**
+     * Legt eine Kopie von [entry] im Ordner [relativePath] an (ab Android 10). Die Kopie gehört der App und braucht keinen
+     * Systemdialog. [onBytes] meldet die gelesenen Bytes; [cancelled] bricht ab und entfernt die angefangene Kopie.
+     */
+    fun copyToFolder(context: Context, entry: MediaEntry, relativePath: String, onBytes: (Long) -> Unit, cancelled: () -> Boolean) {
+        val resolver = context.contentResolver
+        val collection = if (entry.isVideo) MediaStore.Video.Media.EXTERNAL_CONTENT_URI else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, entry.name)
+            if (entry.mime.isNotEmpty()) put(MediaStore.MediaColumns.MIME_TYPE, entry.mime)
+            put("relative_path", relativePath)
+            put("is_pending", 1)
+        }
+        val target = resolver.insert(collection, values) ?: throw IOException("Ziel nicht anlegbar")
+        try {
+            val input = resolver.openInputStream(uriOf(entry)) ?: throw IOException("Quelle nicht lesbar")
+            val output = resolver.openOutputStream(target) ?: throw IOException("Ziel nicht schreibbar")
+            input.use { src ->
+                output.use { dst ->
+                    val buffer = ByteArray(64 * 1024)
+                    while (true) {
+                        if (cancelled()) throw IOException("Abgebrochen")
+                        val n = src.read(buffer)
+                        if (n < 0) break
+                        dst.write(buffer, 0, n)
+                        onBytes(n.toLong())
+                    }
+                }
+            }
+            val done = ContentValues().apply { put("is_pending", 0) }
+            resolver.update(target, done, null, null)
+        } catch (e: Exception) {
+            runCatching { resolver.delete(target, null, null) }
+            throw if (e is IOException) e else IOException(e.message, e)
+        }
+    }
+
     @Suppress("DEPRECATION")
-    private fun query(context: Context, uri: Uri, video: Boolean, out: MutableList<MediaEntry>) {
+    private fun query(context: Context, uri: Uri, video: Boolean, trashed: Boolean, out: MutableList<MediaEntry>) {
         val columns = arrayListOf(
             MediaStore.MediaColumns._ID,
             MediaStore.MediaColumns.DISPLAY_NAME,
@@ -79,8 +158,17 @@ object GalleryRepository {
             "datetaken",
         )
         if (video) columns.add("duration")
+        if (trashed) columns.add("date_expires")
         val cursor = try {
-            context.contentResolver.query(uri, columns.toTypedArray(), null, null, null)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Der Papierkorb der Mediathek bleibt ohne diese Angabe verborgen.
+                val args = Bundle().apply {
+                    putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, if (trashed) MediaStore.MATCH_ONLY else MediaStore.MATCH_EXCLUDE)
+                }
+                context.contentResolver.query(uri, columns.toTypedArray(), args, null)
+            } else {
+                context.contentResolver.query(uri, columns.toTypedArray(), null, null, null)
+            }
         } catch (e: SecurityException) {
             null
         } ?: return
@@ -98,6 +186,7 @@ object GalleryRepository {
             val bucketNameI = c.getColumnIndexOrThrow("bucket_display_name")
             val takenI = c.getColumnIndexOrThrow("datetaken")
             val durI = if (video) c.getColumnIndexOrThrow("duration") else -1
+            val expI = if (trashed) c.getColumnIndexOrThrow("date_expires") else -1
             while (c.moveToNext()) {
                 val path = c.getString(dataI).orEmpty()
                 if (path.contains("/.MiriquidiTrash/")) continue
@@ -118,22 +207,9 @@ object GalleryRepository {
                         height = c.getInt(hI),
                         durationMs = if (durI >= 0) c.getLong(durI) else 0L,
                         mime = c.getString(mimeI).orEmpty(),
+                        expiresMillis = if (expI >= 0) c.getLong(expI) * 1000 else 0L,
                     ),
                 )
-            }
-        }
-    }
-
-    /** Meldet geänderte Dateien dem Medienindex und wartet höchstens 5 s auf dessen Abschluss. */
-    suspend fun scan(context: Context, paths: List<String>) {
-        if (paths.isEmpty()) return
-        val distinct = paths.distinct().toTypedArray()
-        withTimeoutOrNull(5_000) {
-            suspendCancellableCoroutine { cont ->
-                val left = AtomicInteger(distinct.size)
-                MediaScannerConnection.scanFile(context.applicationContext, distinct, null) { _, _ ->
-                    if (left.decrementAndGet() == 0 && cont.isActive) cont.resume(Unit)
-                }
             }
         }
     }

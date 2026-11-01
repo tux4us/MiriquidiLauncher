@@ -27,7 +27,7 @@ Datenschutzbeauftragter:
 
 ## 3. Grundsatz: Wer verarbeitet was?
 
-Der Launcher läuft vollständig auf deinem Gerät. Der Entwickler hat auf deine Daten keinen Zugriff und kann sie nicht einer Person zuordnen. Daten, die du in die App eingibst oder die die App aus deinem Gerät liest (Kontakte, Kalender, Dateien, Fotos u. a.), werden nur lokal verarbeitet, um die jeweilige Funktion bereitzustellen.
+Der Launcher läuft vollständig auf deinem Gerät. Der Entwickler hat auf deine Daten keinen Zugriff und kann sie nicht einer Person zuordnen. Daten, die du in die App eingibst oder die die App aus deinem Gerät liest (Kontakte, Kalender, Fotos u. a.), werden nur lokal verarbeitet, um die jeweilige Funktion bereitzustellen.
 
 Bei Netzwerkabrufen (Abschnitt 5) sendet **dein Gerät** die Anfrage direkt an den genannten Anbieter. Dieser ist für seine Verarbeitung selbst verantwortlich. Der Entwickler erhält weder die Anfragen noch die Antworten.
 
@@ -45,11 +45,11 @@ Soweit die App auf Informationen im Endgerät zugreift oder dort speichert, gesc
 | Kurse | Eigener Bestand („Eigene Werte“), Diagrammauswahl, Datenquellen, optional Stooq-Schlüssel | Interner App-Speicher (Schlüssel verschlüsselt) |
 | Podcasts | Abos, Favoriten, Hörposition, Gehört-Markierungen, Zwischenspeicher der Feeds, heruntergeladene Folgen | Interner App-Speicher |
 | FeedReader | Nextcloud-Adresse und Benutzername, App-Passwort (verschlüsselt), lokale Feeds, Gelesen-Markierungen, zwischengespeicherte Artikel | Interner App-Speicher |
-| Notizen | Markdown-Dateien in `Documents/MiriquidiNotes`, Favoriten, Sortierung, optional Nextcloud-Zugang (Passwort verschlüsselt) | Gemeinsamer Speicher bzw. App-Speicher |
+| Notizen | Markdown-Dateien im app-eigenen Dokumentenordner (`Android/data/<Paket>/files/Documents/MiriquidiNotes`), Favoriten, Sortierung, optional Nextcloud-Zugang (Passwort verschlüsselt) | App-Speicher |
 | Rechner | Winkelmodus, Speicherwert, letztes Ergebnis, Verlauf (begrenzt) | Interner App-Speicher |
 | System | Akku-Statistik der letzten bis zu 7 Tage (vom Launcher aufgezeichnet), eigener Netzwerkverkehr der App (Zähler des Systems) | Interner App-Speicher |
 | Kamera | Fotos und Videos im Ordner `MiriquidiLauncher` der Mediathek; Einstellungen | Gemeinsamer Speicher (Mediathek) |
-| Galerie, Dateien | Es werden Dateien nur auf deinen Befehl angezeigt, verschoben, gelöscht oder geteilt; der Papierkorb des Dateimanagers hält gelöschte Dateien 30 Tage vor | Gemeinsamer Speicher |
+| Galerie | Fotos und Videos werden nur auf deinen Befehl angezeigt, verschoben, kopiert, umbenannt, gelöscht oder geteilt; Papierkorb, Löschen, Umbenennen und Verschieben bestätigt Android jeweils mit einem Systemdialog; der Papierkorb der Mediathek hält gelöschte Medien 30 Tage vor. Favoriten und ausgeblendete Alben speichert die App lokal | Gemeinsamer Speicher (Mediathek), App-Speicher |
 
 Android-Cloud-Backup und Gerät-zu-Gerät-Übertragung sind für die App **ausgeschaltet** (`allowBackup=false`).
 
@@ -98,7 +98,6 @@ Alle Berechtigungen sind optional und werden erst beim Gebrauch der Funktion ang
 | `ACCESS_COARSE_LOCATION` | Grober Standort für die Wetterseite, nur auf Tippen | nur als Koordinaten an Open-Meteo/Nominatim |
 | `CAMERA`, `RECORD_AUDIO` | QR-Scanner (Dekodierung mit ZXing auf dem Gerät), Kamera-Seite; Ton bei Videos | nein |
 | `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`, `READ_MEDIA_VISUAL_USER_SELECTED`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` (bis Android 10) | Galerie | nein |
-| `MANAGE_EXTERNAL_STORAGE` | Dateimanager, Notizordner, Verschieben/Löschen in Galerie, Speicherbaum der Systemseite; nur auf Befehl des Nutzers, Dateiinhalte werden nicht an Dritte übertragen | nein |
 | `PACKAGE_USAGE_STATS` | Nur Daten- und Cachegrößen anderer Apps (Systemseite); die Nutzungsdaten (welche App wann lief) werden nicht gelesen | nein |
 | `REQUEST_DELETE_PACKAGES` | Apps auf Wunsch deinstallieren | nein |
 | `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Benachrichtigung und Vordergrunddienst der Podcast-Wiedergabe | nein |

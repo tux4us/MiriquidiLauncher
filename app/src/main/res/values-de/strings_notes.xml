@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <string name="scope_notes">Notizen</string>
-    <string name="notes_permission_text">Die Notizen liegen als Markdown-Dateien im Ordner Documents/MiriquidiNotes. Dafür braucht die App den Zugriff auf alle Dateien. Android fragt dies in den Systemeinstellungen ab; es werden nur die Notizen gelesen und geändert.</string>
+    <string name="notes_permission_text">Die Notizen liegen als Markdown-Dateien im app-eigenen Dokumentenordner. Dafür ist keine Berechtigung nötig.</string>
     <string name="notes_permission_grant">Zugriff erteilen</string>
     <string name="notes_tab_all">Alle</string>
     <string name="notes_tab_favorites">Favoriten</string>

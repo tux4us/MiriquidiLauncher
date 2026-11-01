@@ -38,27 +38,26 @@
          "Bearbeiten" oder "Löschen" angefragt. Nextcloud-Kalender funktionieren über DAVx5/ICSx5, die sie
          in den Gerätekalender synchronisieren; die App selbst spricht kein CalDAV. -->
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
-    <!-- Nur bis Android 10: Backup-Export in den öffentlichen Download-Ordner (bis Android 9) und Scope "Dateien"
-         (bis Android 10, mit requestLegacyExternalStorage). Ab Android 11 genügt dort MANAGE_EXTERNAL_STORAGE. -->
+    <!-- Nur bis Android 10: Backup-Export in den öffentlichen Download-Ordner (bis Android 9). Ab Android 10 schreibt die
+         App das Backup über MediaStore, ohne Berechtigung. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
     <!-- Erforderlich für ACTION_DELETE (App deinstallieren) ab Android 9. -->
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
-    <!-- Optional: Scope "System", Karten "Cache je App" und "Speicherbaum". Beide Zugriffe sind Spezialzugriffe, die
-         der Nutzer in den Systemeinstellungen selbst erteilt; ohne sie bleiben die Karten bei einem Hinweis.
+    <!-- Optional: Scope "System", Karte "Cache je App". Der Nutzungszugriff ist ein Spezialzugriff, den der Nutzer in den
+         Systemeinstellungen selbst erteilt; ohne ihn bleibt die Karte bei einem Hinweis.
          - PACKAGE_USAGE_STATS (Nutzungszugriff): nur um die Daten- und Cachegrößen anderer Apps zu lesen
            (StorageStatsManager). Die Nutzungsdaten selbst (welche App wann lief) werden nicht gelesen.
-         - MANAGE_EXTERNAL_STORAGE (Zugriff auf alle Dateien, ab Android 11) bzw. READ_EXTERNAL_STORAGE (bis Android 10):
-           auch die Grundlage der Scope "Dateien" (Dateimanager), die Dateien nur auf Befehl des Nutzers liest und ändert;
-           nur um Ordnergrößen im gemeinsamen Speicher zu summieren. Dateiinhalte werden nicht gelesen. -->
+         - READ_EXTERNAL_STORAGE (nur bis Android 12): Medienzugriff der Scope "Galerie" (siehe unten). -->
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
     <!-- Optional: Scope "Galerie". Liest Fotos und Videos nur über die Mediathek des Geräts (MediaStore) und nur,
          solange die Seite geöffnet ist. Ab Android 13 getrennte Medienrechte, ab Android 14 auch die vom Nutzer
          ausgewählten Medien (READ_MEDIA_VISUAL_USER_SELECTED); bis Android 12 gilt READ_EXTERNAL_STORAGE (oben).
-         Löschen, Verschieben und der Papierkorb nutzen MANAGE_EXTERNAL_STORAGE (oben). Kein Netzwerkzugriff. -->
+         Papierkorb, Löschen, Umbenennen und Verschieben laufen ab Android 11 über die Systemdialoge der Mediathek
+         (MediaStore.createTrashRequest/createDeleteRequest/createWriteRequest), nicht über einen Dateizugriff.
+         Kein Netzwerkzugriff. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
@@ -112,18 +111,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Öffnen und Teilen von Dateien aus der Scope "Dateien": Der Provider ist nicht exportiert; jede Freigabe
-             gilt nur für die Dateien, die ein Intent der App ausdrücklich nennt. -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.files"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
 
         <!-- Podcast-Wiedergabe (Media3). exported="true" mit dem Media3-Intent-Filter ist nötig, damit Systemoberfläche,
              Bluetooth und Kopfhörertasten die Mediensitzung steuern können. -->

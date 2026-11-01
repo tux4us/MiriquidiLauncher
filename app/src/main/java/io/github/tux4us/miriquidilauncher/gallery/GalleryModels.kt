@@ -18,6 +18,8 @@ data class MediaEntry(
     val height: Int,
     val durationMs: Long,
     val mime: String,
+    /** Nur im Papierkorb: Zeitpunkt, zu dem das System den Eintrag endgültig löscht (0 = unbekannt). */
+    val expiresMillis: Long = 0L,
 ) {
     val key: String get() = (if (isVideo) "v" else "i") + id
     val dir: String get() = path.substringBeforeLast('/', "")

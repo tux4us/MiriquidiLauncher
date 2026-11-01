@@ -78,17 +78,4 @@
     <string name="system_cache_total">Cache of all apps</string>
     <string name="system_cache_apps">Apps counted</string>
     <string name="system_cache_hint">Largest caches. Tap an app to open its app info, where the cache can be cleared. Only apps with a launcher icon are counted.</string>
-    <string name="system_tree">Storage tree</string>
-    <string name="system_tree_permission">Folder sizes in shared storage need access to all files. Open the settings page and allow it for MiriquidiLauncher.</string>
-    <string name="system_tree_grant">Allow access to all files</string>
-    <string name="system_tree_intro">Shows which folders in shared storage take the most space. The scan can take a while and runs only on request.</string>
-    <string name="system_tree_scan">Analyze storage</string>
-    <string name="system_tree_progress">Scanning … %1$d folders, %2$d files</string>
-    <string name="system_tree_cancel">Cancel</string>
-    <string name="system_tree_size">Size of this folder</string>
-    <string name="system_tree_up">↑ Up</string>
-    <string name="system_tree_more">%1$d more folders not shown</string>
-    <string name="system_tree_files_here">%1$d files directly in this folder</string>
-    <string name="system_tree_hint">Covers shared storage only, not app data. The folders Android/data and Android/obb are not readable on Android 11 and newer, so they are missing from the sizes.</string>
-    <string name="system_tree_discard">Discard result</string>
 </resources>

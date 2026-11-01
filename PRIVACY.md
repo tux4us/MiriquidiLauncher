@@ -25,7 +25,7 @@ Data protection officer:
 
 ## 3. Principle: who processes what?
 
-The launcher runs entirely on your device. The developer has no access to your data and cannot attribute it to a person. Data you enter or that the app reads from your device (contacts, calendar, files, photos, etc.) is processed locally only, to provide the respective feature.
+The launcher runs entirely on your device. The developer has no access to your data and cannot attribute it to a person. Data you enter or that the app reads from your device (contacts, calendar, photos, etc.) is processed locally only, to provide the respective feature.
 
 For network requests (section 5), **your device** sends the request directly to the named provider, which is responsible for its own processing. The developer receives neither the requests nor the responses. Access to or storage of information on the device happens only to provide the feature you explicitly requested (Section 25(2) no. 2 TDDDG, Germany).
 
@@ -41,11 +41,11 @@ For network requests (section 5), **your device** sends the request directly to 
 | Markets | Your own holdings, chart selection, data sources, optional Stooq key | App-internal storage (key encrypted) |
 | Podcasts | Subscriptions, favourites, playback position, played marks, feed cache, downloaded episodes | App-internal storage |
 | Feed reader | Nextcloud address and user name, app password (encrypted), local feeds, read marks, cached articles | App-internal storage |
-| Notes | Markdown files in `Documents/MiriquidiNotes`, favourites, sorting, optionally Nextcloud credentials (password encrypted) | Shared storage / app storage |
+| Notes | Markdown files in the app-specific documents folder (`Android/data/<package>/files/Documents/MiriquidiNotes`), favourites, sorting, optionally Nextcloud credentials (password encrypted) | App storage |
 | Calculator | Angle mode, memory, last result, history (limited) | App-internal storage |
 | System | Battery statistics of up to the last 7 days (recorded by the launcher), the app's own network traffic (system counters) | App-internal storage |
 | Camera | Photos and videos in the `MiriquidiLauncher` folder of the media library; settings | Shared storage (media library) |
-| Gallery, files | Files are shown, moved, deleted or shared only on your command; the file manager's trash keeps deleted files for 30 days | Shared storage |
+| Gallery | Photos and videos are shown, moved, copied, renamed, deleted or shared only on your command; Android confirms trash, delete, rename and move with a system dialog each time; the media library's trash keeps deleted items for 30 days. Favourites and hidden albums are stored locally by the app | Shared storage (media library), app storage |
 
 Android cloud backup and device-to-device transfer are **disabled** for the app (`allowBackup=false`).
 
@@ -92,7 +92,6 @@ All permissions are optional and requested on use (exceptions: `INTERNET` and th
 | `ACCESS_COARSE_LOCATION` | Coarse location for the weather page, only when you tap | only as coordinates to Open-Meteo/Nominatim |
 | `CAMERA`, `RECORD_AUDIO` | QR scanner (decoded on the device with ZXing), camera page; sound for videos | no |
 | `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`, `READ_MEDIA_VISUAL_USER_SELECTED`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` (up to Android 10) | Gallery | no |
-| `MANAGE_EXTERNAL_STORAGE` | File manager, notes folder, move/delete in gallery, storage tree of the system page; only on user command, file contents are not sent to third parties | no |
 | `PACKAGE_USAGE_STATS` | Only data and cache sizes of other apps (system page); usage data (which app ran when) is not read | no |
 | `REQUEST_DELETE_PACKAGES` | Uninstall apps on request | no |
 | `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Notification and foreground service for podcast playback | no |

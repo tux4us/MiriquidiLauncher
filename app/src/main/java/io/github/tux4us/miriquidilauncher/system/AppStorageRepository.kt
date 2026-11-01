@@ -1,24 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.system
 
-import android.Manifest
 import android.app.AppOpsManager
 import android.app.usage.StorageStatsManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Environment
 import android.os.Process
 import android.os.storage.StorageManager
-import androidx.core.content.ContextCompat
-import java.io.File
 
 /**
- * Zugriff auf die beiden Daten der Speicheranalyse, die Sonderrechte brauchen:
- * - Größen von Daten und Cache fremder Apps: Nutzungszugriff (`PACKAGE_USAGE_STATS`, Spezialzugriff in den Einstellungen)
- * - Ordnergrößen im gemeinsamen Speicher: Zugriff auf alle Dateien (`MANAGE_EXTERNAL_STORAGE` ab Android 11,
- *   davor die Leseberechtigung für den Speicher)
+ * Größen von Daten und Cache fremder Apps. Dafür ist der Nutzungszugriff nötig (`PACKAGE_USAGE_STATS`, Spezialzugriff
+ * in den Einstellungen).
  */
 class AppStorageRepository(private val context: Context) {
 
@@ -32,16 +25,6 @@ class AppStorageRepository(private val context: Context) {
         }
         return mode == AppOpsManager.MODE_ALLOWED
     }
-
-    fun hasAllFilesAccess(): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
-        } else {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-        }
-
-    /** Wurzel des gemeinsamen Speichers (`/storage/emulated/0`). */
-    fun sharedStorageRoot(): File = Environment.getExternalStorageDirectory()
 
     /**
      * Daten- und Cachegrößen aller Apps mit Launcher-Aktivität (das ist die Menge, die der Launcher ohne

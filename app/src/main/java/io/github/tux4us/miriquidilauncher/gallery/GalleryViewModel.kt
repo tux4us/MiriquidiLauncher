@@ -2,21 +2,17 @@
 package io.github.tux4us.miriquidilauncher.gallery
 
 import android.app.Application
+import android.content.IntentSender
+import android.os.Build
 import android.os.Environment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.tux4us.miriquidilauncher.files.FileOps
 import io.github.tux4us.miriquidilauncher.files.FilePaths
 import io.github.tux4us.miriquidilauncher.files.FileProgress
-import io.github.tux4us.miriquidilauncher.files.FileTrash
-import io.github.tux4us.miriquidilauncher.files.FileVolumes
 import io.github.tux4us.miriquidilauncher.files.NameCheck
 import io.github.tux4us.miriquidilauncher.files.OpKind
 import io.github.tux4us.miriquidilauncher.files.OpResult
-import io.github.tux4us.miriquidilauncher.files.OperationCancelled
 import io.github.tux4us.miriquidilauncher.files.OperationUi
-import io.github.tux4us.miriquidilauncher.files.TrashItem
-import java.io.File
 import java.io.IOException
 import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +31,7 @@ enum class GalleryNoticeKind {
     DONE,
     PARTLY_FAILED,
     CANCELLED,
-    NEEDS_ALL_FILES,
+    NEEDS_ANDROID_11,
     NAME_INVALID,
     NAME_EXISTS,
     RENAME_FAILED,
@@ -51,7 +47,8 @@ data class GalleryInfo(val entry: MediaEntry, val exif: List<Pair<String, String
 data class GalleryUiState(
     /** `null`, solange der Zugriff noch nicht geprüft ist. */
     val mediaAccess: Boolean? = null,
-    val allFilesAccess: Boolean = false,
+    /** Papierkorb, Löschen, Umbenennen und Verschieben gehen nur ab Android 11 (Systemdialoge der Mediathek). */
+    val canManage: Boolean = false,
     val loading: Boolean = false,
     val items: List<MediaEntry> = emptyList(),
     val tab: GalleryTab = GalleryTab.ALL,
@@ -73,15 +70,17 @@ data class GalleryUiState(
     val viewerIndex: Int? = null,
     val slideshow: Boolean = false,
     val info: GalleryInfo? = null,
-    val trashItems: List<TrashItem> = emptyList(),
+    val trashItems: List<MediaEntry> = emptyList(),
     val trashSelection: Set<String> = emptySet(),
     val operation: OperationUi? = null,
     val notice: GalleryNotice? = null,
 )
 
 /**
- * Zustand und Aktionen der Galerie. Gelesen wird über die Mediathek; Löschen, Verschieben, Umbenennen und der
- * Papierkorb arbeiten auf den Dateien selbst und brauchen deshalb den Zugriff auf alle Dateien.
+ * Zustand und Aktionen der Galerie. Gelesen wird über die Mediathek (MediaStore). Papierkorb, Löschen, Umbenennen und
+ * Verschieben laufen über die Systemdialoge der Mediathek (ab Android 11): Die App stellt die Anfrage, das System fragt
+ * den Nutzer, danach führt die App die Änderung aus. Kopien legt die App selbst an. Dafür ist kein Zugriff auf alle
+ * Dateien nötig.
  */
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
     private val store = GalleryStore(application)
@@ -107,7 +106,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     fun onActive() {
         val app = getApplication<Application>()
         val access = GalleryRepository.hasMediaAccess(app)
-        _state.update { it.copy(mediaAccess = access, allFilesAccess = FileVolumes.hasAllFilesAccess(app)) }
+        _state.update { it.copy(mediaAccess = access, canManage = GalleryRepository.canManage) }
         if (!access) return
         viewModelScope.launch {
             if (!settingsLoaded) {
@@ -329,8 +328,6 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
 
     // region Dateivorgänge -----------------------------------------------------------------------
 
-    private fun roots(): List<File> = FileVolumes.list(getApplication()).map { File(it.path) }
-
     private fun notice(n: GalleryNotice?) = _state.update { it.copy(notice = n) }
 
     fun consumeNotice() = notice(null)
@@ -341,135 +338,187 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         cancelFlag = true
     }
 
-    private fun requireAllFiles(): Boolean {
-        val granted = FileVolumes.hasAllFilesAccess(getApplication())
-        _state.update { it.copy(allFilesAccess = granted) }
-        if (!granted) notice(GalleryNotice(GalleryNoticeKind.NEEDS_ALL_FILES))
-        return granted
+    // Anfrage an das System, die die Oberfläche startet (Systemdialog „Erlauben?“).
+    private val _consentRequest = MutableStateFlow<IntentSender?>(null)
+    val consentRequest: StateFlow<IntentSender?> = _consentRequest.asStateFlow()
+    private var afterConsent: (suspend () -> Unit)? = null
+
+    private fun askConsent(sender: IntentSender, onGranted: suspend () -> Unit) {
+        afterConsent = onGranted
+        _consentRequest.value = sender
     }
 
-    /** Führt [block] im Hintergrund aus, meldet Fortschritt, aktualisiert die Mediathek für [touched] und liest neu. */
-    private fun run(kind: OpKind, touched: List<String>, block: (progress: (FileProgress) -> Unit, cancelled: () -> Boolean, created: (File) -> Unit) -> OpResult) {
+    /** Die Oberfläche hat den Systemdialog gestartet. */
+    fun consentLaunched() {
+        _consentRequest.value = null
+    }
+
+    /** Ergebnis des Systemdialogs: bei Zustimmung folgt die geplante Änderung. */
+    fun onConsentResult(granted: Boolean) {
+        val action = afterConsent
+        afterConsent = null
+        if (!granted || action == null) {
+            notice(GalleryNotice(GalleryNoticeKind.CANCELLED))
+            return
+        }
+        viewModelScope.launch { action() }
+    }
+
+    private fun unsupported() = notice(GalleryNotice(GalleryNoticeKind.NEEDS_ANDROID_11))
+
+    /** Nach erledigter Änderung: Meldung zeigen, Auswahl leeren, Mediathek neu lesen. */
+    private fun finished(kind: OpKind?, done: Int, failed: Int = 0) {
+        val n = if (failed == 0) GalleryNotice(GalleryNoticeKind.DONE, kind, done) else GalleryNotice(GalleryNoticeKind.PARTLY_FAILED, kind, done, failed)
+        _state.update { it.copy(notice = n, selection = emptySet(), trashSelection = emptySet()) }
+        reload()
+    }
+
+    /** Verschiebt in den Papierkorb der Mediathek (Wiederherstellung innerhalb von 30 Tagen möglich). */
+    fun trash(entries: List<MediaEntry>) {
+        if (entries.isEmpty()) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) { unsupported(); return }
+        val keys = entries.map { it.key }.toSet()
+        _state.update { s -> if (s.viewerIndex != null && s.visible.getOrNull(s.viewerIndex)?.key in keys) s.copy(info = null) else s }
+        val sender = try {
+            GalleryRepository.trashRequest(getApplication(), entries, true)
+        } catch (e: RuntimeException) {
+            notice(GalleryNotice(GalleryNoticeKind.PARTLY_FAILED, OpKind.TRASH, 0, entries.size))
+            return
+        }
+        askConsent(sender) { finished(OpKind.TRASH, entries.size) }
+    }
+
+    fun moveTo(entries: List<MediaEntry>, albumDir: String) = transfer(entries, GalleryLogic.relativeDir(albumDir, storageRoot()), move = true)
+
+    fun copyTo(entries: List<MediaEntry>, albumDir: String) = transfer(entries, GalleryLogic.relativeDir(albumDir, storageRoot()), move = false)
+
+    private fun storageRoot(): String = Environment.getExternalStorageDirectory().absolutePath
+
+    private fun transfer(entries: List<MediaEntry>, albumRelative: String?, move: Boolean) {
+        if (entries.isEmpty()) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) { unsupported(); return }
+        // Ziele gibt es nur im internen Speicher; Wechselmedien und unbekannte Ordner lässt die Mediathek nicht zu.
+        if (albumRelative == null) {
+            notice(GalleryNotice(GalleryNoticeKind.NO_PATH))
+            return
+        }
+        if (move) moveEntries(entries, albumRelative) else copyEntries(entries, albumRelative)
+    }
+
+    private fun moveEntries(entries: List<MediaEntry>, albumRelative: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        val sender = try {
+            GalleryRepository.writeRequest(getApplication(), entries)
+        } catch (e: RuntimeException) {
+            notice(GalleryNotice(GalleryNoticeKind.PARTLY_FAILED, OpKind.MOVE, 0, entries.size))
+            return
+        }
+        askConsent(sender) {
+            val root = storageRoot()
+            val moved = HashMap<String, String>()
+            val result = withContext(Dispatchers.IO) {
+                var ok = 0
+                for (entry in entries) {
+                    val rel = GalleryLogic.targetRelativePath(albumRelative, entry.isVideo)
+                    if (GalleryRepository.moveToFolder(getApplication(), entry, rel)) {
+                        ok++
+                        if (entry.path.isNotEmpty()) moved[entry.path] = "$root/$rel${entry.name}"
+                    }
+                }
+                ok
+            }
+            carryFavorites(moved)
+            finished(OpKind.MOVE, result, entries.size - result)
+        }
+    }
+
+    private fun copyEntries(entries: List<MediaEntry>, albumRelative: String) {
         if (opJob?.isActive == true) return
         cancelFlag = false
-        val created = ArrayList<String>()
-        _state.update { it.copy(operation = OperationUi(kind)) }
+        val total = entries.sumOf { it.sizeBytes }
+        _state.update { it.copy(operation = OperationUi(OpKind.COPY)) }
         opJob = viewModelScope.launch {
-            val outcome = try {
-                withContext(Dispatchers.IO) {
-                    block(
-                        { p -> _state.update { s -> s.copy(operation = OperationUi(kind, p)) } },
-                        { cancelFlag },
-                        { f -> synchronized(created) { created.add(f.absolutePath) } },
-                    )
+            var done = 0L
+            var reported = 0L
+            val result = withContext(Dispatchers.IO) {
+                var ok = 0
+                val failed = ArrayList<String>()
+                for (entry in entries) {
+                    if (cancelFlag) break
+                    val rel = GalleryLogic.targetRelativePath(albumRelative, entry.isVideo)
+                    try {
+                        _state.update { it.copy(operation = OperationUi(OpKind.COPY, FileProgress(done, total, entry.name))) }
+                        GalleryRepository.copyToFolder(
+                            getApplication(), entry, rel,
+                            onBytes = { n ->
+                                done += n
+                                // Die Anzeige wird höchstens alle 256 KiB aktualisiert.
+                                if (done - reported >= 256 * 1024) {
+                                    reported = done
+                                    _state.update { it.copy(operation = OperationUi(OpKind.COPY, FileProgress(done, total, entry.name))) }
+                                }
+                            },
+                            cancelled = { cancelFlag },
+                        )
+                        ok++
+                    } catch (e: IOException) {
+                        if (!cancelFlag) failed.add(entry.name)
+                    }
                 }
-            } catch (e: OperationCancelled) {
-                null
-            } catch (e: IOException) {
-                OpResult(0, listOf(e.message.orEmpty()))
-            }
-            withContext(Dispatchers.IO) {
-                GalleryRepository.scan(getApplication(), touched + synchronized(created) { created.toList() })
+                OpResult(ok, failed)
             }
             val n = when {
-                outcome == null -> GalleryNotice(GalleryNoticeKind.CANCELLED, kind)
-                outcome.failed.isEmpty() -> GalleryNotice(GalleryNoticeKind.DONE, kind, outcome.done)
-                else -> GalleryNotice(GalleryNoticeKind.PARTLY_FAILED, kind, outcome.done, outcome.failed.size)
+                cancelFlag -> GalleryNotice(GalleryNoticeKind.CANCELLED, OpKind.COPY)
+                result.failed.isEmpty() -> GalleryNotice(GalleryNoticeKind.DONE, OpKind.COPY, result.done)
+                else -> GalleryNotice(GalleryNoticeKind.PARTLY_FAILED, OpKind.COPY, result.done, result.failed.size)
             }
             _state.update { it.copy(operation = null, notice = n, selection = emptySet()) }
             reload()
         }
     }
 
-    /** Verschiebt in den Papierkorb (Wiederherstellung innerhalb von 30 Tagen möglich). */
-    fun trash(entries: List<MediaEntry>) {
-        if (entries.isEmpty() || !requireAllFiles()) return
-        val files = entries.filter { it.path.isNotEmpty() }.map { File(it.path) }
-        if (files.isEmpty()) {
-            notice(GalleryNotice(GalleryNoticeKind.NO_PATH))
-            return
-        }
-        val roots = roots()
-        val keys = entries.map { it.key }.toSet()
-        _state.update { s -> if (s.viewerIndex != null && s.visible.getOrNull(s.viewerIndex)?.key in keys) s.copy(info = null) else s }
-        run(OpKind.TRASH, files.map { it.absolutePath }) { progress, cancelled, _ ->
-            FileTrash.trash(files, roots, System.currentTimeMillis(), progress, cancelled)
-        }
-    }
-
-    fun moveTo(entries: List<MediaEntry>, albumDir: String) = transfer(entries, albumDir, move = true)
-
-    fun copyTo(entries: List<MediaEntry>, albumDir: String) = transfer(entries, albumDir, move = false)
-
-    private fun transfer(entries: List<MediaEntry>, targetDir: String, move: Boolean) {
-        if (entries.isEmpty() || !requireAllFiles()) return
-        val files = entries.filter { it.path.isNotEmpty() }.map { File(it.path) }
-        val target = File(targetDir)
-        if (files.isEmpty() || !target.isDirectory) {
-            notice(GalleryNotice(GalleryNoticeKind.NO_PATH))
-            return
-        }
-        val kind = if (move) OpKind.MOVE else OpKind.COPY
-        run(kind, if (move) files.map { it.absolutePath } else emptyList()) { progress, cancelled, created ->
-            if (move) FileOps.move(files, target, progress, cancelled, created) else FileOps.copy(files, target, progress, cancelled, created)
-        }
-    }
-
-    /** Legt ein Album (Ordner unter „Pictures“ des internen Speichers) an und verschiebt oder kopiert [entries] hinein. */
+    /** Legt ein Album (Ordner unter „Pictures“ bzw. „Movies“) an und verschiebt oder kopiert [entries] hinein. */
     fun createAlbumAndTransfer(name: String, entries: List<MediaEntry>, move: Boolean) {
-        if (!requireAllFiles()) return
-        val check = FilePaths.checkName(name)
-        if (check != NameCheck.OK) {
+        if (FilePaths.checkName(name) != NameCheck.OK) {
             notice(GalleryNotice(GalleryNoticeKind.NAME_INVALID))
             return
         }
-        val pictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val dir = File(pictures, name.trim())
-        try {
-            if (!dir.isDirectory) FileOps.createFolder(pictures, name.trim())
-        } catch (e: IOException) {
-            notice(GalleryNotice(GalleryNoticeKind.NAME_EXISTS))
-            return
-        }
-        transfer(entries, dir.absolutePath, move)
+        transfer(entries, "Pictures/${name.trim()}/", move)
     }
 
     fun rename(entry: MediaEntry, newName: String) {
-        if (!requireAllFiles()) return
-        if (entry.path.isEmpty()) {
-            notice(GalleryNotice(GalleryNoticeKind.NO_PATH))
-            return
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) { unsupported(); return }
         if (FilePaths.checkName(newName) != NameCheck.OK) {
             notice(GalleryNotice(GalleryNoticeKind.NAME_INVALID))
             return
         }
-        viewModelScope.launch {
-            val old = File(entry.path)
-            val result = withContext(Dispatchers.IO) {
-                try {
-                    FileOps.rename(old, newName)
-                } catch (e: IOException) {
-                    null
-                } catch (e: IllegalArgumentException) {
-                    null
-                }
-            }
-            if (result == null) {
+        val name = newName.trim()
+        val sender = try {
+            GalleryRepository.writeRequest(getApplication(), listOf(entry))
+        } catch (e: RuntimeException) {
+            notice(GalleryNotice(GalleryNoticeKind.RENAME_FAILED))
+            return
+        }
+        askConsent(sender) {
+            val ok = withContext(Dispatchers.IO) { GalleryRepository.rename(getApplication(), entry, name) }
+            if (!ok) {
                 notice(GalleryNotice(GalleryNoticeKind.RENAME_FAILED))
-                return@launch
+                return@askConsent
             }
-            // Favoritenpfad mitführen, damit die Markierung erhalten bleibt.
-            val favorites = _state.value.favorites
-            if (entry.path in favorites) {
-                val next = favorites - entry.path + result.absolutePath
-                _state.update { it.copy(favorites = next) }
-                store.saveFavorites(next)
-            }
-            withContext(Dispatchers.IO) { GalleryRepository.scan(getApplication(), listOf(old.absolutePath, result.absolutePath)) }
+            if (entry.path.isNotEmpty()) carryFavorites(mapOf(entry.path to entry.dir + "/" + name))
             notice(GalleryNotice(GalleryNoticeKind.DONE, null, 1))
             reload()
         }
+    }
+
+    /** Favoriten sind nach Dateipfad gespeichert; nach Umbenennen oder Verschieben wird der neue Pfad übernommen. */
+    private suspend fun carryFavorites(moved: Map<String, String>) {
+        val favorites = _state.value.favorites
+        val affected = moved.filterKeys { it in favorites }
+        if (affected.isEmpty()) return
+        val next = favorites - affected.keys + affected.values
+        _state.update { it.copy(favorites = next) }
+        store.saveFavorites(next)
     }
 
     // endregion
@@ -478,57 +527,50 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
 
     fun loadTrash() {
         viewModelScope.launch {
-            val roots = roots()
             val items = withContext(Dispatchers.IO) {
-                if (FileVolumes.hasAllFilesAccess(getApplication())) GalleryLogic.trashedMedia(FileTrash.list(roots)).sortedByDescending { it.deletedAtMillis } else emptyList()
+                try {
+                    GalleryRepository.load(getApplication(), trashed = true).sortedWith(compareByDescending<MediaEntry> { it.expiresMillis }.thenByDescending { it.id })
+                } catch (e: SecurityException) {
+                    emptyList()
+                }
             }
-            _state.update { it.copy(trashItems = items, trashSelection = it.trashSelection.filter { p -> items.any { t -> t.item.absolutePath == p } }.toSet()) }
+            _state.update { s -> s.copy(trashItems = items, trashSelection = s.trashSelection.filter { k -> items.any { it.key == k } }.toSet()) }
         }
     }
 
-    fun toggleTrashSelect(item: TrashItem) = _state.update {
-        val key = item.item.absolutePath
-        it.copy(trashSelection = if (key in it.trashSelection) it.trashSelection - key else it.trashSelection + key)
+    fun toggleTrashSelect(item: MediaEntry) = _state.update {
+        it.copy(trashSelection = if (item.key in it.trashSelection) it.trashSelection - item.key else it.trashSelection + item.key)
     }
 
-    private fun trashTargets(): List<TrashItem> {
+    private fun trashTargets(): List<MediaEntry> {
         val s = _state.value
-        return if (s.trashSelection.isEmpty()) s.trashItems else s.trashItems.filter { it.item.absolutePath in s.trashSelection }
+        return if (s.trashSelection.isEmpty()) s.trashItems else s.trashItems.filter { it.key in s.trashSelection }
     }
 
     fun restoreTrash() {
         val items = trashTargets()
-        if (items.isEmpty() || !requireAllFiles()) return
-        run(OpKind.RESTORE, items.map { it.originalPath }) { progress, cancelled, created ->
-            var done = 0
-            val failed = ArrayList<String>()
-            for (item in items) {
-                if (cancelled()) throw OperationCancelled()
-                try {
-                    created(FileTrash.restore(item, progress, cancelled))
-                    done++
-                } catch (e: IOException) {
-                    failed.add(item.displayName)
-                }
-            }
-            OpResult(done, failed)
+        if (items.isEmpty()) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) { unsupported(); return }
+        val sender = try {
+            GalleryRepository.trashRequest(getApplication(), items, false)
+        } catch (e: RuntimeException) {
+            notice(GalleryNotice(GalleryNoticeKind.PARTLY_FAILED, OpKind.RESTORE, 0, items.size))
+            return
         }
-        _state.update { it.copy(trashSelection = emptySet()) }
+        askConsent(sender) { finished(OpKind.RESTORE, items.size) }
     }
 
     fun purgeTrash() {
         val items = trashTargets()
-        if (items.isEmpty() || !requireAllFiles()) return
-        run(OpKind.DELETE, emptyList()) { _, cancelled, _ ->
-            var done = 0
-            val failed = ArrayList<String>()
-            for (item in items) {
-                if (cancelled()) throw OperationCancelled()
-                if (FileTrash.purge(item)) done++ else failed.add(item.displayName)
-            }
-            OpResult(done, failed)
+        if (items.isEmpty()) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) { unsupported(); return }
+        val sender = try {
+            GalleryRepository.deleteRequest(getApplication(), items)
+        } catch (e: RuntimeException) {
+            notice(GalleryNotice(GalleryNoticeKind.PARTLY_FAILED, OpKind.DELETE, 0, items.size))
+            return
         }
-        _state.update { it.copy(trashSelection = emptySet()) }
+        askConsent(sender) { finished(OpKind.DELETE, items.size) }
     }
 
     // endregion

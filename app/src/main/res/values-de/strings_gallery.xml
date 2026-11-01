@@ -2,9 +2,8 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <string name="scope_gallery">Galerie</string>
-    <string name="gallery_permission_text">Die Galerie liest Fotos und Videos über die Mediathek des Geräts, solange diese Seite geöffnet ist. Es werden keine Daten über das Netzwerk gesendet. Zum Löschen, Verschieben und für den Papierkorb ist zusätzlich der Zugriff auf alle Dateien nötig.</string>
+    <string name="gallery_permission_text">Die Galerie liest Fotos und Videos über die Mediathek des Geräts, solange diese Seite geöffnet ist. Es werden keine Daten über das Netzwerk gesendet. Papierkorb, Löschen, Umbenennen und Verschieben laufen über die Systemdialoge der Mediathek (ab Android 11); Android fragt jedes Mal um Erlaubnis.</string>
     <string name="gallery_permission_grant">Zugriff auf Fotos und Videos erteilen</string>
-    <string name="gallery_permission_all_files">Zugriff auf alle Dateien erlauben</string>
     <string name="gallery_tab_all">Alle</string>
     <string name="gallery_tab_albums">Alben</string>
     <string name="gallery_tab_favorites">Favoriten</string>
@@ -67,7 +66,7 @@
     <string name="gallery_info_iso">Lichtempfindlichkeit</string>
     <string name="gallery_info_focal">Brennweite</string>
     <string name="gallery_trash_info">Gelöschte Fotos und Videos bleiben %1$d Tage im Papierkorb und werden danach endgültig entfernt.</string>
-    <string name="gallery_trash_needs_all_files">Der Papierkorb arbeitet mit den Dateien selbst und braucht den Zugriff auf alle Dateien.</string>
+    <string name="gallery_trash_needs_android11">Papierkorb, Löschen, Umbenennen und Verschieben brauchen Android 11 oder neuer.</string>
     <string name="gallery_trash_none">Der Papierkorb ist leer.</string>
     <string name="gallery_trash_restore_all">Alle wiederherstellen</string>
     <string name="gallery_trash_restore_selected">Auswahl wiederherstellen</string>
@@ -86,8 +85,7 @@
     <string name="gallery_done_generic">Erledigt.</string>
     <string name="gallery_notice_partly">Erledigt: %1$d, fehlgeschlagen: %2$d</string>
     <string name="gallery_notice_cancelled">Abgebrochen.</string>
-    <string name="gallery_notice_needs_all_files">Dafür ist der Zugriff auf alle Dateien nötig.</string>
-    <string name="gallery_notice_allow">Erlauben</string>
+    <string name="gallery_notice_needs_android11">Dafür ist Android 11 oder neuer nötig.</string>
     <string name="gallery_notice_dismiss">OK</string>
     <string name="gallery_notice_name_invalid">Ungültiger Name.</string>
     <string name="gallery_notice_name_exists">Der Name ist schon vergeben oder der Ordner lässt sich nicht anlegen.</string>

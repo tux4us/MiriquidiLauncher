@@ -13,8 +13,6 @@ import io.github.tux4us.miriquidilauncher.feed.FeedInfo
 import io.github.tux4us.miriquidilauncher.feed.FeedItem
 import io.github.tux4us.miriquidilauncher.feed.FeedSnapshot
 import io.github.tux4us.miriquidilauncher.feed.LocalFeeds
-import io.github.tux4us.miriquidilauncher.files.SortField
-import io.github.tux4us.miriquidilauncher.files.SortOrder
 import io.github.tux4us.miriquidilauncher.markets.ChartChoice
 import io.github.tux4us.miriquidilauncher.markets.ChartCurrency
 import io.github.tux4us.miriquidilauncher.markets.ChartRange
@@ -317,11 +315,9 @@ class BackupCodecTest {
         assertEquals(gallery, file(full.copy(gallery = gallery)).gallery)
     }
 
-    @Test fun filesRoundTripAndUnknownSortFallsBack() {
-        val files = BackupFiles(SortOrder(SortField.DATE, ascending = false), showHidden = true)
-        assertEquals(files, file(full.copy(files = files)).files)
-        val text = BackupCodec.encode(full.copy(files = files), "x").replace("\"DATE\"", "\"BOGUS\"")
-        assertEquals(SortField.NAME, BackupCodec.decode(text, BackupCodec.MAX_FILE_BYTES).files!!.sort.field)
+    @Test fun oldBackupsWithFilesSettingsStillDecode() {
+        val text = BackupCodec.encode(full, "x").replaceFirst("{", "{\n  \"files\": {\"sort\": \"DATE\", \"ascending\": false, \"showHidden\": true},")
+        assertEquals(full.appFavorites, BackupCodec.decode(text, BackupCodec.MAX_FILE_BYTES).appFavorites)
     }
 
     @Test fun calculatorRoundTrip() {
@@ -359,7 +355,6 @@ class BackupCodecTest {
         assertNull(decoded.weatherServer)
         assertNull(decoded.feed)
         assertNull(decoded.gallery)
-        assertNull(decoded.files)
         assertNull(decoded.calculator)
         assertNull(decoded.camera)
         assertNull(decoded.notesSettings)
@@ -377,7 +372,6 @@ class BackupCodecTest {
             weatherServer = BackupWeatherServer("https://wetter.example.org", null),
             feed = BackupFeed(localFeed, true, false),
             gallery = BackupGallery(setOf("/a.jpg"), setOf(5L), false, true),
-            files = BackupFiles(SortOrder(SortField.SIZE, true), false),
             calculator = CalcPersisted(AngleMode.Deg, null, 0.0, listOf(HistoryEntry("2+2", 4.0))),
             camera = BackupCamera(CameraSettings(flash = FlashSetting.On), null),
             notesSettings = BackupNotesSettings(NoteSort.MODIFIED, false),

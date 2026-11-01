@@ -24,7 +24,6 @@ import io.github.tux4us.miriquidilauncher.data.FavoriteContactsStore
 import io.github.tux4us.miriquidilauncher.data.FavoritesStore
 import io.github.tux4us.miriquidilauncher.feed.FeedStore
 import io.github.tux4us.miriquidilauncher.feed.LocalFeeds
-import io.github.tux4us.miriquidilauncher.files.FilesStore
 import io.github.tux4us.miriquidilauncher.gallery.GalleryStore
 import io.github.tux4us.miriquidilauncher.markets.MarketStore
 import io.github.tux4us.miriquidilauncher.notes.NotesRepository
@@ -74,7 +73,6 @@ class BackupManager(context: Context) {
     private val scopeStore = ScopeVisibilityStore(appContext)
     private val feedStore = FeedStore(appContext)
     private val galleryStore = GalleryStore(appContext)
-    private val filesStore = FilesStore(appContext)
     private val calculatorStore = CalculatorStore(appContext)
     private val cameraSettingsStore = CameraSettingsStore(appContext)
     private val cameraAppStore = CameraStore(appContext)
@@ -100,7 +98,6 @@ class BackupManager(context: Context) {
             weatherServer = if (includeFileOnlyData) weatherStore.loadServer().let { BackupWeatherServer(it?.forecastBase, it?.airBase) } else null,
             feed = if (includeFileOnlyData) feedForBackup() else null,
             gallery = if (includeFileOnlyData) galleryStore.load().let { BackupGallery(it.favorites, it.hiddenBuckets, it.ascending, it.showHidden) } else null,
-            files = if (includeFileOnlyData) filesStore.load().let { BackupFiles(it.sort, it.showHidden) } else null,
             calculator = if (includeFileOnlyData) calculatorStore.load() else null,
             camera = if (includeFileOnlyData) cameraForBackup() else null,
             notesSettings = if (includeFileOnlyData) notesStore.settings().let { BackupNotesSettings(it.sort, it.ascending) } else null,
@@ -237,10 +234,6 @@ class BackupManager(context: Context) {
             galleryStore.saveHidden(g.hiddenBuckets)
             galleryStore.saveAscending(g.ascending)
             galleryStore.saveShowHidden(g.showHidden)
-        }
-        data.files?.let { f ->
-            filesStore.saveSort(f.sort)
-            filesStore.saveShowHidden(f.showHidden)
         }
         data.calculator?.let { calculatorStore.save(it) }
         data.camera?.let { c ->

@@ -2,9 +2,8 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <string name="scope_gallery">Gallery</string>
-    <string name="gallery_permission_text">The gallery reads photos and videos through the device media library while this page is open. No data is sent over the network. Deleting, moving and the trash additionally need access to all files.</string>
+    <string name="gallery_permission_text">The gallery reads photos and videos through the device media library while this page is open. No data is sent over the network. The trash, deleting, renaming and moving use the system dialogs of the media library (Android 11 or newer); each time, Android asks you for permission.</string>
     <string name="gallery_permission_grant">Allow access to photos and videos</string>
-    <string name="gallery_permission_all_files">Allow access to all files</string>
     <string name="gallery_tab_all">All</string>
     <string name="gallery_tab_albums">Albums</string>
     <string name="gallery_tab_favorites">Favorites</string>
@@ -67,7 +66,7 @@
     <string name="gallery_info_iso">Sensitivity</string>
     <string name="gallery_info_focal">Focal length</string>
     <string name="gallery_trash_info">Deleted photos and videos stay in the trash for %1$d days and are then removed permanently.</string>
-    <string name="gallery_trash_needs_all_files">The trash works on the files themselves and needs access to all files.</string>
+    <string name="gallery_trash_needs_android11">The trash, deleting, renaming and moving need Android 11 or newer.</string>
     <string name="gallery_trash_none">The trash is empty.</string>
     <string name="gallery_trash_restore_all">Restore all</string>
     <string name="gallery_trash_restore_selected">Restore selection</string>
@@ -86,8 +85,7 @@
     <string name="gallery_done_generic">Done.</string>
     <string name="gallery_notice_partly">Done: %1$d, failed: %2$d</string>
     <string name="gallery_notice_cancelled">Cancelled.</string>
-    <string name="gallery_notice_needs_all_files">This needs access to all files.</string>
-    <string name="gallery_notice_allow">Allow</string>
+    <string name="gallery_notice_needs_android11">This needs Android 11 or newer.</string>
     <string name="gallery_notice_dismiss">OK</string>
     <string name="gallery_notice_name_invalid">Invalid name.</string>
     <string name="gallery_notice_name_exists">The name is already taken or the folder cannot be created.</string>

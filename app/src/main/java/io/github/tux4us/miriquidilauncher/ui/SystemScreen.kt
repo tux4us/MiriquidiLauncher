@@ -78,16 +78,6 @@ fun SystemScreen(viewModel: SystemViewModel, active: Boolean, modifier: Modifier
         lifecycle?.addObserver(observer)
         onDispose { lifecycle?.removeObserver(observer) }
     }
-    val storagePermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-        viewModel.analysis.refreshAccess()
-    }
-    val grantFilesAccess = {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            openAllFilesSettings(context)
-        } else {
-            storagePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-    }
     val separator = DecimalFormatSymbols.getInstance().decimalSeparator
     val snapshot = state.snapshot
 
@@ -112,18 +102,6 @@ fun SystemScreen(viewModel: SystemViewModel, active: Boolean, modifier: Modifier
                         onGrant = { openUsageAccessSettings(context) },
                         onReload = viewModel.analysis::loadApps,
                         onOpenApp = { openAppInfo(context, it) },
-                    )
-                }
-                item {
-                    StorageTreeCard(
-                        state = analysisState,
-                        separator = separator,
-                        onGrant = grantFilesAccess,
-                        onScan = viewModel.analysis::startScan,
-                        onCancel = viewModel.analysis::cancelScan,
-                        onOpen = viewModel.analysis::open,
-                        onUp = viewModel.analysis::up,
-                        onDiscard = viewModel.analysis::discard,
                     )
                 }
                 item { NetworkCard(snapshot.netRxBytes, snapshot.netTxBytes, state.netRxRate, state.netTxRate, separator) }

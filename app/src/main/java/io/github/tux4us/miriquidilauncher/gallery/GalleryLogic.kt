@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.gallery
 
-import io.github.tux4us.miriquidilauncher.files.FileKind
-import io.github.tux4us.miriquidilauncher.files.FileTypes
-import io.github.tux4us.miriquidilauncher.files.TrashItem
 import java.time.Instant
 import java.time.ZoneId
 
@@ -86,9 +83,33 @@ object GalleryLogic {
         return if (h > 0) "%d:%02d:%02d".format(h, m, s) else "%d:%02d".format(m, s)
     }
 
-    /** Einträge des Papierkorbs, die Fotos oder Videos sind, neueste zuerst. */
-    fun trashedMedia(items: List<TrashItem>): List<TrashItem> =
-        items.filter { !it.isDirectory && FileTypes.kindOf(it.displayName, false).let { k -> k == FileKind.IMAGE || k == FileKind.VIDEO } }
+    /** Tage, die das System Einträge im Papierkorb der Mediathek aufbewahrt. */
+    const val TRASH_RETENTION_DAYS = 30
+
+    /**
+     * Relativer Ordner (`Pictures/Urlaub/`) eines Albumordners [absoluteDir] auf dem Speicher mit der Wurzel [storageRoot];
+     * `null`, wenn der Ordner nicht darin liegt (anderer Speicher) oder die Wurzel selbst ist.
+     */
+    fun relativeDir(absoluteDir: String, storageRoot: String): String? {
+        val root = storageRoot.trimEnd('/') + "/"
+        if (!absoluteDir.startsWith(root)) return null
+        val rel = absoluteDir.removePrefix(root).trim('/')
+        return if (rel.isEmpty()) null else "$rel/"
+    }
+
+    /**
+     * Zielordner für ein Foto oder Video in einem Album [albumRelative] (`Pictures/Urlaub/`). Die Mediathek erlaubt Fotos
+     * nur unter `Pictures` und `DCIM`, Videos nur unter `Movies` und `DCIM`; liegt das Album woanders, wird der letzte
+     * Ordnername unter dem passenden Standardordner verwendet.
+     */
+    fun targetRelativePath(albumRelative: String, isVideo: Boolean): String {
+        val clean = albumRelative.trim('/')
+        val top = clean.substringBefore('/')
+        val allowed = if (isVideo) setOf("Movies", "DCIM") else setOf("Pictures", "DCIM")
+        if (top in allowed) return "$clean/"
+        val name = clean.substringAfterLast('/')
+        return (if (isVideo) "Movies" else "Pictures") + "/" + name + "/"
+    }
 
     /** Nächster Index bei der Diashow; am Ende geht es von vorn los. `-1` bei leerer Liste. */
     fun nextIndex(current: Int, size: Int): Int = if (size <= 0) -1 else (current + 1) % size

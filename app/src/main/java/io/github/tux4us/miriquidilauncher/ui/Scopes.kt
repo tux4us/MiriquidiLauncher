@@ -25,7 +25,6 @@ enum class Scope(@StringRes val label: Int, @DrawableRes val icon: Int, val canH
     Markets(R.string.scope_markets, R.drawable.ic_markets, network = true),
     Calculator(R.string.scope_calculator, R.drawable.ic_calculator),
     System(R.string.scope_system, R.drawable.ic_system),
-    Files(R.string.scope_files, R.drawable.ic_files),
     Gallery(R.string.scope_gallery, R.drawable.ic_gallery),
     Notes(R.string.scope_notes, R.drawable.ic_notes),
     Settings(R.string.scope_settings, R.drawable.ic_settings, canHide = false),

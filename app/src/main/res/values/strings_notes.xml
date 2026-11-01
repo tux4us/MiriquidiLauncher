@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <string name="scope_notes">Notes</string>
-    <string name="notes_permission_text">Notes are stored as Markdown files in the folder Documents/MiriquidiNotes. This needs access to all files, which Android asks for in the system settings; only the notes are read and changed.</string>
+    <string name="notes_permission_text">Notes are stored as Markdown files in the app folder for documents. This needs no permission.</string>
     <string name="notes_permission_grant">Grant access</string>
     <string name="notes_tab_all">All</string>
     <string name="notes_tab_favorites">Favorites</string>

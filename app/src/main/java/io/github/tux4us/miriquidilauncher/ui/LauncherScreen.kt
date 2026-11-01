@@ -95,7 +95,6 @@ import io.github.tux4us.miriquidilauncher.calendar.AgendaViewModel
 import io.github.tux4us.miriquidilauncher.calendar.CalendarViewModel
 import io.github.tux4us.miriquidilauncher.feed.FeedViewModel
 import io.github.tux4us.miriquidilauncher.markets.MarketsViewModel
-import io.github.tux4us.miriquidilauncher.files.FilesViewModel
 import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
 import io.github.tux4us.miriquidilauncher.notes.NotesViewModel
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
@@ -158,7 +157,6 @@ fun LauncherScreen(
     feedViewModel: FeedViewModel,
     marketsViewModel: MarketsViewModel,
     podcastsViewModel: PodcastsViewModel,
-    filesViewModel: FilesViewModel,
     galleryViewModel: GalleryViewModel,
     notesViewModel: NotesViewModel,
     systemViewModel: SystemViewModel,
@@ -472,7 +470,6 @@ fun LauncherScreen(
                             calculatorViewModel.reloadFromStore()
                             dogViewModel.reloadFromStore()
                             cameraViewModel.reloadFromStore()
-                            filesViewModel.invalidateSettings()
                             galleryViewModel.invalidateSettings()
                             notesViewModel.invalidateSettings()
                             settingsViewModel.reloadScopes()
@@ -493,10 +490,6 @@ fun LauncherScreen(
                     Scope.Podcasts -> PodcastsScreen(
                         viewModel = podcastsViewModel,
                         active = currentScope == Scope.Podcasts,
-                    )
-                    Scope.Files -> FilesScreen(
-                        viewModel = filesViewModel,
-                        active = currentScope == Scope.Files,
                     )
                     Scope.Gallery -> GalleryScreen(
                         viewModel = galleryViewModel,

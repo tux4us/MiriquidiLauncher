@@ -7,7 +7,6 @@ import io.github.tux4us.miriquidilauncher.data.AppGroup
 import io.github.tux4us.miriquidilauncher.data.FavoriteContact
 import io.github.tux4us.miriquidilauncher.dogs.DogData
 import io.github.tux4us.miriquidilauncher.feed.FeedSnapshot
-import io.github.tux4us.miriquidilauncher.files.SortOrder
 import io.github.tux4us.miriquidilauncher.markets.ChartChoice
 import io.github.tux4us.miriquidilauncher.markets.ChartCurrency
 import io.github.tux4us.miriquidilauncher.markets.ChartRange
@@ -47,7 +46,6 @@ data class BackupData(
     /** Favoriten, ausgeblendete Alben und Sortierung der Galerie; nur in der Backup-Datei. */
     val gallery: BackupGallery? = null,
     /** Sortierung und Anzeige der Scope „Dateien“; nur in der Backup-Datei. */
-    val files: BackupFiles? = null,
     /** Winkelmodus, Speicher, letztes Ergebnis und Verlauf des Rechners; nur in der Backup-Datei. */
     val calculator: CalcPersisted? = null,
     /** Einstellungen der Kamera-Scope und die gewählte Kamera-App des Kamera-Buttons; nur in der Backup-Datei. */
@@ -74,7 +72,6 @@ data class BackupFeed(val local: FeedSnapshot?, val unreadOnly: Boolean, val loa
 
 data class BackupGallery(val favorites: Set<String>, val hiddenBuckets: Set<Long>, val ascending: Boolean, val showHidden: Boolean)
 
-data class BackupFiles(val sort: SortOrder, val showHidden: Boolean)
 
 /**
  * Kamera-Einstellungen ohne gerätespezifische Angaben (Kamerakennung, zuletzt aufgenommene Datei) und die Kamera-App

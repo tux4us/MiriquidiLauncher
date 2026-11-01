@@ -11,7 +11,7 @@
     <string name="settings_move_up">Move %1$s up</string>
     <string name="settings_move_down">Move %1$s down</string>
     <string name="settings_section_backup">Backup</string>
-    <string name="settings_backup_hint">Saves favorites (apps, contacts, weather places) and shadow heights as a JSON file in the Downloads/MiriquidiLauncher folder. It also contains the notes from Documents/MiriquidiNotes (only with access to all files, in plain text), the data of the Podcasts page (subscriptions, favorites, positions, played marks) and of the Markets page (holdings, selection, sources), also in plain text. Also saved are the order and visibility of the scopes, the local feed subscriptions, the settings of Gallery, Files, Camera, Notes, Calculator (with history) and the agenda, and the address of your own weather server. Downloaded episodes, caches, passwords and API keys are never backed up. QR codes contain only favorites, app groups, weather places and the scope arrangement.</string>
+    <string name="settings_backup_hint">Saves favorites (apps, contacts, weather places) and shadow heights as a JSON file in the Downloads/MiriquidiLauncher folder. It also contains the notes (in plain text), the data of the Podcasts page (subscriptions, favorites, positions, played marks) and of the Markets page (holdings, selection, sources), also in plain text. Also saved are the order and visibility of the scopes, the local feed subscriptions, the settings of Gallery, Camera, Notes, Calculator (with history) and the agenda, and the address of your own weather server. Downloaded episodes, caches, passwords and API keys are never backed up. QR codes contain only favorites, app groups, weather places and the scope arrangement.</string>
     <string name="settings_backup_include_contacts">Include favorite contacts</string>
     <string name="settings_backup_contacts_warning">The file will then contain names and phone numbers in plain text.</string>
     <string name="settings_backup_export">Export backup</string>
@@ -62,6 +62,6 @@
     <string name="settings_network_consent_common">No account or personal data is transmitted, there are no ads and no tracking. Without your consent the launcher makes no connections for this scope. You can hide it again at any time.</string>
     <string name="settings_network_consent_weather">Weather: For the forecast and place search, the selected place (coordinates rounded to 4 decimals) or your search term is sent to Open-Meteo.</string>
     <string name="settings_network_consent_feed">FeedReader: Only the feeds and article pages you added yourself are fetched. The respective server sees your IP address.</string>
-    <string name="settings_network_consent_podcasts">Podcasts: The podcast directory, feeds and episodes are fetched; when playing or downloading, the device connects to the podcasts own server.</string>
+    <string name="settings_network_consent_podcasts">Podcasts: The podcast directory, feeds and episodes are fetched; when playing or downloading, the device connects to the podcast’s own server.</string>
     <string name="settings_network_consent_markets">Markets: To get prices, the values you chose are requested from the configured price sources.</string>
 </resources>

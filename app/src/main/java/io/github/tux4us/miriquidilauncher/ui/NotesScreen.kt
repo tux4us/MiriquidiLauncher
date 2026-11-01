@@ -121,14 +121,7 @@ fun NotesScreen(viewModel: NotesViewModel, active: Boolean, modifier: Modifier =
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
-    val legacyPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { viewModel.onActive() }
-    val grant = {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            openAllFilesSettings(context)
-        } else {
-            legacyPermission.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))
-        }
-    }
+    val grant = { viewModel.onActive() }
     val canGoBack = state.editor != null || state.selection.isNotEmpty() || state.trashSelection.isNotEmpty() ||
         state.query != null || state.category != null || state.tab != NotesTab.ALL
     BackHandler(enabled = active && state.access == true && canGoBack) { viewModel.back() }

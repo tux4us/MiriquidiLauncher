@@ -7,7 +7,6 @@ import io.github.tux4us.miriquidilauncher.backup.BackupNote
 import io.github.tux4us.miriquidilauncher.files.FileOps
 import io.github.tux4us.miriquidilauncher.files.FilePaths
 import io.github.tux4us.miriquidilauncher.files.FileTrash
-import io.github.tux4us.miriquidilauncher.files.FileVolumes
 import io.github.tux4us.miriquidilauncher.files.OpResult
 import io.github.tux4us.miriquidilauncher.files.TrashItem
 import java.io.File
@@ -20,19 +19,25 @@ import kotlinx.coroutines.withContext
 data class SyncSummary(val downloaded: Int, val uploaded: Int, val deleted: Int, val conflicts: Int, val failed: Int)
 
 /**
- * Notizen als Dateien in `Documents/MiriquidiNotes` (Unterordner = Kategorien), Papierkorb über [FileTrash] und
- * Abgleich mit Nextcloud Notes. Braucht den Zugriff auf alle Dateien (wie der Dateimanager). Alle Vorgänge laufen
- * nacheinander (Sperre), damit sich Speichern und Abgleich nicht überschneiden.
+ * Notizen als Markdown-Dateien im app-eigenen Dokumentenordner (`Android/data/<Paket>/files/Documents/MiriquidiNotes`,
+ * Unterordner = Kategorien), Papierkorb über [FileTrash] und Abgleich mit Nextcloud Notes. Dafür ist keine
+ * Speicherberechtigung nötig. Der Ordner wird beim Deinstallieren gelöscht; das Backup sichert die Notizen. Alle
+ * Vorgänge laufen nacheinander (Sperre), damit sich Speichern und Abgleich nicht überschneiden.
  */
 class NotesRepository(context: Context, private val store: NotesStore) {
     private val appContext = context.applicationContext
     private val mutex = Mutex()
 
-    fun root(): File = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FOLDER)
+    /** App-eigener Dokumentenordner (Wurzel für Notizen und Papierkorb). */
+    private fun baseDir(): File =
+        appContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: File(appContext.filesDir, "Documents")
 
-    fun hasAccess(): Boolean = FileVolumes.hasAllFilesAccess(appContext)
+    fun root(): File = File(baseDir(), FOLDER)
 
-    private fun volumeRoots(): List<File> = FileVolumes.list(appContext).map { File(it.path) }
+    /** Der app-eigene Ordner braucht keine Berechtigung. */
+    fun hasAccess(): Boolean = true
+
+    private fun volumeRoots(): List<File> = listOf(baseDir())
 
     // region Dateien -----------------------------------------------------------------------------
 

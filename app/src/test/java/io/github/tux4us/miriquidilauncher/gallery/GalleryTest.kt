@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.gallery
 
-import io.github.tux4us.miriquidilauncher.files.TrashItem
-import java.io.File
 import java.time.ZoneId
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -90,10 +88,20 @@ class GalleryTest {
     }
 
     @Test
-    fun trashedMedia() {
-        fun t(path: String, dir: Boolean = false) = TrashItem(File("/t/x"), File("/t/x.info"), path, 1L, dir)
-        val list = GalleryLogic.trashedMedia(listOf(t("/a/b.JPG"), t("/a/c.txt"), t("/a/d.mp4"), t("/a/e.jpg", dir = true)))
-        assertEquals(listOf("b.JPG", "d.mp4"), list.map { it.displayName })
-        assertTrue(GalleryLogic.trashedMedia(emptyList()).isEmpty())
+    fun relativeDirOnPrimaryStorage() {
+        val root = "/storage/emulated/0"
+        assertEquals("Pictures/Urlaub/", GalleryLogic.relativeDir("$root/Pictures/Urlaub", root))
+        assertEquals("DCIM/Camera/", GalleryLogic.relativeDir("$root/DCIM/Camera/", "$root/"))
+        assertEquals(null, GalleryLogic.relativeDir(root, root))
+        assertEquals(null, GalleryLogic.relativeDir("/storage/ABCD-1234/Pictures/X", root))
+    }
+
+    @Test
+    fun targetPathRespectsAllowedFolders() {
+        assertEquals("Pictures/Urlaub/", GalleryLogic.targetRelativePath("Pictures/Urlaub/", isVideo = false))
+        assertEquals("DCIM/Camera/", GalleryLogic.targetRelativePath("DCIM/Camera/", isVideo = true))
+        assertEquals("Movies/Urlaub/", GalleryLogic.targetRelativePath("Pictures/Urlaub/", isVideo = true))
+        assertEquals("Pictures/Memes/", GalleryLogic.targetRelativePath("Download/Memes", isVideo = false))
+        assertEquals("Movies/Memes/", GalleryLogic.targetRelativePath("Download/Memes", isVideo = true))
     }
 }
