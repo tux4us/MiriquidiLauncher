@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-enum class OpKind { COPY, MOVE, DELETE, TRASH, RESTORE, ZIP, UNZIP, EMPTY_TRASH }
 
 enum class FilesNoticeKind {
     DONE,
@@ -40,7 +39,6 @@ data class FilesNotice(val kind: FilesNoticeKind, val op: OpKind? = null, val co
 
 data class Clipboard(val paths: List<String>, val cut: Boolean)
 
-data class OperationUi(val kind: OpKind, val progress: FileProgress? = null)
 
 data class PropertiesUi(val entry: FileEntry, val size: SizeInfo? = null, val loading: Boolean = true)
 

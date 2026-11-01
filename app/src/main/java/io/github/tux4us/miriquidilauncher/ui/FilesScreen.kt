@@ -3,7 +3,10 @@ package io.github.tux4us.miriquidilauncher.ui
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.text.format.Formatter
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -433,12 +436,19 @@ private fun iconFor(kind: FileKind): Int = when (kind) {
     else -> R.drawable.ic_file
 }
 
-internal fun formatDateTime(millis: Long, locale: Locale): String =
-    if (millis <= 0L) {
-        ""
-    } else {
-        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale)
-            .format(Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()))
+internal fun openAllFilesSettings(context: Context) {
+    try {
+        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${context.packageName}"))
+        context.startActivity(intent)
+    } catch (_: Exception) {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            context.startActivity(intent)
+        } catch (_: Exception) {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))
+            context.startActivity(intent)
+        }
     }
+}
 
 // endregion

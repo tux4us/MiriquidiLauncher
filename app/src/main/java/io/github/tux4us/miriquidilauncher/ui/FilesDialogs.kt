@@ -20,7 +20,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -50,16 +49,6 @@ import java.util.Locale
 
 private val DialogColor = Color(0xFF141A22)
 
-@Composable
-internal fun filesFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = WeatherText,
-    unfocusedTextColor = WeatherText,
-    focusedBorderColor = WeatherText,
-    unfocusedBorderColor = WeatherTextMuted,
-    focusedLabelColor = WeatherText,
-    unfocusedLabelColor = WeatherTextMuted,
-    cursorColor = WeatherText,
-)
 
 @Composable
 private fun DialogButton(text: String, onClick: () -> Unit) {
