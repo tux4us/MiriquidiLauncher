@@ -53,7 +53,7 @@ class WeatherRepository {
         "&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,surface_pressure," +
         "wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,is_day" +
         "&hourly=temperature_2m,apparent_temperature,precipitation,precipitation_probability,weather_code,wind_speed_10m," +
-        "wind_gusts_10m,wind_direction_10m,cape,surface_pressure,uv_index" +
+        "wind_gusts_10m,wind_direction_10m,cape,surface_pressure,uv_index,shortwave_radiation" +
         "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max," +
         "wind_gusts_10m_max,uv_index_max,sunshine_duration,sunrise,sunset" +
         "&timezone=auto&forecast_days=7&past_days=1&wind_speed_unit=kmh" + WeatherEndpoints.keyParam(server)

@@ -342,4 +342,30 @@ Evening: %3$s – %4$s</string>
     <string name="weather_server_error_air">Please enter a valid air quality server address.</string>
     <string name="weather_server_error_key">The key must not contain spaces and may have at most 200 characters.</string>
     <string name="weather_server_error_store">Could not save securely on this device.</string>
+    <string name="weather_section_dog">Dog weather (next 24 hours)</string>
+    <string name="weather_dog_none">No hourly data available for a dog walk rating.</string>
+    <string name="weather_dog_now">Right now: %1$s</string>
+    <string name="weather_dog_surface">Estimated asphalt in the sun: about %1$d °C</string>
+    <string name="weather_dog_peak">Hottest asphalt in daylight: about %1$d °C around %2$s</string>
+    <string name="weather_dog_windows_good">Good times for a walk:</string>
+    <string name="weather_dog_windows_caution">No ideal time. Least bad times (take care):</string>
+    <string name="weather_dog_no_window">No suitable time for a walk in daylight in the next 24 hours.</string>
+    <string name="weather_dog_window_line">%1$s – %2$s</string>
+    <string name="weather_dog_avoid_hint">Keep walks short, choose shade, grass or soil, and bring water.</string>
+    <string name="weather_dog_tick_active">Ticks are likely active today (high of %1$d °C). Check your dog after walks through grass or bushes.</string>
+    <string name="weather_dog_tick_inactive">Ticks are mostly inactive today (high of %1$d °C).</string>
+    <string name="weather_dog_note">Estimates based on weather data, not measurements, and not veterinary advice. Test it yourself: if you cannot hold the back of your hand on the pavement for 7 seconds, it is too hot for paws. Never leave a dog in a parked car.</string>
+    <string-array name="weather_dog_levels">
+        <item>Good</item>
+        <item>Caution</item>
+        <item>Avoid</item>
+    </string-array>
+    <string-array name="weather_dog_reasons">
+        <item>hot pavement</item>
+        <item>heat</item>
+        <item>cold</item>
+        <item>thunderstorm</item>
+        <item>strong gusts</item>
+        <item>heavy rain</item>
+    </string-array>
 </resources>

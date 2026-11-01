@@ -342,4 +342,30 @@ Abends: %3$s – %4$s</string>
     <string name="weather_server_error_air">Bitte eine gültige Adresse für den Luftqualitäts-Server eingeben.</string>
     <string name="weather_server_error_key">Der Schlüssel darf keine Leerzeichen enthalten und höchstens 200 Zeichen lang sein.</string>
     <string name="weather_server_error_store">Auf diesem Gerät konnte nicht sicher gespeichert werden.</string>
+    <string name="weather_section_dog">Hunde-Wetter (nächste 24 Stunden)</string>
+    <string name="weather_dog_none">Keine Stundendaten für eine Bewertung des Spaziergangs vorhanden.</string>
+    <string name="weather_dog_now">Jetzt: %1$s</string>
+    <string name="weather_dog_surface">Geschätzter Asphalt in der Sonne: etwa %1$d °C</string>
+    <string name="weather_dog_peak">Heißester Asphalt bei Tageslicht: etwa %1$d °C gegen %2$s</string>
+    <string name="weather_dog_windows_good">Gute Zeiten für den Spaziergang:</string>
+    <string name="weather_dog_windows_caution">Keine ideale Zeit. Am ehesten geeignet (mit Vorsicht):</string>
+    <string name="weather_dog_no_window">In den nächsten 24 Stunden gibt es bei Tageslicht keine geeignete Zeit für einen Spaziergang.</string>
+    <string name="weather_dog_window_line">%1$s – %2$s</string>
+    <string name="weather_dog_avoid_hint">Gassirunden kurz halten, Schatten, Wiese oder Waldboden wählen und Wasser mitnehmen.</string>
+    <string name="weather_dog_tick_active">Zecken sind heute wahrscheinlich aktiv (Höchsttemperatur %1$d °C). Nach Spaziergängen durch Gras und Gebüsch den Hund absuchen.</string>
+    <string name="weather_dog_tick_inactive">Zecken sind heute meist inaktiv (Höchsttemperatur %1$d °C).</string>
+    <string name="weather_dog_note">Schätzung aus Wetterdaten, keine Messung und keine tierärztliche Beratung. Selbst prüfen: Kannst du den Handrücken nicht 7 Sekunden auf den Boden halten, ist er für die Pfoten zu heiß. Hunde nie im geparkten Auto lassen.</string>
+    <string-array name="weather_dog_levels">
+        <item>Gut</item>
+        <item>Vorsicht</item>
+        <item>Meiden</item>
+    </string-array>
+    <string-array name="weather_dog_reasons">
+        <item>heißer Boden</item>
+        <item>Hitze</item>
+        <item>Kälte</item>
+        <item>Gewitter</item>
+        <item>starke Böen</item>
+        <item>Starkregen</item>
+    </string-array>
 </resources>

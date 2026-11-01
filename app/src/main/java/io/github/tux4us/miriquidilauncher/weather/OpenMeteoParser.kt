@@ -44,6 +44,7 @@ object OpenMeteoParser {
         val cape = hourly["cape"].asArray()
         val pressure = hourly["surface_pressure"].asArray()
         val uv = hourly["uv_index"].asArray()
+        val radiation = hourly["shortwave_radiation"].asArray()
         val out = ArrayList<HourPoint>(times.size)
         for (i in times.indices) {
             val time = parseDateTime(times.stringAt(i)) ?: continue
@@ -61,6 +62,7 @@ object OpenMeteoParser {
                 cape = cape.doubleAt(i) ?: 0.0,
                 pressure = pressure.doubleAt(i),
                 uvIndex = uv.doubleAt(i) ?: 0.0,
+                shortwaveRadiation = radiation.doubleAt(i),
             )
         }
         return out

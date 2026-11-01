@@ -39,6 +39,8 @@ data class HourPoint(
     val cape: Double,
     val pressure: Double?,
     val uvIndex: Double,
+    /** Globalstrahlung in W/m²; `null`, wenn die Quelle sie nicht liefert (z. B. ältere Berichte). */
+    val shortwaveRadiation: Double? = null,
 )
 
 data class DayPoint(

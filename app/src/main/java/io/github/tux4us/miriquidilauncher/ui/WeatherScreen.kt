@@ -334,6 +334,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.weatherSections(
     if (upcoming.size >= 2) item { WindCard(upcoming) }
     if (report.forecast.days.isNotEmpty()) item { DailyCard(report.forecast.days, now, onDetail) }
     item { ThunderCard(report.forecast.hours, now) }
+    item { DogWeatherCard(report, now) }
     item { AirCard(report.air, hourStart) }
     item { BioCard(report, hourStart) }
     item { SunCard(report, now, heights, onDetail, onEditShadow) }
