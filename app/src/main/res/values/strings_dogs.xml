@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_dogs">Dogs</string>
+    <string name="dogs_empty">No dog yet. Add your dog or import the profiles from the HundeWildnis app.</string>
+    <string name="dogs_add">Add dog</string>
+    <string name="dogs_edit">Edit</string>
+    <string name="dogs_delete">Delete</string>
+    <string name="dogs_save">Save</string>
+    <string name="dogs_cancel">Cancel</string>
+    <string name="dogs_close">Close</string>
+    <string name="dogs_import">Import from HundeWildnis app</string>
+    <string name="dogs_import_hint">Choose a backup file (.hundebackup) from the HundeWildnis app. Basic data, contacts and health notes are imported; photos, training, vital signs and cycles are not. The file is only read on this device.</string>
+    <string name="dogs_import_done">%1$d dog(s) imported, %2$d already present.</string>
+    <string name="dogs_import_error">The file could not be read or contains no dog profiles.</string>
+    <string name="dogs_importing">Reading backup file …</string>
+    <string name="dogs_delete_title">Delete %1$s?</string>
+    <string name="dogs_delete_text">The profile and all its entries are removed from this device.</string>
+    <string name="dogs_age">%1$d y %2$d mo</string>
+    <string name="dogs_age_approx">approx. %1$d y %2$d mo</string>
+    <string name="dogs_weight">%1$s kg</string>
+    <string name="dogs_section_health">Health and due dates</string>
+    <string name="dogs_health_empty">No entries yet. Add vaccinations, worming, tick and flea protection or vet appointments.</string>
+    <string name="dogs_item_add">Add entry</string>
+    <string name="dogs_item_edit">Edit entry</string>
+    <string name="dogs_done">Done today</string>
+    <string name="dogs_to_calendar">To calendar</string>
+    <string name="dogs_due_overdue">overdue since %1$s (%2$d days)</string>
+    <string name="dogs_due_today">due today</string>
+    <string name="dogs_due_in">due %1$s (in %2$d days)</string>
+    <string name="dogs_due_none">no due date set</string>
+    <string name="dogs_last">Last: %1$s</string>
+    <string name="dogs_calendar_failed">No calendar app found.</string>
+    <string name="dogs_emergency_open">Emergency card</string>
+    <string name="dogs_emergency_title">Emergency card: %1$s</string>
+    <string name="dogs_emergency_hint">Anyone who scans this code can read the data shown. Choose what appears on the card when editing the dog.</string>
+    <string name="dogs_emergency_header">EMERGENCY CARD</string>
+    <string name="dogs_label_breed">Breed</string>
+    <string name="dogs_label_owner">Owner</string>
+    <string name="dogs_label_contact">Contact</string>
+    <string name="dogs_label_chip">Chip</string>
+    <string name="dogs_label_vet">Vet</string>
+    <string name="dogs_label_medical">Medical</string>
+    <string name="dogs_label_insurance">Insurance</string>
+    <string name="dogs_field_name">Name</string>
+    <string name="dogs_field_breed">Breed</string>
+    <string name="dogs_field_color">Colour</string>
+    <string name="dogs_field_chip">Chip number</string>
+    <string name="dogs_field_weight">Weight (kg)</string>
+    <string name="dogs_field_owner">Owner</string>
+    <string name="dogs_field_owner_phone">Owner phone</string>
+    <string name="dogs_field_contact">Other contact (name, phone)</string>
+    <string name="dogs_field_vet">Vet</string>
+    <string name="dogs_field_vet_phone">Vet phone</string>
+    <string name="dogs_field_insurance">Insurance</string>
+    <string name="dogs_field_medical">Allergies, medication, conditions</string>
+    <string name="dogs_field_birth">Birth date: %1$s</string>
+    <string name="dogs_field_birth_none">Birth date: not set</string>
+    <string name="dogs_clear">Clear</string>
+    <string name="dogs_field_sex">Sex: %1$s</string>
+    <string name="dogs_field_neutered">Neutered: %1$s</string>
+    <string name="dogs_field_card_title">Show on the emergency card:</string>
+    <string name="dogs_item_title">Title</string>
+    <string name="dogs_item_kind">Type: %1$s</string>
+    <string name="dogs_item_last">Last done: %1$s</string>
+    <string name="dogs_item_last_none">Last done: not set</string>
+    <string name="dogs_item_interval">Repeat every … months (optional)</string>
+    <string name="dogs_item_due">Due on: %1$s</string>
+    <string name="dogs_item_due_none">Due on: not set</string>
+    <string name="dogs_item_hint">Without a fixed date, the due date is the last date plus the interval.</string>
+    <string name="dogs_home_title">Dogs: due soon</string>
+    <string name="dogs_home_overdue">%1$s: %2$s – overdue</string>
+    <string name="dogs_home_today">%1$s: %2$s – today</string>
+    <string name="dogs_home_soon">%1$s: %2$s – in %3$d days</string>
+    <string name="dogs_home_more">+%1$d more</string>
+    <string-array name="dogs_kinds">
+        <item>Vaccination</item>
+        <item>Worming</item>
+        <item>Tick and flea protection</item>
+        <item>Vet appointment</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="dogs_sex">
+        <item>unknown</item>
+        <item>male</item>
+        <item>female</item>
+    </string-array>
+    <string-array name="dogs_neutered">
+        <item>unknown</item>
+        <item>yes</item>
+        <item>no</item>
+    </string-array>
+</resources>

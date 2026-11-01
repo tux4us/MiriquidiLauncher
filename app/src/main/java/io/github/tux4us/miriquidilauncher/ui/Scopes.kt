@@ -17,6 +17,7 @@ enum class Scope(@StringRes val label: Int, @DrawableRes val icon: Int, val canH
     ContactFavorites(R.string.scope_contact_favorites, R.drawable.ic_person),
     AppGroups(R.string.scope_app_groups, R.drawable.ic_folder),
     Weather(R.string.scope_weather, R.drawable.ic_weather),
+    Dogs(R.string.scope_dogs, R.drawable.ic_dog),
     Calendar(R.string.scope_calendar, R.drawable.ic_calendar),
     Feed(R.string.scope_feed, R.drawable.ic_feed),
     Podcasts(R.string.scope_podcasts, R.drawable.ic_podcasts),

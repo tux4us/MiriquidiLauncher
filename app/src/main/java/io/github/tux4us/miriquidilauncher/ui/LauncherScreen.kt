@@ -115,6 +115,9 @@ import io.github.tux4us.miriquidilauncher.quickmenu.QuickMenuState
 import io.github.tux4us.miriquidilauncher.quickmenu.isOpen
 import io.github.tux4us.miriquidilauncher.search.ActionResult
 import io.github.tux4us.miriquidilauncher.calculator.CalculatorViewModel
+import io.github.tux4us.miriquidilauncher.dogs.DogLogic
+import io.github.tux4us.miriquidilauncher.dogs.DogViewModel
+import io.github.tux4us.miriquidilauncher.dogs.DueEntry
 import io.github.tux4us.miriquidilauncher.scopes.ScopePages
 import io.github.tux4us.miriquidilauncher.scopes.ScopeVisibility
 import io.github.tux4us.miriquidilauncher.camera.CameraViewModel
@@ -162,6 +165,7 @@ fun LauncherScreen(
     calculatorViewModel: CalculatorViewModel,
     cameraViewModel: CameraViewModel,
     agendaViewModel: AgendaViewModel,
+    dogViewModel: DogViewModel,
     settingsViewModel: SettingsViewModel,
     contactsGranted: Boolean,
     onRequestContacts: () -> Unit,
@@ -179,6 +183,8 @@ fun LauncherScreen(
     val podcastDetailOpen by podcastsViewModel.detailOpen.collectAsStateWithLifecycle()
     val cameraBusy by cameraViewModel.busy.collectAsStateWithLifecycle()
     val agendaState by agendaViewModel.state.collectAsStateWithLifecycle()
+    val dogState by dogViewModel.state.collectAsStateWithLifecycle()
+    val dogDue = remember(dogState.data) { DogLogic.upcoming(dogState.data.dogs, java.time.LocalDate.now(), DogLogic.HOME_DAYS) }
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
     val scopeOrder by settingsViewModel.scopeOrder.collectAsStateWithLifecycle()
     val visibleScopes = remember(hiddenScopes, scopeOrder) {
@@ -403,6 +409,7 @@ fun LauncherScreen(
                             onRequestContacts = onRequestContacts,
                             agenda = agendaState,
                             onAgendaRefresh = agendaViewModel::refresh,
+                            dogDue = dogDue,
                             onAgendaOpen = { view ->
                                 calendarViewModel.openDay(view.day)
                                 pageOf(Scope.Calendar)?.let { page -> scope.launch { sidePagerState.animateScrollToPage(page) } }
@@ -459,6 +466,7 @@ fun LauncherScreen(
                             marketsViewModel.reloadFromStore()
                             feedViewModel.reloadFromStore()
                             calculatorViewModel.reloadFromStore()
+                            dogViewModel.reloadFromStore()
                             cameraViewModel.reloadFromStore()
                             filesViewModel.invalidateSettings()
                             galleryViewModel.invalidateSettings()
@@ -507,6 +515,7 @@ fun LauncherScreen(
                         active = currentScope == Scope.Camera,
                     )
                     Scope.Calculator -> CalculatorScreen(viewModel = calculatorViewModel)
+                    Scope.Dogs -> DogsScreen(viewModel = dogViewModel)
                     null -> Unit
                 }
             }
@@ -661,6 +670,7 @@ private fun HomePage(
     onRequestContacts: () -> Unit,
     agenda: AgendaUiState,
     onAgendaRefresh: () -> Unit,
+    dogDue: List<DueEntry>,
     onAgendaOpen: (AgendaView) -> Unit,
     onOpenScope: (Scope) -> Unit,
     firstScope: Scope,
@@ -688,6 +698,7 @@ private fun HomePage(
                     if (agenda.enabled && agenda.permissionGranted && view != null) {
                         AgendaCard(view = view, onRefresh = onAgendaRefresh, onOpen = onAgendaOpen)
                     }
+                    DogsHomeCard(entries = dogDue, onOpen = { onOpenScope(Scope.Dogs) })
                 }
             } else {
                 SearchResultsContent(

@@ -18,6 +18,7 @@ import io.github.tux4us.miriquidilauncher.calculator.CalculatorStore
 import io.github.tux4us.miriquidilauncher.calendar.AgendaStore
 import io.github.tux4us.miriquidilauncher.camera.CameraSettingsStore
 import io.github.tux4us.miriquidilauncher.data.AppGroupsStore
+import io.github.tux4us.miriquidilauncher.dogs.DogStore
 import io.github.tux4us.miriquidilauncher.data.CameraStore
 import io.github.tux4us.miriquidilauncher.data.FavoriteContactsStore
 import io.github.tux4us.miriquidilauncher.data.FavoritesStore
@@ -76,6 +77,7 @@ class BackupManager(context: Context) {
     private val cameraSettingsStore = CameraSettingsStore(appContext)
     private val cameraAppStore = CameraStore(appContext)
     private val agendaStore = AgendaStore(appContext)
+    private val dogStore = DogStore(appContext)
 
     /** Aktueller Bestand als Backup-JSON. */
     private suspend fun snapshot(includeContacts: Boolean, includeFileOnlyData: Boolean): String {
@@ -101,6 +103,7 @@ class BackupManager(context: Context) {
             camera = if (includeFileOnlyData) cameraForBackup() else null,
             notesSettings = if (includeFileOnlyData) notesStore.settings().let { BackupNotesSettings(it.sort, it.ascending) } else null,
             agendaEnabled = if (includeFileOnlyData) agendaStore.enabled.first() else null,
+            dogs = if (includeFileOnlyData) dogStore.load() else null,
         )
         return BackupCodec.encode(data, Instant.now().toString())
     }
@@ -244,6 +247,7 @@ class BackupManager(context: Context) {
         }
         data.notesSettings?.let { notesStore.saveSort(it.sort, it.ascending) }
         data.agendaEnabled?.let { agendaStore.setEnabled(it) }
+        data.dogs?.let { dogStore.save(it) }
     }
 
     /** Der Schlüssel bleibt nur erhalten, wenn die Adresse dieselbe ist; sonst muss er neu eingegeben werden. */

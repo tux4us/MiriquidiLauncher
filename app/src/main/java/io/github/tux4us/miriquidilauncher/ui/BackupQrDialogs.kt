@@ -598,7 +598,7 @@ private fun backupFieldColors() = OutlinedTextFieldDefaults.colors(
 )
 
 /** QR-Code (Stufe M, 4 Module Rand) als schwarz-weißes Bitmap; unabhängig vom App-Thema. */
-private fun renderQr(content: String): Bitmap {
+internal fun renderQr(content: String): Bitmap {
     val hints = mapOf<EncodeHintType, Any>(
         EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,
         EncodeHintType.MARGIN to 4,

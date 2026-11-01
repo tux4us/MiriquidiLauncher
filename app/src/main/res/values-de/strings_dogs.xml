@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_dogs">Hunde</string>
+    <string name="dogs_empty">Noch kein Hund angelegt. Lege deinen Hund an oder importiere die Profile aus der HundeWildnis-App.</string>
+    <string name="dogs_add">Hund hinzufügen</string>
+    <string name="dogs_edit">Bearbeiten</string>
+    <string name="dogs_delete">Löschen</string>
+    <string name="dogs_save">Speichern</string>
+    <string name="dogs_cancel">Abbrechen</string>
+    <string name="dogs_close">Schließen</string>
+    <string name="dogs_import">Aus HundeWildnis-App importieren</string>
+    <string name="dogs_import_hint">Wähle eine Sicherungsdatei (.hundebackup) der HundeWildnis-App. Übernommen werden Stammdaten, Kontakte und Gesundheitsangaben; Fotos, Training, Vitalwerte und Läufigkeiten nicht. Die Datei wird nur auf diesem Gerät gelesen.</string>
+    <string name="dogs_import_done">%1$d Hund(e) übernommen, %2$d bereits vorhanden.</string>
+    <string name="dogs_import_error">Die Datei konnte nicht gelesen werden oder enthält keine Hundeprofile.</string>
+    <string name="dogs_importing">Sicherungsdatei wird gelesen …</string>
+    <string name="dogs_delete_title">%1$s löschen?</string>
+    <string name="dogs_delete_text">Das Profil und alle Einträge werden von diesem Gerät entfernt.</string>
+    <string name="dogs_age">%1$d J. %2$d Mon.</string>
+    <string name="dogs_age_approx">ca. %1$d J. %2$d Mon.</string>
+    <string name="dogs_weight">%1$s kg</string>
+    <string name="dogs_section_health">Gesundheit und Fälligkeiten</string>
+    <string name="dogs_health_empty">Noch keine Einträge. Lege Impfungen, Entwurmung, Zecken- und Flohschutz oder Tierarzttermine an.</string>
+    <string name="dogs_item_add">Eintrag hinzufügen</string>
+    <string name="dogs_item_edit">Eintrag bearbeiten</string>
+    <string name="dogs_done">Heute erledigt</string>
+    <string name="dogs_to_calendar">In den Kalender</string>
+    <string name="dogs_due_overdue">überfällig seit %1$s (%2$d Tage)</string>
+    <string name="dogs_due_today">heute fällig</string>
+    <string name="dogs_due_in">fällig am %1$s (in %2$d Tagen)</string>
+    <string name="dogs_due_none">kein Termin festgelegt</string>
+    <string name="dogs_last">Zuletzt: %1$s</string>
+    <string name="dogs_calendar_failed">Keine Kalender-App gefunden.</string>
+    <string name="dogs_emergency_open">Notfallkarte</string>
+    <string name="dogs_emergency_title">Notfallkarte: %1$s</string>
+    <string name="dogs_emergency_hint">Wer diesen Code scannt, kann die angezeigten Daten lesen. Welche Angaben auf der Karte stehen, legst du beim Bearbeiten des Hundes fest.</string>
+    <string name="dogs_emergency_header">NOTFALLKARTE</string>
+    <string name="dogs_label_breed">Rasse</string>
+    <string name="dogs_label_owner">Besitzer</string>
+    <string name="dogs_label_contact">Kontakt</string>
+    <string name="dogs_label_chip">Chip</string>
+    <string name="dogs_label_vet">Tierarzt</string>
+    <string name="dogs_label_medical">Medizinisch</string>
+    <string name="dogs_label_insurance">Versicherung</string>
+    <string name="dogs_field_name">Name</string>
+    <string name="dogs_field_breed">Rasse</string>
+    <string name="dogs_field_color">Farbe</string>
+    <string name="dogs_field_chip">Chipnummer</string>
+    <string name="dogs_field_weight">Gewicht (kg)</string>
+    <string name="dogs_field_owner">Besitzer</string>
+    <string name="dogs_field_owner_phone">Telefon des Besitzers</string>
+    <string name="dogs_field_contact">Weiterer Kontakt (Name, Telefon)</string>
+    <string name="dogs_field_vet">Tierarzt</string>
+    <string name="dogs_field_vet_phone">Telefon des Tierarztes</string>
+    <string name="dogs_field_insurance">Versicherung</string>
+    <string name="dogs_field_medical">Allergien, Medikamente, Erkrankungen</string>
+    <string name="dogs_field_birth">Geburtsdatum: %1$s</string>
+    <string name="dogs_field_birth_none">Geburtsdatum: nicht gesetzt</string>
+    <string name="dogs_clear">Löschen</string>
+    <string name="dogs_field_sex">Geschlecht: %1$s</string>
+    <string name="dogs_field_neutered">Kastriert: %1$s</string>
+    <string name="dogs_field_card_title">Auf der Notfallkarte anzeigen:</string>
+    <string name="dogs_item_title">Titel</string>
+    <string name="dogs_item_kind">Art: %1$s</string>
+    <string name="dogs_item_last">Zuletzt erledigt: %1$s</string>
+    <string name="dogs_item_last_none">Zuletzt erledigt: nicht gesetzt</string>
+    <string name="dogs_item_interval">Wiederholung alle … Monate (optional)</string>
+    <string name="dogs_item_due">Fällig am: %1$s</string>
+    <string name="dogs_item_due_none">Fällig am: nicht gesetzt</string>
+    <string name="dogs_item_hint">Ohne festes Datum ergibt sich die Fälligkeit aus dem letzten Datum plus Abstand.</string>
+    <string name="dogs_home_title">Hunde: bald fällig</string>
+    <string name="dogs_home_overdue">%1$s: %2$s – überfällig</string>
+    <string name="dogs_home_today">%1$s: %2$s – heute</string>
+    <string name="dogs_home_soon">%1$s: %2$s – in %3$d Tagen</string>
+    <string name="dogs_home_more">+%1$d weitere</string>
+    <string-array name="dogs_kinds">
+        <item>Impfung</item>
+        <item>Entwurmung</item>
+        <item>Zecken- und Flohschutz</item>
+        <item>Tierarzttermin</item>
+        <item>Sonstiges</item>
+    </string-array>
+    <string-array name="dogs_sex">
+        <item>unbekannt</item>
+        <item>Rüde</item>
+        <item>Hündin</item>
+    </string-array>
+    <string-array name="dogs_neutered">
+        <item>unbekannt</item>
+        <item>ja</item>
+        <item>nein</item>
+    </string-array>
+</resources>

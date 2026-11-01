@@ -5,6 +5,7 @@ import io.github.tux4us.miriquidilauncher.calculator.CalcPersisted
 import io.github.tux4us.miriquidilauncher.camera.CameraSettings
 import io.github.tux4us.miriquidilauncher.data.AppGroup
 import io.github.tux4us.miriquidilauncher.data.FavoriteContact
+import io.github.tux4us.miriquidilauncher.dogs.DogData
 import io.github.tux4us.miriquidilauncher.feed.FeedSnapshot
 import io.github.tux4us.miriquidilauncher.files.SortOrder
 import io.github.tux4us.miriquidilauncher.markets.ChartChoice
@@ -55,6 +56,8 @@ data class BackupData(
     val notesSettings: BackupNotesSettings? = null,
     /** Ob die Terminübersicht auf der Startseite angezeigt wird; nur in der Backup-Datei. */
     val agendaEnabled: Boolean? = null,
+    /** Hundeprofile mit Fälligkeiten und Angaben der Notfallkarte (persönliche Daten); nur in der Backup-Datei, nie im QR-Code. */
+    val dogs: DogData? = null,
 )
 
 /** Ausgeblendete Scopes und die Reihenfolge aller Scopes (Namen). Unbekannte Namen werden beim Einspielen verworfen. */

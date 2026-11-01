@@ -26,6 +26,7 @@ import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
 import io.github.tux4us.miriquidilauncher.notes.NotesViewModel
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
 import io.github.tux4us.miriquidilauncher.calculator.CalculatorViewModel
+import io.github.tux4us.miriquidilauncher.dogs.DogViewModel
 import io.github.tux4us.miriquidilauncher.ui.LauncherScreen
 import io.github.tux4us.miriquidilauncher.ui.LauncherTheme
 import io.github.tux4us.miriquidilauncher.ui.LauncherViewModel
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
     private val calculatorViewModel: CalculatorViewModel by viewModels()
     private val cameraViewModel: CameraViewModel by viewModels()
     private val agendaViewModel: AgendaViewModel by viewModels()
+    private val dogViewModel: DogViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
 
     private var contactsGranted by mutableStateOf(false)
@@ -81,6 +83,7 @@ class MainActivity : ComponentActivity() {
                     calculatorViewModel = calculatorViewModel,
                     cameraViewModel = cameraViewModel,
                     agendaViewModel = agendaViewModel,
+                    dogViewModel = dogViewModel,
                     settingsViewModel = settingsViewModel,
                     contactsGranted = contactsGranted,
                     onRequestContacts = {

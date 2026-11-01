@@ -32,6 +32,10 @@ import io.github.tux4us.miriquidilauncher.weather.ShadowHeights
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import io.github.tux4us.miriquidilauncher.dogs.DogData
+import io.github.tux4us.miriquidilauncher.dogs.DogProfile
+import io.github.tux4us.miriquidilauncher.dogs.HealthItem
+import io.github.tux4us.miriquidilauncher.dogs.HealthKind
 import org.junit.Test
 
 class BackupCodecTest {
@@ -360,6 +364,7 @@ class BackupCodecTest {
         assertNull(decoded.camera)
         assertNull(decoded.notesSettings)
         assertNull(decoded.agendaEnabled)
+        assertNull(decoded.dogs)
     }
 
     @Test fun completeBackupRoundTrips() {
@@ -377,6 +382,14 @@ class BackupCodecTest {
             camera = BackupCamera(CameraSettings(flash = FlashSetting.On), null),
             notesSettings = BackupNotesSettings(NoteSort.MODIFIED, false),
             agendaEnabled = true,
+            dogs = DogData(
+                listOf(
+                    DogProfile(
+                        id = "d1", name = "Bella", ownerPhone = "0170 1", birthDate = java.time.LocalDate.of(2020, 3, 1), birthApprox = true,
+                        health = listOf(HealthItem("h1", HealthKind.DEWORMING, "Wurmkur", java.time.LocalDate.of(2026, 9, 1), 3, null)),
+                    ),
+                ),
+            ),
         )
         assertEquals(complete, file(complete))
     }
