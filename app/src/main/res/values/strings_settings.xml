@@ -62,6 +62,6 @@
     <string name="settings_network_consent_common">No account or personal data is transmitted, there are no ads and no tracking. Without your consent the launcher makes no connections for this scope. You can hide it again at any time.</string>
     <string name="settings_network_consent_weather">Weather: For the forecast and place search, the selected place (coordinates rounded to 4 decimals) or your search term is sent to Open-Meteo.</string>
     <string name="settings_network_consent_feed">FeedReader: Only the feeds and article pages you added yourself are fetched. The respective server sees your IP address.</string>
-    <string name="settings_network_consent_podcasts">Podcasts: The podcast directory, feeds and episodes are fetched; when playing or downloading, the device connects to the podcast's own server.</string>
+    <string name="settings_network_consent_podcasts">Podcasts: The podcast directory, feeds and episodes are fetched; when playing or downloading, the device connects to the podcasts own server.</string>
     <string name="settings_network_consent_markets">Markets: To get prices, the values you chose are requested from the configured price sources.</string>
 </resources>

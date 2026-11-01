@@ -184,8 +184,12 @@ fun LauncherScreen(
     val cameraBusy by cameraViewModel.busy.collectAsStateWithLifecycle()
     val agendaState by agendaViewModel.state.collectAsStateWithLifecycle()
     val dogState by dogViewModel.state.collectAsStateWithLifecycle()
-    val dogDue = remember(dogState.data) { DogLogic.upcoming(dogState.data.dogs, java.time.LocalDate.now(), DogLogic.HOME_DAYS) }
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
+    // Die Karte „Hunde“ erscheint nur bei eingeblendeter Hunde-Scope.
+    val dogsShown = Scope.Dogs.name !in hiddenScopes
+    val dogDue = remember(dogState.data, dogsShown) {
+        if (dogsShown) DogLogic.upcoming(dogState.data.dogs, java.time.LocalDate.now(), DogLogic.HOME_DAYS) else emptyList()
+    }
     val scopeOrder by settingsViewModel.scopeOrder.collectAsStateWithLifecycle()
     val visibleScopes = remember(hiddenScopes, scopeOrder) {
         ScopeVisibility.visible(scopeOrder, hiddenScopes, PinnedScopeNames).map { Scope.valueOf(it) }
@@ -698,7 +702,7 @@ private fun HomePage(
                     if (agenda.enabled && agenda.permissionGranted && view != null) {
                         AgendaCard(view = view, onRefresh = onAgendaRefresh, onOpen = onAgendaOpen)
                     }
-                    if (Scope.Dogs.name !in hiddenScopes) DogsHomeCard(entries = dogDue, onOpen = { onOpenScope(Scope.Dogs) })
+                    DogsHomeCard(entries = dogDue, onOpen = { onOpenScope(Scope.Dogs) })
                 }
             } else {
                 SearchResultsContent(
