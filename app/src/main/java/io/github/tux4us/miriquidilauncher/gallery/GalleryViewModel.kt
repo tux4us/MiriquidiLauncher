@@ -89,6 +89,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     val state: StateFlow<GalleryUiState> = _state.asStateFlow()
 
     private var settingsLoaded = false
+
+    /** Die gespeicherten Einstellungen wurden ersetzt (Backup-Import): Sie werden beim nächsten Öffnen der Seite neu gelesen. */
+    fun invalidateSettings() {
+        settingsLoaded = false
+    }
     private var loadJob: Job? = null
     private var opJob: Job? = null
     private var slideshowJob: Job? = null

@@ -20,7 +20,7 @@ private val Context.calculatorDataStore: DataStore<Preferences> by preferencesDa
 
 /**
  * Lokaler Speicher des Rechners: Winkelmodus, Speicherwert, letztes Ergebnis und Verlauf (höchstens
- * [CalcSession.MAX_HISTORY] Einträge). Die Daten verlassen das Gerät nicht und sind nicht Teil des Launcher-Backups.
+ * [CalcSession.MAX_HISTORY] Einträge). Die Daten verlassen das Gerät nicht; sie sind Teil der Backup-Datei des Launchers.
  */
 class CalculatorStore(context: Context) {
     private val store = context.applicationContext.calculatorDataStore

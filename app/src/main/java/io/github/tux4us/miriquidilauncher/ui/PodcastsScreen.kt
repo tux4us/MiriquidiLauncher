@@ -28,6 +28,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -48,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -87,7 +90,7 @@ fun PodcastsScreen(viewModel: PodcastsViewModel, active: Boolean, modifier: Modi
 
     LaunchedEffect(active) { if (active) viewModel.onActive() }
     // Zurück schließt zuerst die Shownotes, dann die Folgenliste; erst danach geht es zur Startseite.
-    BackHandler(enabled = active && (state.openEpisode != null || state.selectedPodcast != null)) { viewModel.back() }
+    BackHandler(enabled = active && (state.openEpisode != null || state.selectedPodcast != null || state.showAll)) { viewModel.back() }
 
     // Die Systemdialoge zur Dateiwahl brauchen keine Berechtigung; gelesen oder geschrieben wird nur die gewählte Datei.
     val importPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -122,6 +125,7 @@ fun PodcastsScreen(viewModel: PodcastsViewModel, active: Boolean, modifier: Modi
                     !state.loaded -> CircularProgressIndicator(Modifier.align(Alignment.Center), color = WeatherText)
                     episode != null -> EpisodeDetail(state, episode, viewModel, play)
                     podcastUrl != null -> EpisodeListPage(state, podcastUrl, viewModel, play)
+                    state.showAll -> AllEpisodesPage(state, viewModel, play)
                     else -> {
                         Column(Modifier.fillMaxSize()) {
                             TabRow(state.tab, viewModel::selectTab)
@@ -270,8 +274,29 @@ private fun SubscriptionsTab(
             address = ""
         }
     }
+    // Ohne Abo steht die Karte zum Hinzufügen offen; danach bleibt sie hinter dem Zahnrad, bis es angetippt wird.
+    val hasSubscriptions = state.data.subscriptions.isNotEmpty()
+    var showAdd by rememberSaveable { mutableStateOf(false) }
     LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        item {
+        if (hasSubscriptions) {
+            item(key = "toolbar") {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PodcastButton(stringResource(R.string.podcasts_all_episodes), viewModel::openAll)
+                    Spacer(Modifier.weight(1f))
+                    if (state.working || state.refreshing) {
+                        CircularProgressIndicator(Modifier.size(20.dp), color = WeatherText, strokeWidth = 2.dp)
+                    }
+                    IconButton(onClick = { showAdd = !showAdd }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_settings),
+                            contentDescription = stringResource(R.string.podcasts_manage_feeds),
+                            tint = if (showAdd) WeatherText else WeatherTextMuted,
+                        )
+                    }
+                }
+            }
+        }
+        if (!hasSubscriptions || showAdd) item(key = "add") {
             Column(Modifier.fillMaxWidth().glass(RoundedCornerShape(20.dp)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
@@ -293,12 +318,12 @@ private fun SubscriptionsTab(
                     PodcastTextButton(stringResource(R.string.podcasts_export_opml), onExportOpml)
                     PodcastTextButton(stringResource(R.string.podcasts_export_html), onExportHtml)
                 }
-                if (state.working || state.refreshing) {
+                if (!hasSubscriptions && (state.working || state.refreshing)) {
                     CircularProgressIndicator(Modifier.size(20.dp), color = WeatherText, strokeWidth = 2.dp)
                 }
             }
         }
-        if (state.data.subscriptions.isEmpty()) {
+        if (!hasSubscriptions) {
             item { ScopeEmptyHint(stringResource(R.string.podcasts_empty_subs)) }
         }
         items(state.data.subscriptions, key = { it.feedUrl }) { podcast ->
@@ -356,6 +381,48 @@ private fun EpisodeListPage(state: PodcastsUiState, podcastUrl: String, viewMode
             viewModel = viewModel,
             onPlay = onPlay,
         )
+    }
+}
+
+/** Alle Folgen aller Abos, neueste zuerst. Die Liste wächst beim Scrollen um [PodcastLogic.ALL_PAGE_SIZE] Folgen. */
+@Composable
+private fun AllEpisodesPage(state: PodcastsUiState, viewModel: PodcastsViewModel, onPlay: (Episode) -> Unit) {
+    val locale = remember { Locale.getDefault() }
+    val all = remember(state.data.subscriptions, state.data.episodes) { PodcastLogic.allEpisodes(state.data) }
+    var visible by rememberSaveable { mutableStateOf(PodcastLogic.ALL_PAGE_SIZE) }
+    val shown = remember(all, visible) { all.take(visible) }
+    Column(Modifier.fillMaxSize()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            PodcastTextButton(stringResource(R.string.podcasts_back), viewModel::back)
+            Text(
+                stringResource(R.string.podcasts_all_episodes),
+                color = WeatherTextMuted,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            if (state.refreshing) CircularProgressIndicator(Modifier.size(20.dp), color = WeatherText, strokeWidth = 2.dp)
+        }
+        if (all.isEmpty()) {
+            ScopeEmptyHint(stringResource(R.string.podcasts_empty_episodes))
+            return@Column
+        }
+        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(shown, key = { it.id }) { episode ->
+                EpisodeRow(episode, state, locale, onOpen = { viewModel.openEpisode(episode) }, onPlay = { onPlay(episode) })
+            }
+            if (visible < all.size) {
+                // Sobald dieser Eintrag in den sichtbaren Bereich kommt, werden die nächsten Folgen nachgeladen.
+                item(key = "more") {
+                    LaunchedEffect(visible) { visible += PodcastLogic.ALL_PAGE_SIZE }
+                    Box(Modifier.fillMaxWidth().padding(8.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(Modifier.size(20.dp), color = WeatherText, strokeWidth = 2.dp)
+                    }
+                }
+            }
+            item { Spacer(Modifier.height(8.dp)) }
+        }
     }
 }
 

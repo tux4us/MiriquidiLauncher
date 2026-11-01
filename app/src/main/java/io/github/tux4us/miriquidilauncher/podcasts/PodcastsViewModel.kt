@@ -68,6 +68,8 @@ data class PodcastsUiState(
     val selectedPodcast: String? = null,
     /** Geöffnete Folge (Shownotes) oder `null`. */
     val openEpisode: Episode? = null,
+    /** `true`, solange die Liste aller Folgen aller Abos offen ist. */
+    val showAll: Boolean = false,
     val query: String = "",
     val searching: Boolean = false,
     val searched: Boolean = false,
@@ -154,7 +156,10 @@ class PodcastsViewModel(application: Application) : AndroidViewModel(application
         if (System.currentTimeMillis() - lastRefreshMillis > REFRESH_INTERVAL_MS) refreshAll()
     }
 
-    fun selectTab(tab: PodcastTab) = _state.update { it.copy(tab = tab, selectedPodcast = null, openEpisode = null) }
+    fun selectTab(tab: PodcastTab) = _state.update { it.copy(tab = tab, selectedPodcast = null, openEpisode = null, showAll = false) }
+
+    /** Öffnet die Liste aller Folgen aller Abos (neueste zuerst). */
+    fun openAll() = _state.update { it.copy(showAll = true, selectedPodcast = null, openEpisode = null) }
 
     fun openPodcast(feedUrl: String) {
         _state.update { it.copy(selectedPodcast = feedUrl, openEpisode = null) }
@@ -169,6 +174,7 @@ class PodcastsViewModel(application: Application) : AndroidViewModel(application
         return when {
             s.openEpisode != null -> { _state.update { it.copy(openEpisode = null) }; true }
             s.selectedPodcast != null -> { _state.update { it.copy(selectedPodcast = null) }; true }
+            s.showAll -> { _state.update { it.copy(showAll = false) }; true }
             else -> false
         }
     }

@@ -11,14 +11,14 @@
     <string name="settings_move_up">Move %1$s up</string>
     <string name="settings_move_down">Move %1$s down</string>
     <string name="settings_section_backup">Backup</string>
-    <string name="settings_backup_hint">Saves favorites (apps, contacts, weather places) and shadow heights as a JSON file in the Downloads/MiriquidiLauncher folder. It also contains the notes from Documents/MiriquidiNotes (only with access to all files, in plain text), the data of the Podcasts page (subscriptions, favorites, positions, played marks) and of the Markets page (holdings, selection, sources), also in plain text. Downloaded episodes, passwords and API keys are never backed up. QR codes contain none of this.</string>
+    <string name="settings_backup_hint">Saves favorites (apps, contacts, weather places) and shadow heights as a JSON file in the Downloads/MiriquidiLauncher folder. It also contains the notes from Documents/MiriquidiNotes (only with access to all files, in plain text), the data of the Podcasts page (subscriptions, favorites, positions, played marks) and of the Markets page (holdings, selection, sources), also in plain text. Also saved are the order and visibility of the scopes, the local feed subscriptions, the settings of Gallery, Files, Camera, Notes, Calculator (with history) and the agenda, and the address of your own weather server. Downloaded episodes, caches, passwords and API keys are never backed up. QR codes contain only favorites, app groups, weather places and the scope arrangement.</string>
     <string name="settings_backup_include_contacts">Include favorite contacts</string>
     <string name="settings_backup_contacts_warning">The file will then contain names and phone numbers in plain text.</string>
     <string name="settings_backup_export">Export backup</string>
     <string name="settings_backup_import">Import backup</string>
     <string name="settings_backup_import_note">Importing replaces the existing favorites with the contents of the file.</string>
     <string name="settings_backup_import_confirm_title">Restore backup?</string>
-    <string name="settings_backup_import_confirm_text">The existing favorites will be replaced by the contents of the selected file. Notes are only added; existing notes stay unchanged. Podcast and markets data in the file replace the existing data; downloaded episodes are kept.</string>
+    <string name="settings_backup_import_confirm_text">The existing favorites will be replaced by the contents of the selected file. Notes are only added; existing notes stay unchanged. Podcast and markets data and the settings of the other scopes in the file replace the existing data; downloaded episodes are kept.</string>
     <string name="settings_backup_import_confirm_action">Restore</string>
     <string name="settings_backup_exported">Backup saved: Downloads/%1$s</string>
     <string name="settings_backup_export_failed">The backup could not be saved.</string>
@@ -55,5 +55,6 @@
     <string name="settings_license_notices">Open-source licenses</string>
     <string name="settings_license_close">Close</string>
     <string name="settings_section_scopes">Scopes</string>
-    <string name="settings_scopes_text">Checked scopes are shown. Hidden scopes disappear from the swipe order and from the Scopes menu. The home screen and the settings always stay available.</string>
+    <string name="settings_scopes_text">Checked scopes are shown. The arrows set the order in which scopes appear when swiping and in the Scopes menu. Hidden scopes disappear from both. The home screen and the settings always stay available.</string>
+    <string name="settings_scopes_reset_order">Reset order</string>
 </resources>

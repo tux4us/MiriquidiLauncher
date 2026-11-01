@@ -7,7 +7,8 @@ import io.github.tux4us.miriquidilauncher.R
 
 /**
  * Eine Scope ist eine Seite neben der Startseite, die per Wischen oder über den Scopes-Button erreichbar ist.
- * Die Reihenfolge hier ist die Reihenfolge im Scopes-Menü und im seitlichen Pager (rechts neben der Startseite).
+ * Die Reihenfolge hier ist die Standardreihenfolge im Scopes-Menü und im seitlichen Pager (rechts neben der Startseite);
+ * in den Einstellungen lässt sie sich ändern (siehe `ScopeVisibility.orderOf`).
  * Scopes mit [canHide] lassen sich in den Einstellungen ausblenden; die Einstellungen selbst bleiben immer sichtbar.
  * Eine neue Scope braucht einen Eintrag hier und einen Zweig im seitlichen Pager von `LauncherScreen`.
  */
@@ -29,6 +30,6 @@ enum class Scope(@StringRes val label: Int, @DrawableRes val icon: Int, val canH
     Camera(R.string.scope_camera, R.drawable.ic_camera),
 }
 
-/** Namen aller Scopes in Menüreihenfolge und die der nicht ausblendbaren. */
+/** Namen aller Scopes in Standardreihenfolge und die der nicht ausblendbaren. */
 internal val ScopeNames: List<String> = Scope.entries.map { it.name }
 internal val PinnedScopeNames: Set<String> = Scope.entries.filter { !it.canHide }.map { it.name }.toSet()

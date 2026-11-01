@@ -88,6 +88,7 @@ fun SettingsScreen(
     val state by settingsViewModel.state.collectAsStateWithLifecycle()
     val agenda by agendaViewModel.state.collectAsStateWithLifecycle()
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
+    val scopeOrder by settingsViewModel.scopeOrder.collectAsStateWithLifecycle()
     var appsExpanded by rememberSaveable { mutableStateOf(false) }
     var contactsExpanded by rememberSaveable { mutableStateOf(false) }
     var pendingImport by remember { mutableStateOf<Uri?>(null) }
@@ -254,21 +255,26 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = WeatherTextMuted,
                     )
-                    for (target in Scope.entries.filter { it.canHide }) {
+                    val ordered = scopeOrder.mapNotNull { name -> Scope.entries.firstOrNull { it.name == name } }
+                    ordered.forEachIndexed { index, target ->
                         val shown = target.name !in hiddenScopes
+                        val label = stringResource(target.label)
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable(role = Role.Checkbox) { settingsViewModel.setScopeVisible(target, !shown) },
+                                .clickable(enabled = target.canHide, role = Role.Checkbox) { settingsViewModel.setScopeVisible(target, !shown) },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Checkbox(
                                 checked = shown,
                                 onCheckedChange = null,
+                                enabled = target.canHide,
                                 colors = CheckboxDefaults.colors(
                                     checkedColor = WeatherText,
                                     checkmarkColor = Color(0xFF141A22),
                                     uncheckedColor = WeatherText,
+                                    disabledCheckedColor = WeatherTextMuted,
+                                    disabledUncheckedColor = WeatherTextMuted,
                                 ),
                             )
                             Icon(
@@ -276,9 +282,27 @@ fun SettingsScreen(
                                 contentDescription = null,
                                 modifier = Modifier.padding(start = 8.dp).size(20.dp),
                             )
-                            Text(stringResource(target.label), modifier = Modifier.padding(start = 8.dp))
+                            Text(label, modifier = Modifier.padding(start = 8.dp).weight(1f))
+                            IconButton(onClick = { settingsViewModel.moveScope(target, -1) }, enabled = index > 0) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_arrow_up),
+                                    contentDescription = stringResource(R.string.settings_move_up, label),
+                                    tint = if (index > 0) WeatherText else WeatherTextMuted,
+                                )
+                            }
+                            IconButton(onClick = { settingsViewModel.moveScope(target, 1) }, enabled = index < ordered.lastIndex) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_arrow_down),
+                                    contentDescription = stringResource(R.string.settings_move_down, label),
+                                    tint = if (index < ordered.lastIndex) WeatherText else WeatherTextMuted,
+                                )
+                            }
                         }
                     }
+                    OutlineAction(
+                        stringResource(R.string.settings_scopes_reset_order), enabled = scopeOrder != ScopeNames,
+                        onClick = settingsViewModel::resetScopeOrder,
+                    )
                 }
             }
             item {

@@ -21,7 +21,7 @@ private val Context.cameraScopeDataStore: DataStore<Preferences> by preferencesD
 
 /**
  * Lokaler Speicher der Kamera-Scope: Einstellungen und Adresse der zuletzt aufgenommenen Datei. Die Daten verlassen
- * das Gerät nicht und sind nicht Teil des Launcher-Backups. Die Aufnahmen selbst liegen in der Mediathek.
+ * das Gerät nicht. Die Einstellungen (ohne Kamerakennung und letzte Datei) sind Teil der Backup-Datei des Launchers. Die Aufnahmen selbst liegen in der Mediathek.
  */
 class CameraSettingsStore(context: Context) {
     private val store = context.applicationContext.cameraScopeDataStore

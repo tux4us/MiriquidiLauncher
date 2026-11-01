@@ -180,8 +180,9 @@ fun LauncherScreen(
     val cameraBusy by cameraViewModel.busy.collectAsStateWithLifecycle()
     val agendaState by agendaViewModel.state.collectAsStateWithLifecycle()
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
-    val visibleScopes = remember(hiddenScopes) {
-        ScopeVisibility.visible(ScopeNames, hiddenScopes, PinnedScopeNames).map { Scope.valueOf(it) }
+    val scopeOrder by settingsViewModel.scopeOrder.collectAsStateWithLifecycle()
+    val visibleScopes = remember(hiddenScopes, scopeOrder) {
+        ScopeVisibility.visible(scopeOrder, hiddenScopes, PinnedScopeNames).map { Scope.valueOf(it) }
     }
     val pages = remember(visibleScopes) { ScopePages(visibleScopes.map { it.name }) }
     val sidePagerState = rememberPagerState(initialPage = SIDE_PAGE_LAUNCHER, pageCount = { pages.count })
@@ -409,6 +410,8 @@ fun LauncherScreen(
                             onOpenScope = { target ->
                                 pageOf(target)?.let { page -> scope.launch { sidePagerState.animateScrollToPage(page) } }
                             },
+                            // Die Sichtbarkeit enthält immer die Einstellungen, die Liste ist also nie leer.
+                            firstScope = visibleScopes.first(),
                             onQuickMenuEvent = ::dispatchMenuEvent,
                             onQuickMenuAnchorChanged = { kind, bounds ->
                                 if (!(menuState.isOpen && activeKind == kind)) menuAnchors[kind] = bounds
@@ -454,6 +457,13 @@ fun LauncherScreen(
                             weatherViewModel.reloadFromStore()
                             podcastsViewModel.reloadFromStore()
                             marketsViewModel.reloadFromStore()
+                            feedViewModel.reloadFromStore()
+                            calculatorViewModel.reloadFromStore()
+                            cameraViewModel.reloadFromStore()
+                            filesViewModel.invalidateSettings()
+                            galleryViewModel.invalidateSettings()
+                            notesViewModel.invalidateSettings()
+                            settingsViewModel.reloadScopes()
                         },
                     )
                     Scope.Weather -> WeatherScreen(
@@ -653,6 +663,7 @@ private fun HomePage(
     onAgendaRefresh: () -> Unit,
     onAgendaOpen: (AgendaView) -> Unit,
     onOpenScope: (Scope) -> Unit,
+    firstScope: Scope,
     onQuickMenuEvent: (QuickMenuKind, QuickMenuEvent) -> Unit,
     onQuickMenuAnchorChanged: (QuickMenuKind, Bounds) -> Unit,
     onScanQr: () -> Unit,
@@ -712,6 +723,7 @@ private fun HomePage(
         // Der Scopes-Button steht unter dem Suchfeld; das Pop-up öffnet nach oben über dem Suchfeld.
         if (query.isEmpty()) {
             QuickMenuBar(
+                firstScope = firstScope,
                 onOpenScope = onOpenScope,
                 onQuickMenuEvent = onQuickMenuEvent,
                 onQuickMenuAnchorChanged = onQuickMenuAnchorChanged,
@@ -723,10 +735,12 @@ private fun HomePage(
 
 /**
  * Button-Leiste unter dem Suchfeld: Pfeil-Button zu den Einstellungen (links), Scopes-Button (nimmt die
- * übrige Breite, `Modifier.weight(1f)`), Pfeil-Button zu den App-Favoriten (rechts).
+ * übrige Breite, `Modifier.weight(1f)`), Pfeil-Button zur ersten sichtbaren Scope (rechts; standardmäßig die
+ * App-Favoriten).
  */
 @Composable
 private fun QuickMenuBar(
+    firstScope: Scope,
     onOpenScope: (Scope) -> Unit,
     onQuickMenuEvent: (QuickMenuKind, QuickMenuEvent) -> Unit,
     onQuickMenuAnchorChanged: (QuickMenuKind, Bounds) -> Unit,
@@ -736,7 +750,7 @@ private fun QuickMenuBar(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Direkt zu den Einstellungen (links) und zu den App-Favoriten (rechts).
+        // Direkt zu den Einstellungen (links) und zur ersten Scope in der eingestellten Reihenfolge (rechts).
         NeighborScopeButton(target = Scope.Settings, toRight = false, onClick = { onOpenScope(Scope.Settings) })
         QuickMenuButton(
             kind = QuickMenuKind.Scopes,
@@ -744,7 +758,7 @@ private fun QuickMenuBar(
             onAnchorChanged = { onQuickMenuAnchorChanged(QuickMenuKind.Scopes, it) },
             modifier = Modifier.weight(1f),
         )
-        NeighborScopeButton(target = Scope.AppFavorites, toRight = true, onClick = { onOpenScope(Scope.AppFavorites) })
+        NeighborScopeButton(target = firstScope, toRight = true, onClick = { onOpenScope(firstScope) })
     }
 }
 

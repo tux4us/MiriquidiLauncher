@@ -1,8 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.backup
 
+import io.github.tux4us.miriquidilauncher.calculator.AngleMode
+import io.github.tux4us.miriquidilauncher.calculator.CalcPersisted
+import io.github.tux4us.miriquidilauncher.calculator.HistoryEntry
+import io.github.tux4us.miriquidilauncher.camera.CameraSettings
+import io.github.tux4us.miriquidilauncher.camera.FlashSetting
+import io.github.tux4us.miriquidilauncher.camera.RatioSetting
 import io.github.tux4us.miriquidilauncher.data.AppGroup
 import io.github.tux4us.miriquidilauncher.data.FavoriteContact
+import io.github.tux4us.miriquidilauncher.feed.FeedInfo
+import io.github.tux4us.miriquidilauncher.feed.FeedItem
+import io.github.tux4us.miriquidilauncher.feed.FeedSnapshot
+import io.github.tux4us.miriquidilauncher.feed.LocalFeeds
+import io.github.tux4us.miriquidilauncher.files.SortField
+import io.github.tux4us.miriquidilauncher.files.SortOrder
 import io.github.tux4us.miriquidilauncher.markets.ChartChoice
 import io.github.tux4us.miriquidilauncher.markets.ChartCurrency
 import io.github.tux4us.miriquidilauncher.markets.ChartRange
@@ -10,6 +22,7 @@ import io.github.tux4us.miriquidilauncher.markets.CryptoRange
 import io.github.tux4us.miriquidilauncher.markets.Position
 import io.github.tux4us.miriquidilauncher.markets.PositionKind
 import io.github.tux4us.miriquidilauncher.markets.SeriesRange
+import io.github.tux4us.miriquidilauncher.notes.NoteSort
 import io.github.tux4us.miriquidilauncher.podcasts.Episode
 import io.github.tux4us.miriquidilauncher.podcasts.Podcast
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastData
@@ -198,4 +211,175 @@ class BackupCodecTest {
         assertNull(decoded.podcasts)
         assertNull(decoded.markets)
     }
+
+    // region Übrige Scopes ---------------------------------------------------------------------------
+
+    private fun file(data: BackupData): BackupData =
+        BackupCodec.decode(BackupCodec.encode(data, "x"), BackupCodec.MAX_FILE_BYTES)
+
+    @Test fun scopesRoundTripAndAreAllowedInQrCodes() {
+        val scopes = BackupScopes(hidden = setOf("Weather", "Camera"), order = listOf("Notes", "Weather", "Camera", "Settings"))
+        // Ohne Dateigrenze (QR-Codes: MAX_BYTES) wird die Anordnung gelesen.
+        val decoded = BackupCodec.decode(BackupCodec.encode(full.copy(scopes = scopes), "x"))
+        assertEquals(scopes, decoded.scopes)
+    }
+
+    @Test fun invalidScopeNamesAreDropped() {
+        val json = """{"format":"miriquidilauncher-backup","version":1,"appFavorites":[],
+            "scopes":{"hidden":["Weather","", "Bad Name","${"x".repeat(41)}",7,"Weather"],"order":["B","A","B","a-b"]}}"""
+        val scopes = BackupCodec.decode(json).scopes!!
+        assertEquals(setOf("Weather"), scopes.hidden)
+        assertEquals(listOf("B", "A"), scopes.order)
+    }
+
+    @Test fun weatherServerRoundTripAndPublicDefault() {
+        val own = BackupWeatherServer("https://wetter.example.org", "https://luft.example.org")
+        assertEquals(own, file(full.copy(weatherServer = own)).weatherServer)
+        val public = BackupWeatherServer(null, null)
+        assertEquals(public, file(full.copy(weatherServer = public)).weatherServer)
+    }
+
+    @Test fun weatherServerRejectsInsecureAddressesAndNeverCarriesAKey() {
+        val text = BackupCodec.encode(full.copy(weatherServer = BackupWeatherServer("https://wetter.example.org", "https://luft.example.org")), "x")
+        assertTrue(!text.contains("apikey", ignoreCase = true))
+        val insecure = file(full.copy(weatherServer = BackupWeatherServer("http://wetter.example.org", "https://luft.example.org")))
+        assertEquals(BackupWeatherServer(null, null), insecure.weatherServer)
+        val insecureAir = file(full.copy(weatherServer = BackupWeatherServer("https://wetter.example.org", "http://luft.example.org")))
+        assertEquals(BackupWeatherServer("https://wetter.example.org", null), insecureAir.weatherServer)
+    }
+
+    private val staticUrl = LocalFeeds.STATIC_PREFIX + "abc123"
+
+    private fun feedItem(feedUrl: String, key: String, body: String = "<p>Text</p>") = FeedItem(
+        id = LocalFeeds.itemId(feedUrl, key), feedId = LocalFeeds.feedId(feedUrl), title = key, author = "A", url = "https://example.org/$key",
+        body = body, publishedSeconds = 1_700_000_000L, unread = true, starred = false,
+    )
+
+    private val localFeed = FeedSnapshot(
+        feeds = listOf(
+            FeedInfo(LocalFeeds.feedId("https://blog.example.org/feed.xml"), "Blog", "https://blog.example.org/feed.xml"),
+            FeedInfo(LocalFeeds.feedId(staticUrl), "Importiert", staticUrl),
+        ),
+        items = listOf(feedItem(staticUrl, "s1"), feedItem(staticUrl, "s2")),
+        fetchedAtMillis = 0L,
+        pendingRead = setOf(11L, 22L),
+    )
+
+    @Test fun feedRoundTrip() {
+        val feed = BackupFeed(localFeed, unreadOnly = false, loadImages = false)
+        assertEquals(feed, file(full.copy(feed = feed)).feed)
+    }
+
+    @Test fun feedWithoutLocalFeedsKeepsSettings() {
+        val feed = BackupFeed(null, unreadOnly = false, loadImages = true)
+        assertEquals(feed, file(full.copy(feed = feed)).feed)
+    }
+
+    @Test fun feedImportDropsInsecureFeedsForeignItemsAndScripts() {
+        val live = "https://blog.example.org/feed.xml"
+        val bad = localFeed.copy(
+            feeds = localFeed.feeds + listOf(
+                FeedInfo(1L, "Unsicher", "http://plain.example.org/feed.xml"),
+                FeedInfo(2L, "Doppelt", live.uppercase()),
+            ),
+            items = listOf(
+                feedItem(staticUrl, "s1", "<p>ok</p><script>alert(1)</script>").copy(url = "javascript:alert(1)", starred = true),
+                // Artikel von Feeds mit eigener Adresse werden nicht übernommen, sie werden neu abgerufen.
+                feedItem(live, "l1"),
+                feedItem("import:unknown", "u1"),
+            ),
+        )
+        val decoded = file(full.copy(feed = BackupFeed(bad, true, true))).feed!!.local!!
+        assertEquals(listOf(live, staticUrl), decoded.feeds.map { it.link })
+        assertEquals(1, decoded.items.size)
+        assertTrue(!decoded.items[0].body.contains("script", ignoreCase = true))
+        assertNull(decoded.items[0].url)
+        assertTrue(!decoded.items[0].starred)
+        assertEquals(setOf(11L, 22L), decoded.pendingRead)
+    }
+
+    @Test fun feedWithoutAnyValidFeedBecomesNoLocalFeed() {
+        val onlyInsecure = localFeed.copy(feeds = listOf(FeedInfo(1L, "Unsicher", "http://plain.example.org/feed.xml")), items = emptyList())
+        assertNull(file(full.copy(feed = BackupFeed(onlyInsecure, true, true))).feed!!.local)
+    }
+
+    @Test fun galleryRoundTrip() {
+        val gallery = BackupGallery(
+            favorites = setOf("/storage/emulated/0/DCIM/Camera/a \"1\".jpg", "/storage/emulated/0/Pictures/b.png"),
+            hiddenBuckets = setOf(-1739773001L, 42L),
+            ascending = true,
+            showHidden = true,
+        )
+        assertEquals(gallery, file(full.copy(gallery = gallery)).gallery)
+    }
+
+    @Test fun filesRoundTripAndUnknownSortFallsBack() {
+        val files = BackupFiles(SortOrder(SortField.DATE, ascending = false), showHidden = true)
+        assertEquals(files, file(full.copy(files = files)).files)
+        val text = BackupCodec.encode(full.copy(files = files), "x").replace("\"DATE\"", "\"BOGUS\"")
+        assertEquals(SortField.NAME, BackupCodec.decode(text, BackupCodec.MAX_FILE_BYTES).files!!.sort.field)
+    }
+
+    @Test fun calculatorRoundTrip() {
+        val calc = CalcPersisted(AngleMode.Rad, memory = 2.5, ans = 42.0, history = listOf(HistoryEntry("6*7", 42.0), HistoryEntry("1+1", 2.0)))
+        assertEquals(calc, file(full.copy(calculator = calc)).calculator)
+    }
+
+    @Test fun cameraRoundTripKeepsSettingsAndDropsDeviceSpecificValues() {
+        val settings = CameraSettings(flash = FlashSetting.Auto, ratio = RatioSetting.R16x9, stabilization = false)
+        val camera = BackupCamera(settings, buttonApp = "org.fossify.camera")
+        assertEquals(camera, file(full.copy(camera = camera)).camera)
+        // Eine manipulierte Datei kann weder Kamerakennung noch Datei-Adresse einschleusen.
+        val withDevice = BackupCamera(settings.copy(cameraId = "7", lastUri = "content://media/external/images/media/1", lastIsVideo = true), null)
+        val decoded = file(full.copy(camera = withDevice)).camera!!
+        assertEquals(settings, decoded.settings)
+        assertNull(decoded.buttonApp)
+    }
+
+    @Test fun cameraButtonAppMustBeAPackageName() {
+        val text = BackupCodec.encode(full.copy(camera = BackupCamera(CameraSettings(), "org.fossify.camera")), "x")
+            .replace("org.fossify.camera", "../evil app")
+        assertNull(BackupCodec.decode(text, BackupCodec.MAX_FILE_BYTES).camera!!.buttonApp)
+    }
+
+    @Test fun notesSettingsAndAgendaRoundTrip() {
+        val data = full.copy(notesSettings = BackupNotesSettings(NoteSort.TITLE, ascending = true), agendaEnabled = false)
+        val decoded = file(data)
+        assertEquals(BackupNotesSettings(NoteSort.TITLE, true), decoded.notesSettings)
+        assertEquals(false, decoded.agendaEnabled)
+    }
+
+    @Test fun everyScopeAreaIsAbsentFromBackupsWithoutIt() {
+        val decoded = BackupCodec.decode(BackupCodec.encode(full, "x"), BackupCodec.MAX_FILE_BYTES)
+        assertNull(decoded.scopes)
+        assertNull(decoded.weatherServer)
+        assertNull(decoded.feed)
+        assertNull(decoded.gallery)
+        assertNull(decoded.files)
+        assertNull(decoded.calculator)
+        assertNull(decoded.camera)
+        assertNull(decoded.notesSettings)
+        assertNull(decoded.agendaEnabled)
+    }
+
+    @Test fun completeBackupRoundTrips() {
+        val complete = full.copy(
+            appGroups = listOf(AppGroup("g1", "Messenger", listOf("a/.B#0"))),
+            notes = listOf(BackupNote("Gut.md", "Text", true, 5L)),
+            podcasts = podcasts,
+            markets = markets,
+            scopes = BackupScopes(setOf("Camera"), listOf("Notes", "Camera")),
+            weatherServer = BackupWeatherServer("https://wetter.example.org", null),
+            feed = BackupFeed(localFeed, true, false),
+            gallery = BackupGallery(setOf("/a.jpg"), setOf(5L), false, true),
+            files = BackupFiles(SortOrder(SortField.SIZE, true), false),
+            calculator = CalcPersisted(AngleMode.Deg, null, 0.0, listOf(HistoryEntry("2+2", 4.0))),
+            camera = BackupCamera(CameraSettings(flash = FlashSetting.On), null),
+            notesSettings = BackupNotesSettings(NoteSort.MODIFIED, false),
+            agendaEnabled = true,
+        )
+        assertEquals(complete, file(complete))
+    }
+
+    // endregion
 }

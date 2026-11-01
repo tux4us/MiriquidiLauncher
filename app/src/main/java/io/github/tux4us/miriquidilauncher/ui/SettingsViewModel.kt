@@ -45,8 +45,36 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     /** Namen der ausgeblendeten Scopes. */
     val hiddenScopes: StateFlow<Set<String>> = _hiddenScopes.asStateFlow()
 
+    private val _scopeOrder = MutableStateFlow(ScopeNames)
+
+    /** Namen aller Scopes in der eingestellten Reihenfolge (einschließlich der ausgeblendeten). */
+    val scopeOrder: StateFlow<List<String>> = _scopeOrder.asStateFlow()
+
     init {
-        viewModelScope.launch { _hiddenScopes.value = scopeStore.loadHidden(ScopeNames.toSet()) }
+        reloadScopes()
+    }
+
+    /** Liest Sichtbarkeit und Reihenfolge der Scopes neu aus dem Speicher; beim Start und nach einem Backup-Import. */
+    fun reloadScopes() {
+        viewModelScope.launch {
+            _hiddenScopes.value = scopeStore.loadHidden(ScopeNames.toSet())
+            _scopeOrder.value = scopeStore.loadOrder(ScopeNames)
+        }
+    }
+
+    /** Verschiebt [scope] um [delta] Plätze (negativ = nach vorn). */
+    fun moveScope(scope: Scope, delta: Int) {
+        val next = ScopeVisibility.move(_scopeOrder.value, scope.name, delta)
+        if (next == _scopeOrder.value) return
+        _scopeOrder.value = next
+        viewModelScope.launch { scopeStore.saveOrder(next) }
+    }
+
+    /** Stellt die Standardreihenfolge wieder her. */
+    fun resetScopeOrder() {
+        if (_scopeOrder.value == ScopeNames) return
+        _scopeOrder.value = ScopeNames
+        viewModelScope.launch { scopeStore.saveOrder(ScopeNames) }
     }
 
     /** Blendet [scope] ein oder aus; die Einstellungen bleiben immer sichtbar. */

@@ -3,6 +3,8 @@
 <resources>
     <string name="scope_podcasts">Podcasts</string>
     <string name="podcasts_tab_subs">Subscriptions</string>
+    <string name="podcasts_all_episodes">All episodes</string>
+    <string name="podcasts_manage_feeds">Add, import and export feeds</string>
     <string name="podcasts_tab_favorites">Favorites</string>
     <string name="podcasts_tab_downloads">Downloads</string>
     <string name="podcasts_tab_search">Search</string>

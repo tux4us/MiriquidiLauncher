@@ -14,15 +14,29 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import io.github.tux4us.miriquidilauncher.calculator.CalculatorStore
+import io.github.tux4us.miriquidilauncher.calendar.AgendaStore
+import io.github.tux4us.miriquidilauncher.camera.CameraSettingsStore
 import io.github.tux4us.miriquidilauncher.data.AppGroupsStore
+import io.github.tux4us.miriquidilauncher.data.CameraStore
 import io.github.tux4us.miriquidilauncher.data.FavoriteContactsStore
 import io.github.tux4us.miriquidilauncher.data.FavoritesStore
+import io.github.tux4us.miriquidilauncher.feed.FeedStore
+import io.github.tux4us.miriquidilauncher.feed.LocalFeeds
+import io.github.tux4us.miriquidilauncher.files.FilesStore
+import io.github.tux4us.miriquidilauncher.gallery.GalleryStore
 import io.github.tux4us.miriquidilauncher.markets.MarketStore
 import io.github.tux4us.miriquidilauncher.notes.NotesRepository
 import io.github.tux4us.miriquidilauncher.notes.NotesStore
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastData
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastStore
+import io.github.tux4us.miriquidilauncher.scopes.ScopeVisibility
+import io.github.tux4us.miriquidilauncher.scopes.ScopeVisibilityStore
+import io.github.tux4us.miriquidilauncher.ui.PinnedScopeNames
+import io.github.tux4us.miriquidilauncher.ui.ScopeNames
+import io.github.tux4us.miriquidilauncher.weather.WeatherServer
 import io.github.tux4us.miriquidilauncher.weather.WeatherStore
+import java.security.GeneralSecurityException
 import kotlinx.coroutines.flow.first
 
 /** Ergebnis eines Imports: Anzahl der übernommenen Einträge je Bereich. */
@@ -50,9 +64,18 @@ class BackupManager(context: Context) {
     private val contactStore = FavoriteContactsStore(appContext)
     private val weatherStore = WeatherStore(appContext)
     private val groupsStore = AppGroupsStore(appContext)
-    private val notes = NotesRepository(appContext, NotesStore(appContext))
+    private val notesStore = NotesStore(appContext)
+    private val notes = NotesRepository(appContext, notesStore)
     private val podcastStore = PodcastStore(appContext)
     private val marketStore = MarketStore(appContext)
+    private val scopeStore = ScopeVisibilityStore(appContext)
+    private val feedStore = FeedStore(appContext)
+    private val galleryStore = GalleryStore(appContext)
+    private val filesStore = FilesStore(appContext)
+    private val calculatorStore = CalculatorStore(appContext)
+    private val cameraSettingsStore = CameraSettingsStore(appContext)
+    private val cameraAppStore = CameraStore(appContext)
+    private val agendaStore = AgendaStore(appContext)
 
     /** Aktueller Bestand als Backup-JSON. */
     private suspend fun snapshot(includeContacts: Boolean, includeFileOnlyData: Boolean): String {
@@ -68,9 +91,35 @@ class BackupManager(context: Context) {
             // Podcast- und Kursdaten sind zu groß bzw. zu persönlich für QR-Codes und stehen nur in der Datei.
             podcasts = if (includeFileOnlyData) podcastStore.load() else null,
             markets = if (includeFileOnlyData) marketsForBackup() else null,
+            // Anordnung der Scopes ist klein und steht auch in QR-Codes; alles Weitere nur in der Datei.
+            scopes = BackupScopes(scopeStore.loadHidden(ScopeNames.toSet()), scopeStore.loadOrder(ScopeNames)),
+            weatherServer = if (includeFileOnlyData) weatherStore.loadServer().let { BackupWeatherServer(it?.forecastBase, it?.airBase) } else null,
+            feed = if (includeFileOnlyData) feedForBackup() else null,
+            gallery = if (includeFileOnlyData) galleryStore.load().let { BackupGallery(it.favorites, it.hiddenBuckets, it.ascending, it.showHidden) } else null,
+            files = if (includeFileOnlyData) filesStore.load().let { BackupFiles(it.sort, it.showHidden) } else null,
+            calculator = if (includeFileOnlyData) calculatorStore.load() else null,
+            camera = if (includeFileOnlyData) cameraForBackup() else null,
+            notesSettings = if (includeFileOnlyData) notesStore.settings().let { BackupNotesSettings(it.sort, it.ascending) } else null,
+            agendaEnabled = if (includeFileOnlyData) agendaStore.enabled.first() else null,
         )
         return BackupCodec.encode(data, Instant.now().toString())
     }
+
+    /** Lokale Abos mit Gelesen-Markierungen; Artikel nur von importierten Feeds ohne Adresse, alle anderen werden neu abgerufen. */
+    private suspend fun feedForBackup(): BackupFeed {
+        val settings = feedStore.settings.first()
+        val local = feedStore.loadLocal()?.let { snapshot ->
+            val staticIds = snapshot.feeds.filter { it.link?.startsWith(LocalFeeds.STATIC_PREFIX) == true }.map { it.id }.toSet()
+            snapshot.copy(items = snapshot.items.filter { it.feedId in staticIds }, fetchedAtMillis = 0L)
+        }
+        return BackupFeed(local, settings.unreadOnly, settings.loadImages)
+    }
+
+    /** Ohne gerätespezifische Angaben: keine Kamerakennung, keine zuletzt aufgenommene Datei. */
+    private suspend fun cameraForBackup() = BackupCamera(
+        settings = cameraSettingsStore.load().copy(cameraId = null, lastUri = null, lastIsVideo = false),
+        buttonApp = cameraAppStore.preferred.first(),
+    )
 
     private suspend fun marketsForBackup() = BackupMarkets(
         positions = marketStore.positions.first(),
@@ -135,6 +184,7 @@ class BackupManager(context: Context) {
         }
         data.podcasts?.let { restorePodcasts(it) }
         data.markets?.let { restoreMarkets(it) }
+        restoreScopeData(data)
         return ImportSummary(
             data.appFavorites.size, data.contactFavorites?.size, data.weatherFavorites.size, restoredNotes,
             podcasts = data.podcasts?.subscriptions?.size,
@@ -161,6 +211,54 @@ class BackupManager(context: Context) {
             ),
             withEpisodes = true,
         )
+    }
+
+    /** Ersetzt die Daten der übrigen Scopes, soweit sie im Backup stehen. Zugangsdaten und Schlüssel bleiben unberührt. */
+    private suspend fun restoreScopeData(data: BackupData) {
+        data.scopes?.let { s ->
+            val hidden = s.hidden.filter { it in ScopeNames && it !in PinnedScopeNames }.toSet()
+            scopeStore.replaceAll(hidden, ScopeVisibility.orderOf(s.order, ScopeNames))
+        }
+        data.weatherServer?.let { restoreWeatherServer(it) }
+        data.feed?.let { f ->
+            feedStore.setUnreadOnly(f.unreadOnly)
+            feedStore.setLoadImages(f.loadImages)
+            if (f.local != null) feedStore.saveLocal(f.local) else feedStore.deleteLocal()
+        }
+        data.gallery?.let { g ->
+            galleryStore.saveFavorites(g.favorites)
+            galleryStore.saveHidden(g.hiddenBuckets)
+            galleryStore.saveAscending(g.ascending)
+            galleryStore.saveShowHidden(g.showHidden)
+        }
+        data.files?.let { f ->
+            filesStore.saveSort(f.sort)
+            filesStore.saveShowHidden(f.showHidden)
+        }
+        data.calculator?.let { calculatorStore.save(it) }
+        data.camera?.let { c ->
+            // Kamerakennung und zuletzt aufgenommene Datei gehören zum Gerät und bleiben erhalten.
+            val current = cameraSettingsStore.load()
+            cameraSettingsStore.save(c.settings.copy(cameraId = current.cameraId, lastUri = current.lastUri, lastIsVideo = current.lastIsVideo))
+            cameraAppStore.setPreferred(c.buttonApp)
+        }
+        data.notesSettings?.let { notesStore.saveSort(it.sort, it.ascending) }
+        data.agendaEnabled?.let { agendaStore.setEnabled(it) }
+    }
+
+    /** Der Schlüssel bleibt nur erhalten, wenn die Adresse dieselbe ist; sonst muss er neu eingegeben werden. */
+    private suspend fun restoreWeatherServer(restored: BackupWeatherServer) {
+        val forecast = restored.forecastBase
+        try {
+            if (forecast == null) {
+                weatherStore.saveServer(null)
+            } else {
+                val key = weatherStore.loadServer()?.takeIf { it.forecastBase == forecast }?.apiKey
+                weatherStore.saveServer(WeatherServer(forecast, restored.airBase, key))
+            }
+        } catch (e: GeneralSecurityException) {
+            // Keystore nicht verfügbar: Die Server-Einstellung bleibt, wie sie ist.
+        }
     }
 
     private suspend fun restoreMarkets(m: BackupMarkets) {

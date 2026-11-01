@@ -11,14 +11,14 @@
     <string name="settings_move_up">%1$s nach oben verschieben</string>
     <string name="settings_move_down">%1$s nach unten verschieben</string>
     <string name="settings_section_backup">Backup</string>
-    <string name="settings_backup_hint">Sichert die Favoriten (Apps, Kontakte, Wetterorte) und die Schattenhöhen als JSON-Datei im Ordner Downloads/MiriquidiLauncher. Enthalten sind auch die Notizen aus Documents/MiriquidiNotes (nur mit Zugriff auf alle Dateien, im Klartext) sowie die Daten der Podcast-Seite (Abos, Favoriten, Positionen, Gehört-Markierungen) und der Kurse-Seite (Bestand, Auswahl, Quellen), ebenfalls im Klartext. Heruntergeladene Folgen, Passwörter und API-Schlüssel werden nie gesichert. QR-Codes enthalten nichts davon.</string>
+    <string name="settings_backup_hint">Sichert die Favoriten (Apps, Kontakte, Wetterorte) und die Schattenhöhen als JSON-Datei im Ordner Downloads/MiriquidiLauncher. Enthalten sind auch die Notizen aus Documents/MiriquidiNotes (nur mit Zugriff auf alle Dateien, im Klartext) sowie die Daten der Podcast-Seite (Abos, Favoriten, Positionen, Gehört-Markierungen) und der Kurse-Seite (Bestand, Auswahl, Quellen), ebenfalls im Klartext. Außerdem gesichert werden Reihenfolge und Sichtbarkeit der Scopes, die lokalen Feed-Abos, die Einstellungen von Galerie, Dateien, Kamera, Notizen, Rechner (mit Verlauf) und Terminübersicht sowie die Adresse des eigenen Wetterservers. Heruntergeladene Folgen, Zwischenspeicher, Passwörter und API-Schlüssel werden nie gesichert. QR-Codes enthalten nur Favoriten, App-Gruppen, Wetterorte und die Anordnung der Scopes.</string>
     <string name="settings_backup_include_contacts">Favoriten-Kontakte einschließen</string>
     <string name="settings_backup_contacts_warning">Die Datei enthält dann Namen und Telefonnummern im Klartext.</string>
     <string name="settings_backup_export">Backup exportieren</string>
     <string name="settings_backup_import">Backup importieren</string>
     <string name="settings_backup_import_note">Beim Import werden die vorhandenen Favoriten durch den Inhalt der Datei ersetzt.</string>
     <string name="settings_backup_import_confirm_title">Backup einspielen?</string>
-    <string name="settings_backup_import_confirm_text">Die vorhandenen Favoriten werden durch den Inhalt der gewählten Datei ersetzt. Notizen werden nur ergänzt; vorhandene Notizen bleiben unverändert. Podcast- und Kursdaten aus der Datei ersetzen die vorhandenen; heruntergeladene Folgen bleiben erhalten.</string>
+    <string name="settings_backup_import_confirm_text">Die vorhandenen Favoriten werden durch den Inhalt der gewählten Datei ersetzt. Notizen werden nur ergänzt; vorhandene Notizen bleiben unverändert. Podcast- und Kursdaten sowie die Einstellungen der übrigen Scopes aus der Datei ersetzen die vorhandenen; heruntergeladene Folgen bleiben erhalten.</string>
     <string name="settings_backup_import_confirm_action">Einspielen</string>
     <string name="settings_backup_exported">Backup gespeichert: Downloads/%1$s</string>
     <string name="settings_backup_export_failed">Das Backup konnte nicht gespeichert werden.</string>
@@ -55,5 +55,6 @@
     <string name="settings_license_notices">Open-Source-Lizenzen</string>
     <string name="settings_license_close">Schließen</string>
     <string name="settings_section_scopes">Scopes</string>
-    <string name="settings_scopes_text">Scopes mit Häkchen werden angezeigt. Ausgeblendete Scopes verschwinden aus der Wischreihenfolge und aus dem Scopes-Menü. Startseite und Einstellungen bleiben immer erreichbar.</string>
+    <string name="settings_scopes_text">Scopes mit Häkchen werden angezeigt. Mit den Pfeilen wird die Reihenfolge festgelegt, in der die Scopes beim Wischen und im Scopes-Menü erscheinen. Ausgeblendete Scopes verschwinden aus beidem. Startseite und Einstellungen bleiben immer erreichbar.</string>
+    <string name="settings_scopes_reset_order">Reihenfolge zurücksetzen</string>
 </resources>

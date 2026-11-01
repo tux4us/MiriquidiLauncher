@@ -167,4 +167,33 @@ class PodcastTest {
         assertNull(PodcastCodec.decode("{\"v\":99}"))
         assertNull(PodcastCodec.decode("kaputt"))
     }
+
+    private fun ep(id: String, feed: String, published: Long) = Episode(
+        id = id, podcastUrl = feed, podcastTitle = feed, title = id, publishedSeconds = published,
+        audioUrl = "https://example.org/$id.mp3", mime = "audio/mpeg", durationSeconds = 60, notesHtml = "", link = null, imageUrl = null,
+    )
+
+    @Test fun allEpisodesAreSortedNewestFirstAcrossFeeds() {
+        val a = "https://a.example/feed"
+        val b = "https://b.example/feed"
+        val data = PodcastData(
+            subscriptions = listOf(Podcast(a, "A"), Podcast(b, "B")),
+            episodes = mapOf(
+                a to listOf(ep("a-old", a, 100), ep("a-new", a, 300), ep("a-undated", a, 0)),
+                b to listOf(ep("b-mid", b, 200), ep("b-same", b, 300)),
+            ),
+        )
+        assertEquals(listOf("a-new", "b-same", "b-mid", "a-old", "a-undated"), PodcastLogic.allEpisodes(data).map { it.id })
+    }
+
+    @Test fun allEpisodesIgnoreUnsubscribedFeedsAndDuplicates() {
+        val a = "https://a.example/feed"
+        val gone = "https://gone.example/feed"
+        val data = PodcastData(
+            subscriptions = listOf(Podcast(a, "A")),
+            episodes = mapOf(a to listOf(ep("x", a, 5), ep("x", a, 5)), gone to listOf(ep("g", gone, 99))),
+        )
+        assertEquals(listOf("x"), PodcastLogic.allEpisodes(data).map { it.id })
+        assertTrue(PodcastLogic.allEpisodes(PodcastData()).isEmpty())
+    }
 }

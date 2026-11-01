@@ -94,6 +94,11 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     val state: StateFlow<NotesUiState> = _state.asStateFlow()
 
     private var settingsLoaded = false
+
+    /** Sortierung und Notizen wurden ersetzt (Backup-Import): Sie werden beim nächsten Öffnen der Seite neu gelesen. */
+    fun invalidateSettings() {
+        settingsLoaded = false
+    }
     private var credentials: NotesCredentials? = null
     private var autosaveJob: Job? = null
     private var syncJob: Job? = null

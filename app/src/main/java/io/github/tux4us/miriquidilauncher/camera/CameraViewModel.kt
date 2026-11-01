@@ -88,6 +88,14 @@ class CameraViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    /** Übernimmt die gespeicherten Einstellungen neu, nachdem ein Backup eingespielt wurde. */
+    fun reloadFromStore() {
+        viewModelScope.launch {
+            val saved = store.load()
+            _state.update { it.copy(settings = saved) }
+        }
+    }
+
     // --- Vorbereitung und Binden -----------------------------------------------------------------------------
 
     /** Liest die Kameras und Fähigkeiten, sobald die Berechtigung vorliegt. Mehrfaches Aufrufen schadet nicht. */

@@ -34,6 +34,21 @@ object PodcastLogic {
         return data.copy(subscriptions = subscriptions, episodes = data.episodes + (url to parsed.episodes))
     }
 
+    /** So viele Folgen erscheinen in der Liste aller Folgen je Schritt; beim Scrollen kommen weitere hinzu. */
+    const val ALL_PAGE_SIZE = 40
+
+    /**
+     * Alle bekannten Folgen der abonnierten Feeds, neueste zuerst. Folgen ohne Datum (Zeit 0) stehen am Ende; bei
+     * gleicher Zeit entscheidet die Kennung, damit die Reihenfolge stabil bleibt. Doppelte Kennungen entfallen.
+     */
+    fun allEpisodes(data: PodcastData): List<Episode> {
+        val seen = HashSet<String>()
+        return data.subscriptions
+            .flatMap { data.episodes[it.feedUrl].orEmpty() }
+            .filter { seen.add(it.id) }
+            .sortedWith(compareByDescending<Episode> { it.publishedSeconds }.thenBy { it.id })
+    }
+
     fun isFavorite(data: PodcastData, id: String): Boolean = data.favorites.any { it.id == id }
 
     /** Schaltet den Favoritenstatus um; neue Favoriten stehen vorn. `null` bei Limit. */

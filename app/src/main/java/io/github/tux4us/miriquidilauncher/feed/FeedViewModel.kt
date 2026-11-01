@@ -425,6 +425,20 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** Liest die lokalen Abos neu und ruft sie ab, nachdem ein Backup eingespielt wurde. Mit Nextcloud-Konto bleibt alles, wie es ist. */
+    fun reloadFromStore() {
+        if (_state.value.account != null) return
+        viewModelScope.launch {
+            fetchGeneration++
+            pendingRead.clear()
+            _state.update {
+                it.copy(localFeeds = emptyList(), feeds = emptyMap(), items = emptyList(), openItemId = null, refreshing = false, fetchedAtMillis = 0L)
+            }
+            loadLocal()
+            refresh(force = true)
+        }
+    }
+
     private fun localInfos(feeds: List<LocalFeed>): Map<Long, FeedInfo> =
         feeds.associate { it.id to FeedInfo(it.id, LocalFeeds.displayTitle(it), it.url) }
 

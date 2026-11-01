@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.backup
 
+import io.github.tux4us.miriquidilauncher.calculator.CalcCodec
+import io.github.tux4us.miriquidilauncher.camera.CameraSettingsCodec
 import io.github.tux4us.miriquidilauncher.data.AppGroup
 import io.github.tux4us.miriquidilauncher.data.AppGroupCodec
 import io.github.tux4us.miriquidilauncher.data.FavoriteContact
+import io.github.tux4us.miriquidilauncher.feed.FeedCacheCodec
+import io.github.tux4us.miriquidilauncher.feed.FeedInfo
+import io.github.tux4us.miriquidilauncher.feed.FeedItem
+import io.github.tux4us.miriquidilauncher.feed.FeedSnapshot
 import io.github.tux4us.miriquidilauncher.feed.FeedText
+import io.github.tux4us.miriquidilauncher.feed.LocalFeeds
+import io.github.tux4us.miriquidilauncher.feed.ServerUrl
+import io.github.tux4us.miriquidilauncher.files.SortField
+import io.github.tux4us.miriquidilauncher.files.SortOrder
 import io.github.tux4us.miriquidilauncher.markets.BaseUrlCheck
 import io.github.tux4us.miriquidilauncher.markets.ChartChoice
 import io.github.tux4us.miriquidilauncher.markets.ChartCurrency
@@ -16,6 +26,7 @@ import io.github.tux4us.miriquidilauncher.markets.Position
 import io.github.tux4us.miriquidilauncher.markets.PositionKind
 import io.github.tux4us.miriquidilauncher.markets.PositionsLogic
 import io.github.tux4us.miriquidilauncher.markets.SeriesRange
+import io.github.tux4us.miriquidilauncher.notes.NoteSort
 import io.github.tux4us.miriquidilauncher.notes.NotesLogic
 import io.github.tux4us.miriquidilauncher.podcasts.Episode
 import io.github.tux4us.miriquidilauncher.podcasts.Podcast
@@ -25,6 +36,7 @@ import io.github.tux4us.miriquidilauncher.podcasts.PodcastLogic
 import io.github.tux4us.miriquidilauncher.weather.GeoPlace
 import io.github.tux4us.miriquidilauncher.weather.MiniJson
 import io.github.tux4us.miriquidilauncher.weather.ShadowHeights
+import io.github.tux4us.miriquidilauncher.weather.WeatherEndpoints
 import io.github.tux4us.miriquidilauncher.weather.asArray
 import io.github.tux4us.miriquidilauncher.weather.asDouble
 import io.github.tux4us.miriquidilauncher.weather.asObject
@@ -93,8 +105,48 @@ object BackupCodec {
             sb.append(", \"holdingsVisible\": ").append(m.holdingsVisible)
             sb.append("}")
         }
+        encodeScopeData(sb, data)
         sb.append("\n}\n")
         return sb.toString()
+    }
+
+    /** Die Bereiche der übrigen Scopes, in der Reihenfolge der Felder von [BackupData]. */
+    private fun encodeScopeData(sb: StringBuilder, data: BackupData) {
+        data.scopes?.let { s ->
+            sb.append(",\n  \"scopes\": {\"hidden\": [").append(s.hidden.sorted().joinToString(", ") { str(it) })
+            sb.append("], \"order\": [").append(s.order.joinToString(", ") { str(it) }).append("]}")
+        }
+        data.weatherServer?.let { w ->
+            sb.append(",\n  \"weatherServer\": {")
+            val parts = ArrayList<String>()
+            w.forecastBase?.let { parts += "\"forecast\": ${str(it)}" }
+            w.airBase?.let { parts += "\"air\": ${str(it)}" }
+            sb.append(parts.joinToString(", ")).append("}")
+        }
+        data.feed?.let { f ->
+            sb.append(",\n  \"feed\": {\"unreadOnly\": ${f.unreadOnly}, \"loadImages\": ${f.loadImages}")
+            f.local?.let { sb.append(", \"local\": ").append(str(FeedCacheCodec.encode(it))) }
+            sb.append("}")
+        }
+        data.gallery?.let { g ->
+            sb.append(",\n  \"gallery\": {\"favorites\": [").append(g.favorites.sorted().joinToString(", ") { str(it) })
+            sb.append("], \"hiddenBuckets\": [").append(g.hiddenBuckets.sorted().joinToString(", "))
+            sb.append("], \"ascending\": ${g.ascending}, \"showHidden\": ${g.showHidden}}")
+        }
+        data.files?.let { f ->
+            sb.append(",\n  \"files\": {\"sort\": ${str(f.sort.field.name)}, \"ascending\": ${f.sort.ascending}, \"showHidden\": ${f.showHidden}}")
+        }
+        data.calculator?.let { sb.append(",\n  \"calculator\": ").append(str(CalcCodec.encode(it))) }
+        data.camera?.let { c ->
+            sb.append(",\n  \"camera\": {\"settings\": ").append(str(CameraSettingsCodec.encode(c.settings)))
+            c.buttonApp?.let { sb.append(", \"buttonApp\": ").append(str(it)) }
+            sb.append("}")
+        }
+        data.notesSettings?.let { n ->
+            val sort = if (n.sort == NoteSort.TITLE) "title" else "modified"
+            sb.append(",\n  \"notesSettings\": {\"sort\": ${str(sort)}, \"ascending\": ${n.ascending}}")
+        }
+        data.agendaEnabled?.let { sb.append(",\n  \"agendaEnabled\": ").append(it) }
     }
 
     fun decode(text: String, maxBytes: Int = MAX_BYTES): BackupData {
@@ -159,8 +211,122 @@ object BackupCodec {
         }
         val podcasts = root["podcasts"].asObject()?.let { sanitizePodcasts(PodcastCodec.decodeBackup(it)) }
         val markets = root["markets"].asObject()?.let { parseMarkets(it) }
-        return BackupData(apps, contacts, places, selected, heights, groups, notes, podcasts, markets)
+        return BackupData(
+            appFavorites = apps,
+            contactFavorites = contacts,
+            weatherFavorites = places,
+            selectedPlace = selected,
+            shadowHeights = heights,
+            appGroups = groups,
+            notes = notes,
+            podcasts = podcasts,
+            markets = markets,
+            scopes = root["scopes"].asObject()?.let { parseScopes(it) },
+            weatherServer = root["weatherServer"].asObject()?.let { parseWeatherServer(it) },
+            feed = root["feed"].asObject()?.let { parseFeed(it) },
+            gallery = root["gallery"].asObject()?.let { parseGallery(it) },
+            files = root["files"].asObject()?.let { parseFiles(it) },
+            calculator = root["calculator"].asString()?.takeIf { it.length <= MAX_CODEC_TEXT }?.let { CalcCodec.decode(it) },
+            camera = root["camera"].asObject()?.let { parseCamera(it) },
+            notesSettings = root["notesSettings"].asObject()?.let { parseNotesSettings(it) },
+            agendaEnabled = root["agendaEnabled"] as? Boolean,
+        )
     }
+
+    private const val MAX_CODEC_TEXT = 200_000
+    private const val MAX_SCOPE_NAMES = 100
+    private const val MAX_GALLERY_ENTRIES = 50_000
+    private const val MAX_READ_MARKS = 50_000
+
+    private fun isScopeName(name: String) = name.length in 1..40 && name.all { it.isLetterOrDigit() }
+
+    private fun parseScopes(o: Map<String, Any?>): BackupScopes {
+        fun names(key: String) = o[key].asArray().orEmpty().mapNotNull { it.asString()?.takeIf(::isScopeName) }.distinct().take(MAX_SCOPE_NAMES)
+        return BackupScopes(hidden = names("hidden").toSet(), order = names("order"))
+    }
+
+    /** Ein leeres Objekt bedeutet: öffentliche Adressen. Ungültige Adressen (nicht HTTPS usw.) werden verworfen. */
+    private fun parseWeatherServer(o: Map<String, Any?>): BackupWeatherServer {
+        fun base(key: String) = o[key].asString()?.let { (WeatherEndpoints.parseBase(it) as? ServerUrl.Ok)?.baseUrl }
+        val forecast = base("forecast")
+        return BackupWeatherServer(forecast, if (forecast != null) base("air") else null)
+    }
+
+    private fun parseFeed(o: Map<String, Any?>): BackupFeed {
+        val local = o["local"].asString()?.takeIf { it.length <= MAX_FILE_BYTES }?.let { FeedCacheCodec.decode(it) }?.let { sanitizeLocalFeeds(it) }
+        return BackupFeed(local, o["unreadOnly"] as? Boolean ?: true, o["loadImages"] as? Boolean ?: true)
+    }
+
+    /**
+     * Behält Feeds mit HTTPS-Adresse (oder der künstlichen Adresse importierter Feeds) und nur deren Artikel von Feeds
+     * ohne eigene Adresse; Texte werden erneut bereinigt, weil die Datei von außen kommen kann. `null`, wenn kein Feed bleibt.
+     */
+    internal fun sanitizeLocalFeeds(snapshot: FeedSnapshot): FeedSnapshot? {
+        val feeds = LinkedHashMap<String, FeedInfo>()
+        for (info in snapshot.feeds) {
+            val link = info.link ?: continue
+            val valid = link.startsWith(LocalFeeds.STATIC_PREFIX) && link.length <= MAX_TEXT || isHttps(link)
+            if (!valid || link.lowercase() in feeds) continue
+            val id = LocalFeeds.feedId(link)
+            feeds[link.lowercase()] = FeedInfo(id, info.title.take(MAX_TEXT), link)
+            if (feeds.size >= LocalFeeds.MAX_FEEDS) break
+        }
+        if (feeds.isEmpty()) return null
+        val staticIds = feeds.values.filter { it.link!!.startsWith(LocalFeeds.STATIC_PREFIX) }.map { it.id }.toSet()
+        val perFeed = HashMap<Long, Int>()
+        val items = ArrayList<FeedItem>()
+        for (item in snapshot.items) {
+            if (item.feedId !in staticIds) continue
+            val count = perFeed.getOrDefault(item.feedId, 0)
+            if (count >= LocalFeeds.MAX_ITEMS_PER_FEED) continue
+            perFeed[item.feedId] = count + 1
+            items += item.copy(
+                title = item.title.take(MAX_TEXT),
+                author = item.author?.take(MAX_TEXT),
+                url = item.url?.takeIf { isWebLink(it) },
+                body = FeedText.sanitize(item.body.take(io.github.tux4us.miriquidilauncher.feed.NewsApi.MAX_BODY_CHARS)),
+                starred = false,
+            )
+        }
+        return FeedSnapshot(
+            feeds = feeds.values.toList(),
+            items = items,
+            fetchedAtMillis = 0L,
+            pendingRead = snapshot.pendingRead.take(MAX_READ_MARKS).toSet(),
+        )
+    }
+
+    private fun isWebLink(url: String): Boolean =
+        url.length <= MAX_TEXT && url.none { it.isWhitespace() } &&
+            (url.startsWith("https://", ignoreCase = true) || url.startsWith("http://", ignoreCase = true))
+
+    private fun parseGallery(o: Map<String, Any?>): BackupGallery {
+        val favorites = o["favorites"].asArray().orEmpty().mapNotNull { it.asString()?.takeIf { s -> s.isNotBlank() && s.length <= MAX_TEXT } }
+            .take(MAX_GALLERY_ENTRIES).toSet()
+        val buckets = o["hiddenBuckets"].asArray().orEmpty().mapNotNull { it.asDouble()?.takeIf { d -> d.isFinite() }?.toLong() }
+            .take(MAX_GALLERY_ENTRIES).toSet()
+        return BackupGallery(favorites, buckets, o["ascending"] as? Boolean ?: false, o["showHidden"] as? Boolean ?: false)
+    }
+
+    private fun parseFiles(o: Map<String, Any?>): BackupFiles {
+        val field = SortField.entries.firstOrNull { it.name == o["sort"].asString() } ?: SortField.NAME
+        return BackupFiles(SortOrder(field, o["ascending"] as? Boolean ?: true), o["showHidden"] as? Boolean ?: false)
+    }
+
+    private val PACKAGE_NAME = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
+
+    /** Gerätespezifische Angaben (Kamerakennung, letzte Datei) kommen nie aus dem Backup. */
+    private fun parseCamera(o: Map<String, Any?>): BackupCamera? {
+        val text = o["settings"].asString()?.takeIf { it.length <= MAX_CODEC_TEXT } ?: return null
+        val settings = CameraSettingsCodec.decode(text).copy(cameraId = null, lastUri = null, lastIsVideo = false)
+        val app = o["buttonApp"].asString()?.takeIf { it.length <= 255 && PACKAGE_NAME.matches(it) }
+        return BackupCamera(settings, app)
+    }
+
+    private fun parseNotesSettings(o: Map<String, Any?>) = BackupNotesSettings(
+        sort = if (o["sort"].asString() == "title") NoteSort.TITLE else NoteSort.MODIFIED,
+        ascending = o["ascending"] as? Boolean ?: false,
+    )
 
     private const val MAX_TEXT = 2_000
     private const val MAX_POSITION_ENTRIES = 5_000

@@ -29,6 +29,14 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    /** Liest den gespeicherten Stand neu, nachdem ein Backup eingespielt wurde. */
+    fun reloadFromStore() {
+        viewModelScope.launch {
+            val saved = store.load()
+            _state.update { it.copy(angle = saved.angle, memory = saved.memory, ans = saved.ans, history = saved.history) }
+        }
+    }
+
     private val decimalSeparator: Char get() = DecimalFormatSymbols.getInstance().decimalSeparator
 
     private fun mutate(block: (CalcSession) -> CalcSession) {

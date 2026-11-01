@@ -59,4 +59,50 @@ class ScopePagesTest {
         assertEquals(emptySet<String>(), ScopeVisibility.decode(null, known))
         assertEquals(emptySet<String>(), ScopeVisibility.decode("", known))
     }
+
+    @Test
+    fun orderFollowsSavedListAndKeepsEveryScopeOnce() {
+        val known = listOf("A", "B", "C", "D")
+        assertEquals(listOf("C", "A", "B", "D"), ScopeVisibility.orderOf(listOf("C", "A", "B", "D"), known))
+        // Unbekannte und doppelte Kennungen entfallen.
+        assertEquals(listOf("C", "A", "B", "D"), ScopeVisibility.orderOf(listOf("C", "X", "A", "C", "B", "D"), known))
+        // Ohne gespeicherte Reihenfolge gilt die Standardreihenfolge.
+        assertEquals(known, ScopeVisibility.orderOf(emptyList(), known))
+    }
+
+    @Test
+    fun newScopesAreInsertedBehindTheirPredecessor() {
+        // "B2" kam in einer neueren Version zwischen "B" und "C" hinzu, "Z" ganz an den Anfang.
+        val known = listOf("Z", "A", "B", "B2", "C")
+        assertEquals(listOf("Z", "C", "B", "B2", "A"), ScopeVisibility.orderOf(listOf("C", "B", "A"), known))
+    }
+
+    @Test
+    fun movingChangesOneStepAndStopsAtTheEdges() {
+        val list = listOf("A", "B", "C")
+        assertEquals(listOf("B", "A", "C"), ScopeVisibility.move(list, "B", -1))
+        assertEquals(listOf("A", "C", "B"), ScopeVisibility.move(list, "B", 1))
+        assertEquals(list, ScopeVisibility.move(list, "A", -1))
+        assertEquals(list, ScopeVisibility.move(list, "C", 1))
+        assertEquals(list, ScopeVisibility.move(list, "Unknown", 1))
+    }
+
+    @Test
+    fun orderRoundTripsAndFallsBackToDefault() {
+        val known = listOf("A", "B", "C")
+        assertEquals("C,A,B", ScopeVisibility.encodeOrder(listOf("C", "A", "B")))
+        assertEquals(listOf("C", "A", "B"), ScopeVisibility.decodeOrder("C,A,B", known))
+        // "C" fehlt in der gespeicherten Liste und kommt hinter seinen Vorgänger "B".
+        assertEquals(listOf("B", "C", "A"), ScopeVisibility.decodeOrder(" B , Gone,A", known))
+        assertEquals(known, ScopeVisibility.decodeOrder(null, known))
+        assertEquals(known, ScopeVisibility.decodeOrder("", known))
+    }
+
+    @Test
+    fun hiddenScopesStayHiddenInTheCustomOrder() {
+        val custom = ScopeVisibility.orderOf(listOf("Camera", "C", "A", "Settings", "B"), order)
+        val visible = ScopeVisibility.visible(custom, setOf("A"), pinned)
+        assertEquals(listOf("Camera", "C", "Settings", "B"), visible)
+        assertEquals(1, ScopePages(visible).pageOf("Camera"))
+    }
 }

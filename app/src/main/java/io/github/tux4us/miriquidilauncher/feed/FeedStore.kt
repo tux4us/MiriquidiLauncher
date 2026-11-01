@@ -31,7 +31,8 @@ data class FeedSettings(val unreadOnly: Boolean = true, val loadImages: Boolean 
 /**
  * Lokale Daten des FeedReaders: Zugangsdaten (das Passwort verschlüsselt über den Keystore), Einstellungen und
  * der Zwischenspeicher der Artikel für die Offline-Anzeige. Alles liegt im privaten App-Speicher; die App
- * ist vom Android-Backup ausgenommen, und die Zugangsdaten sind nicht Teil des Backups des Launchers.
+ * ist vom Android-Backup ausgenommen. Im Backup des Launchers stehen die Einstellungen und die lokalen Abos, die
+ * Zugangsdaten nicht.
  */
 class FeedStore(context: Context) {
     private val appContext = context.applicationContext
