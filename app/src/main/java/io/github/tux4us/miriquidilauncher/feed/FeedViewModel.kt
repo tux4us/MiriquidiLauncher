@@ -435,7 +435,7 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
                 it.copy(localFeeds = emptyList(), feeds = emptyMap(), items = emptyList(), openItemId = null, refreshing = false, fetchedAtMillis = 0L)
             }
             loadLocal()
-            refresh(force = true)
+            // Kein Abruf hier: Die Feed-Seite lädt selbst, sobald sie sichtbar ist (und nur, wenn sie eingeblendet wurde).
         }
     }
 

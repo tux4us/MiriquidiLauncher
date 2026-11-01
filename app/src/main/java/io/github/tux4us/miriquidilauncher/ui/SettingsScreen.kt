@@ -89,6 +89,8 @@ fun SettingsScreen(
     val agenda by agendaViewModel.state.collectAsStateWithLifecycle()
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
     val scopeOrder by settingsViewModel.scopeOrder.collectAsStateWithLifecycle()
+    val consentedScopes by settingsViewModel.consentedScopes.collectAsStateWithLifecycle()
+    var consentScope by remember { mutableStateOf<Scope?>(null) }
     var appsExpanded by rememberSaveable { mutableStateOf(false) }
     var contactsExpanded by rememberSaveable { mutableStateOf(false) }
     var pendingImport by remember { mutableStateOf<Uri?>(null) }
@@ -118,6 +120,33 @@ fun SettingsScreen(
     }
     if (showQrImport) {
         BackupQrScanDialog(settingsViewModel, onRestored = onRestored, onDismiss = { showQrImport = false })
+    }
+
+    consentScope?.let { target ->
+        AlertDialog(
+            onDismissRequest = { consentScope = null },
+            containerColor = Color(0xFF141A22),
+            titleContentColor = WeatherText,
+            textContentColor = WeatherText,
+            title = { Text(stringResource(R.string.settings_network_consent_title, stringResource(target.label))) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(networkConsentDetail(target)))
+                    Text(stringResource(R.string.settings_network_consent_common))
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { consentScope = null; settingsViewModel.allowNetworkScope(target) },
+                    colors = ButtonDefaults.textButtonColors(contentColor = WeatherText),
+                ) { Text(stringResource(R.string.settings_network_consent_allow)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { consentScope = null }, colors = ButtonDefaults.textButtonColors(contentColor = WeatherText)) {
+                    Text(stringResource(R.string.weather_cancel))
+                }
+            },
+        )
     }
 
     pendingImport?.let { uri ->
@@ -262,7 +291,10 @@ fun SettingsScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable(enabled = target.canHide, role = Role.Checkbox) { settingsViewModel.setScopeVisible(target, !shown) },
+                                .clickable(enabled = target.canHide, role = Role.Checkbox) {
+                                    if (!shown && target.network && target.name !in consentedScopes) consentScope = target
+                                    else settingsViewModel.setScopeVisible(target, !shown)
+                                },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Checkbox(
@@ -452,4 +484,12 @@ private fun openAppLanguageSettings(context: Context) {
     } catch (e: ActivityNotFoundException) {
         // Gerät ohne diese Einstellungsseite: nichts zu tun.
     }
+}
+
+/** Text, der im Zustimmungsdialog beschreibt, was die jeweilige Scope ins Netz sendet. */
+private fun networkConsentDetail(scope: Scope): Int = when (scope) {
+    Scope.Weather -> R.string.settings_network_consent_weather
+    Scope.Feed -> R.string.settings_network_consent_feed
+    Scope.Podcasts -> R.string.settings_network_consent_podcasts
+    else -> R.string.settings_network_consent_markets
 }

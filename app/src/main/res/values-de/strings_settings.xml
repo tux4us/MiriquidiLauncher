@@ -55,6 +55,13 @@
     <string name="settings_license_notices">Open-Source-Lizenzen</string>
     <string name="settings_license_close">Schließen</string>
     <string name="settings_section_scopes">Scopes</string>
-    <string name="settings_scopes_text">Scopes mit Häkchen werden angezeigt. Mit den Pfeilen wird die Reihenfolge festgelegt, in der die Scopes beim Wischen und im Scopes-Menü erscheinen. Ausgeblendete Scopes verschwinden aus beidem. Startseite und Einstellungen bleiben immer erreichbar.</string>
+    <string name="settings_scopes_text">Scopes mit Häkchen werden angezeigt. Mit den Pfeilen wird die Reihenfolge festgelegt, in der die Scopes beim Wischen und im Scopes-Menü erscheinen. Ausgeblendete Scopes verschwinden aus beidem. Startseite und Einstellungen bleiben immer erreichbar. Scopes mit Internetabruf (Wetter, FeedReader, Podcasts, Kurse) und Hunde sind nach der Installation ausgeblendet; vor dem ersten Einblenden fragt der Launcher dich um Erlaubnis.</string>
     <string name="settings_scopes_reset_order">Reihenfolge zurücksetzen</string>
+    <string name="settings_network_consent_title">%1$s einblenden?</string>
+    <string name="settings_network_consent_allow">Einblenden und erlauben</string>
+    <string name="settings_network_consent_common">Es werden keine Konto- oder Personendaten übertragen, es gibt keine Werbung und kein Tracking. Ohne Zustimmung stellt der Launcher für diese Scope keine Verbindung her. Du kannst sie jederzeit wieder ausblenden.</string>
+    <string name="settings_network_consent_weather">Wetter: Für Vorhersage und Ortssuche werden der gewählte Ort (Koordinaten auf 4 Nachkommastellen gerundet) bzw. dein Suchbegriff an Open-Meteo gesendet.</string>
+    <string name="settings_network_consent_feed">FeedReader: Es werden nur die Feeds und Artikelseiten abgerufen, die du selbst hinzugefügt hast. Dabei sieht der jeweilige Server deine IP-Adresse.</string>
+    <string name="settings_network_consent_podcasts">Podcasts: Es werden Podcast-Verzeichnis, Feeds und Folgen abgerufen; beim Abspielen oder Laden verbindet sich das Gerät mit dem jeweiligen Server des Podcasts.</string>
+    <string name="settings_network_consent_markets">Kurse: Für Kurse und Preise werden die gewählten Werte bei den eingestellten Kursquellen abgefragt.</string>
 </resources>

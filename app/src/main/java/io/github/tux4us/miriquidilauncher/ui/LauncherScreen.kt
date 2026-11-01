@@ -698,7 +698,7 @@ private fun HomePage(
                     if (agenda.enabled && agenda.permissionGranted && view != null) {
                         AgendaCard(view = view, onRefresh = onAgendaRefresh, onOpen = onAgendaOpen)
                     }
-                    DogsHomeCard(entries = dogDue, onOpen = { onOpenScope(Scope.Dogs) })
+                    if (Scope.Dogs.name !in hiddenScopes) DogsHomeCard(entries = dogDue, onOpen = { onOpenScope(Scope.Dogs) })
                 }
             } else {
                 SearchResultsContent(

@@ -67,6 +67,28 @@ object ScopeVisibility {
     fun move(order: List<String>, id: String, delta: Int): List<String> =
         ListOrder.moveBy(order, delta) { it == id }
 
+    /**
+     * Ausgeblendete Scopes: Ohne gespeicherten Wert (Neuinstallation, Zurücksetzen) gelten die [defaults];
+     * sonst der gespeicherte Wert ohne unbekannte Kennungen.
+     */
+    fun initialHidden(saved: String?, defaults: Set<String>, known: Set<String>): Set<String> =
+        if (saved == null) defaults.filter { it in known }.toSet() else decode(saved, known)
+
+    /**
+     * Scopes mit Netzwerkzugriff ([network]), denen der Nutzer zugestimmt hat. Ist noch nichts gespeichert, gelten Installationen,
+     * die schon eine Auswahl der ausgeblendeten Scopes gespeichert hatten, die sichtbaren Netzwerk-Scopes als zugestimmt;
+     * sonst ist es keine.
+     */
+    fun consentOf(savedConsent: String?, savedHidden: String?, network: Set<String>, known: Set<String>): Set<String> = when {
+        savedConsent != null -> decode(savedConsent, network)
+        savedHidden != null -> network - decode(savedHidden, known)
+        else -> emptySet()
+    }
+
+    /** Ausgeblendet ist, was gespeichert so ist, und jede Netzwerk-Scope ohne Zustimmung. */
+    fun effectiveHidden(hidden: Set<String>, network: Set<String>, consented: Set<String>): Set<String> =
+        hidden + (network - consented)
+
     fun encodeOrder(order: List<String>): String = order.joinToString(",")
 
     /** Liest die gespeicherte Reihenfolge; `null` oder Text ohne gültige Kennungen ergibt die Standardreihenfolge [known]. */

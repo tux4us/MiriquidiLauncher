@@ -6,7 +6,7 @@ Last updated: 1 November 2026 · applies to MiriquidiLauncher 0.6.8 and later ·
 
 - The developer operates **no server** for the launcher. There is **no user account, no advertising, no usage analytics, no crash reporting and no Google services**. The developer receives no data from the app.
 - Personal data (favourites, notes, dog profiles, holdings on the markets page, podcast subscriptions, calculator history, etc.) is stored **on the device only**.
-- Some pages (weather, markets, feed reader, notes with Nextcloud, podcasts) fetch data **directly from your device from third parties** and only when you use the page. All connections use HTTPS. The recipients see at least your IP address (section 5).
+- Some pages (weather, markets, feed reader, notes with Nextcloud, podcasts) fetch data **directly from your device from third parties** and only when you use the page. These pages (weather, feed reader, podcasts, markets) are **hidden** after installation and after resetting the app; the launcher makes no connection for them until you show them in the settings ("Scopes" card) and agree in the notice dialog. An imported backup cannot show them without this consent. All connections use HTTPS. The recipients see at least your IP address (section 5).
 - Permissions are requested **on first use** of the respective feature and can be revoked at any time (section 6).
 
 ## 2. Controller and contact

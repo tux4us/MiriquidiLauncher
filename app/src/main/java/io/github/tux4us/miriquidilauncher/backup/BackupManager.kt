@@ -33,6 +33,8 @@ import io.github.tux4us.miriquidilauncher.podcasts.PodcastData
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastStore
 import io.github.tux4us.miriquidilauncher.scopes.ScopeVisibility
 import io.github.tux4us.miriquidilauncher.scopes.ScopeVisibilityStore
+import io.github.tux4us.miriquidilauncher.ui.DefaultHiddenScopeNames
+import io.github.tux4us.miriquidilauncher.ui.NetworkScopeNames
 import io.github.tux4us.miriquidilauncher.ui.PinnedScopeNames
 import io.github.tux4us.miriquidilauncher.ui.ScopeNames
 import io.github.tux4us.miriquidilauncher.weather.WeatherServer
@@ -94,7 +96,7 @@ class BackupManager(context: Context) {
             podcasts = if (includeFileOnlyData) podcastStore.load() else null,
             markets = if (includeFileOnlyData) marketsForBackup() else null,
             // Anordnung der Scopes ist klein und steht auch in QR-Codes; alles Weitere nur in der Datei.
-            scopes = BackupScopes(scopeStore.loadHidden(ScopeNames.toSet()), scopeStore.loadOrder(ScopeNames)),
+            scopes = BackupScopes(scopeStore.loadHidden(ScopeNames.toSet(), DefaultHiddenScopeNames, NetworkScopeNames), scopeStore.loadOrder(ScopeNames)),
             weatherServer = if (includeFileOnlyData) weatherStore.loadServer().let { BackupWeatherServer(it?.forecastBase, it?.airBase) } else null,
             feed = if (includeFileOnlyData) feedForBackup() else null,
             gallery = if (includeFileOnlyData) galleryStore.load().let { BackupGallery(it.favorites, it.hiddenBuckets, it.ascending, it.showHidden) } else null,
@@ -219,6 +221,8 @@ class BackupManager(context: Context) {
     /** Ersetzt die Daten der übrigen Scopes, soweit sie im Backup stehen. Zugangsdaten und Schlüssel bleiben unberührt. */
     private suspend fun restoreScopeData(data: BackupData) {
         data.scopes?.let { s ->
+            // Zustimmungen gehören zum Gerät und kommen nie aus dem Backup; Netzwerk-Scopes ohne Zustimmung bleiben ausgeblendet.
+            scopeStore.loadConsented(NetworkScopeNames, ScopeNames.toSet())
             val hidden = s.hidden.filter { it in ScopeNames && it !in PinnedScopeNames }.toSet()
             scopeStore.replaceAll(hidden, ScopeVisibility.orderOf(s.order, ScopeNames))
         }

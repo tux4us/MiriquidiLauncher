@@ -11,9 +11,9 @@ android {
     defaultConfig {
         applicationId = "io.github.tux4us.miriquidilauncher"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 29
-        versionName = "0.7.0"
+        targetSdk = 36
+        versionCode = 30
+        versionName = "0.7.1"
     }
 
     buildTypes {

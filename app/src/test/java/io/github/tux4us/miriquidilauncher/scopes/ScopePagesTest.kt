@@ -105,4 +105,38 @@ class ScopePagesTest {
         assertEquals(listOf("Camera", "C", "Settings", "B"), visible)
         assertEquals(1, ScopePages(visible).pageOf("Camera"))
     }
+
+    private val known = setOf("A", "B", "Net", "Dogs")
+    private val network = setOf("Net")
+    private val defaults = setOf("Net", "Dogs")
+
+    @Test
+    fun freshInstallHidesDefaultsAndGrantsNoConsent() {
+        assertEquals(defaults, ScopeVisibility.initialHidden(null, defaults, known))
+        assertEquals(emptySet<String>(), ScopeVisibility.consentOf(null, null, network, known))
+        val effective = ScopeVisibility.effectiveHidden(ScopeVisibility.initialHidden(null, defaults, known), network, emptySet())
+        assertEquals(defaults, effective)
+    }
+
+    @Test
+    fun savedHiddenSetOverridesDefaultsButNotMissingConsent() {
+        // Gespeichert ist „nichts ausgeblendet“ (z. B. aus einem Backup): Dogs wird sichtbar, Net bleibt ohne Zustimmung verborgen.
+        val saved = ScopeVisibility.initialHidden("", defaults, known)
+        assertEquals(emptySet<String>(), saved)
+        assertEquals(setOf("Net"), ScopeVisibility.effectiveHidden(saved, network, emptySet()))
+        assertEquals(emptySet<String>(), ScopeVisibility.effectiveHidden(saved, network, network))
+    }
+
+    @Test
+    fun existingCustomizedInstallIsGrandfathered() {
+        // Vorhandene Auswahl: Net war sichtbar -> gilt als zugestimmt; war Net ausgeblendet -> keine Zustimmung.
+        assertEquals(network, ScopeVisibility.consentOf(null, "A", network, known))
+        assertEquals(emptySet<String>(), ScopeVisibility.consentOf(null, "Net", network, known))
+    }
+
+    @Test
+    fun storedConsentWinsAndIgnoresUnknownIds() {
+        assertEquals(emptySet<String>(), ScopeVisibility.consentOf("", "A", network, known))
+        assertEquals(network, ScopeVisibility.consentOf("Net,Gone,A", null, network, known))
+    }
 }

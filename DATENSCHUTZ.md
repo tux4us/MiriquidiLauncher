@@ -6,7 +6,7 @@ Stand: 1. November 2026 · gilt für MiriquidiLauncher ab Version 0.6.8 · [Engl
 
 - Der Entwickler betreibt **keinen Server** für den Launcher. Es gibt **kein Benutzerkonto, keine Werbung, keine Nutzungsanalyse, keine Absturzberichte und keine Google-Dienste**. Der Entwickler erhält keine Daten aus der App.
 - Persönliche Daten (Favoriten, Notizen, Hundeprofile, Kurse-Bestand, Podcast-Abos, Rechner-Verlauf u. a.) werden **nur auf dem Gerät** gespeichert.
-- Einige Seiten (Wetter, Kurse, FeedReader, Notizen mit Nextcloud, Podcasts) rufen Daten **direkt vom Gerät aus bei Drittanbietern** ab, und zwar erst, wenn du die Seite benutzt. Die Verbindungen sind ausschließlich per HTTPS. Die Empfänger sehen dabei mindestens deine IP-Adresse (Abschnitt 5).
+- Einige Seiten (Wetter, Kurse, FeedReader, Notizen mit Nextcloud, Podcasts) rufen Daten **direkt vom Gerät aus bei Drittanbietern** ab, und zwar erst, wenn du die Seite benutzt. Diese Seiten (Wetter, FeedReader, Podcasts, Kurse) sind nach der Installation und nach dem Zurücksetzen der App **ausgeblendet**; der Launcher stellt für sie keine Verbindung her, bis du sie in den Einstellungen (Karte „Scopes“) einblendest und im Hinweisdialog zustimmst. Ein eingespieltes Backup kann sie nicht ohne diese Zustimmung einblenden. Die Verbindungen sind ausschließlich per HTTPS. Die Empfänger sehen dabei mindestens deine IP-Adresse (Abschnitt 5).
 - Berechtigungen werden **erst bei der ersten Nutzung** der jeweiligen Funktion angefragt und sind widerrufbar (Abschnitt 6).
 
 ## 2. Verantwortlicher und Kontakt

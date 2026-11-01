@@ -45,6 +45,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     /** Namen der ausgeblendeten Scopes. */
     val hiddenScopes: StateFlow<Set<String>> = _hiddenScopes.asStateFlow()
 
+    private val _consentedScopes = MutableStateFlow<Set<String>>(emptySet())
+
+    /** Netzwerk-Scopes, denen der Nutzer schon zugestimmt hat. */
+    val consentedScopes: StateFlow<Set<String>> = _consentedScopes.asStateFlow()
+
     private val _scopeOrder = MutableStateFlow(ScopeNames)
 
     /** Namen aller Scopes in der eingestellten Reihenfolge (einschließlich der ausgeblendeten). */
@@ -57,7 +62,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     /** Liest Sichtbarkeit und Reihenfolge der Scopes neu aus dem Speicher; beim Start und nach einem Backup-Import. */
     fun reloadScopes() {
         viewModelScope.launch {
-            _hiddenScopes.value = scopeStore.loadHidden(ScopeNames.toSet())
+            _consentedScopes.value = scopeStore.loadConsented(NetworkScopeNames, ScopeNames.toSet())
+            _hiddenScopes.value = scopeStore.loadHidden(ScopeNames.toSet(), DefaultHiddenScopeNames, NetworkScopeNames)
             _scopeOrder.value = scopeStore.loadOrder(ScopeNames)
         }
     }
@@ -77,8 +83,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch { scopeStore.saveOrder(ScopeNames) }
     }
 
-    /** Blendet [scope] ein oder aus; die Einstellungen bleiben immer sichtbar. */
+    /** Hält die Zustimmung zum Netzwerkzugriff von [scope] fest und blendet sie ein. */
+    fun allowNetworkScope(scope: Scope) {
+        if (!scope.network) return
+        viewModelScope.launch {
+            scopeStore.grantConsent(scope.name, NetworkScopeNames, ScopeNames.toSet())
+            _consentedScopes.value = _consentedScopes.value + scope.name
+            setScopeVisible(scope, true)
+        }
+    }
+
+    /** Blendet [scope] ein oder aus; die Einstellungen bleiben immer sichtbar. Netzwerk-Scopes erst nach Zustimmung. */
     fun setScopeVisible(scope: Scope, visible: Boolean) {
+        if (visible && scope.network && scope.name !in _consentedScopes.value) return
         val next = ScopeVisibility.withVisible(_hiddenScopes.value, scope.name, visible, PinnedScopeNames)
         if (next == _hiddenScopes.value) return
         _hiddenScopes.value = next

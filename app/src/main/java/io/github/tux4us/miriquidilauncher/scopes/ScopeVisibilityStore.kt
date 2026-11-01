@@ -26,7 +26,28 @@ class ScopeVisibilityStore(context: Context) {
         if (error is IOException) emit(emptyPreferences()) else throw error
     }.first()
 
-    suspend fun loadHidden(known: Set<String>): Set<String> = ScopeVisibility.decode(prefs()[HIDDEN], known)
+    /**
+     * Wirksam ausgeblendete Scopes: der gespeicherte Wert (ohne ihn [defaults]) plus jede Netzwerk-Scope ([network]) ohne
+     * Zustimmung. Damit kann auch ein eingespieltes Backup keine Netzwerk-Scope ohne Zustimmung einblenden.
+     */
+    suspend fun loadHidden(known: Set<String>, defaults: Set<String>, network: Set<String>): Set<String> {
+        val saved = ScopeVisibility.initialHidden(prefs()[HIDDEN], defaults, known)
+        return ScopeVisibility.effectiveHidden(saved, network, loadConsented(network, known))
+    }
+
+    /** Scopes mit Netzwerkzugriff, denen zugestimmt wurde; ein abgeleiteter Wert wird dabei dauerhaft gespeichert. */
+    suspend fun loadConsented(network: Set<String>, known: Set<String>): Set<String> {
+        val p = prefs()
+        val consented = ScopeVisibility.consentOf(p[CONSENT], p[HIDDEN], network, known)
+        if (p[CONSENT] == null) store.edit { it[CONSENT] = ScopeVisibility.encode(consented) }
+        return consented
+    }
+
+    /** Hält die Zustimmung des Nutzers zu [id] fest. */
+    suspend fun grantConsent(id: String, network: Set<String>, known: Set<String>) {
+        val consented = loadConsented(network, known) + id
+        store.edit { it[CONSENT] = ScopeVisibility.encode(consented.filter { c -> c in network }.toSet()) }
+    }
 
     suspend fun saveHidden(hidden: Set<String>) {
         store.edit { it[HIDDEN] = ScopeVisibility.encode(hidden) }
@@ -50,5 +71,6 @@ class ScopeVisibilityStore(context: Context) {
     private companion object {
         val HIDDEN = stringPreferencesKey("hidden")
         val ORDER = stringPreferencesKey("order")
+        val CONSENT = stringPreferencesKey("networkConsent")
     }
 }
