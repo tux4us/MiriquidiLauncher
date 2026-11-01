@@ -13,12 +13,17 @@ Stand: 1. November 2026 · gilt für MiriquidiLauncher ab Version 0.6.8 · [Engl
 
 Verantwortlich für diese Datenschutzerklärung und das Angebot der App:
 
-> [Name bzw. Firma des Anbieters]
-> [Straße und Hausnummer]
-> [PLZ Ort, Land]
-> E-Mail: [E-Mail-Adresse für Datenschutzanfragen]
+> Jörg Ulbricht
+> Hohe Lehne 14
+> 01705 Freital
+> E-Mail: tux4us@online.de
 
-Einen Datenschutzbeauftragten gibt es nicht; eine Benennung ist nicht erforderlich.
+Datenschutzbeauftragter:
+
+> Jörg Ulbricht
+> Hohe Lehne 14
+> 01705 Freital
+> E-Mail: tux4us@online.de
 
 ## 3. Grundsatz: Wer verarbeitet was?
 

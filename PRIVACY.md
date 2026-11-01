@@ -11,12 +11,17 @@ Last updated: 1 November 2026 · applies to MiriquidiLauncher 0.6.8 and later ·
 
 ## 2. Controller and contact
 
-> [Name or company of the provider]
-> [Street and number]
-> [Postal code, city, country]
-> Email: [email address for privacy requests]
+> Jörg Ulbricht
+> Hohe Lehne 14
+> 01705 Freital
+> E-Mail: tux4us@online.de
 
-No data protection officer has been appointed; none is required.
+Data protection officer:
+
+> Jörg Ulbricht
+> Hohe Lehne 14
+> 01705 Freital
+> E-Mail: tux4us@online.de
 
 ## 3. Principle: who processes what?
 
