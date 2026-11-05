@@ -189,4 +189,8 @@
     <string name="markets_commodity_corn">Mais</string>
     <string name="markets_commodity_coffee">Kaffee</string>
     <string name="markets_commodity_sugar">Zucker</string>
+    <string name="markets_portfolio_title">Verlauf des Gesamtwerts</string>
+    <string name="markets_portfolio_description">Verlauf des Gesamtwerts in Euro von %3$s bis %4$s, Tief %1$s, Hoch %2$s</string>
+    <string name="markets_portfolio_missing">Ohne %1$d von %2$d Werten, für die kein Verlauf vorliegt.</string>
+    <string name="markets_portfolio_note">Gesamtwert in Euro, berechnet mit den heutigen Mengen und den Kursverläufen des Zeitraums. Fremdwährungen mit dem heutigen Wechselkurs. Die Verläufe werden einzeln bei den Kursquellen abgerufen.</string>
 </resources>

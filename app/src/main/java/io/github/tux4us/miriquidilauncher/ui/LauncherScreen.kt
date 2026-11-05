@@ -114,6 +114,7 @@ import io.github.tux4us.miriquidilauncher.quickmenu.QuickMenuState
 import io.github.tux4us.miriquidilauncher.quickmenu.isOpen
 import io.github.tux4us.miriquidilauncher.search.ActionResult
 import io.github.tux4us.miriquidilauncher.calculator.CalculatorViewModel
+import io.github.tux4us.miriquidilauncher.converter.ConverterViewModel
 import io.github.tux4us.miriquidilauncher.dogs.DogLogic
 import io.github.tux4us.miriquidilauncher.dogs.DogViewModel
 import io.github.tux4us.miriquidilauncher.dogs.DueEntry
@@ -161,6 +162,7 @@ fun LauncherScreen(
     notesViewModel: NotesViewModel,
     systemViewModel: SystemViewModel,
     calculatorViewModel: CalculatorViewModel,
+    converterViewModel: ConverterViewModel,
     cameraViewModel: CameraViewModel,
     agendaViewModel: AgendaViewModel,
     dogViewModel: DogViewModel,
@@ -512,6 +514,7 @@ fun LauncherScreen(
                         active = currentScope == Scope.Camera,
                     )
                     Scope.Calculator -> CalculatorScreen(viewModel = calculatorViewModel)
+                    Scope.Converter -> ConverterScreen(viewModel = converterViewModel)
                     Scope.Dogs -> DogsScreen(viewModel = dogViewModel)
                     null -> Unit
                 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_converter">Converter</string>
+
+    <string name="converter_category">Choose category</string>
+    <string name="converter_clear">Clear</string>
+    <string name="converter_toggle_sign">Toggle sign</string>
+
+    <string name="converter_cat_length">Length</string>
+    <string name="converter_cat_area">Area</string>
+    <string name="converter_cat_volume">Volume</string>
+    <string name="converter_cat_time">Time</string>
+    <string name="converter_cat_temperature">Temperature</string>
+    <string name="converter_cat_speed">Speed</string>
+    <string name="converter_cat_mass">Mass</string>
+    <string name="converter_cat_force">Force</string>
+    <string name="converter_cat_fuel">Fuel consumption</string>
+    <string name="converter_cat_radix">Number systems</string>
+    <string name="converter_cat_energy">Energy</string>
+    <string name="converter_cat_power">Power</string>
+    <string name="converter_cat_pressure">Pressure</string>
+    <string name="converter_cat_angle">Angle</string>
+    <string name="converter_cat_density">Density</string>
+    <string name="converter_cat_shoe">Shoe size</string>
+    <string name="converter_cat_clothes_women">Clothing sizes, women</string>
+    <string name="converter_cat_clothes_men">Clothing sizes, men</string>
+    <string name="converter_cat_digital">Digital sizes</string>
+    <string name="converter_cat_prefixes">Unit prefixes</string>
+
+    <string name="converter_note_time">Month and year are averages: a year has 365.25 days, a month is one twelfth of that.</string>
+    <string name="converter_note_fuel">The smaller the value in l/100 km, the more economical the vehicle; for km/l and mpg it is the other way round.</string>
+    <string name="converter_note_radix">Whole numbers from 0 only. Roman numerals run from I to MMMCMXCIX (1 to 3999).</string>
+    <string name="converter_note_shoe">Guide values for adult shoes, rounded to half sizes. Foot length assumes 1.5 cm of allowance in the shoe. Manufacturers differ; children\'s sizes are not included.</string>
+    <string name="converter_note_clothes">Guide values for garment sizes; cut and letter sizes differ between manufacturers. Enter a value from the table in any field to fill the others, e.g. 38 or M.</string>
+</resources>

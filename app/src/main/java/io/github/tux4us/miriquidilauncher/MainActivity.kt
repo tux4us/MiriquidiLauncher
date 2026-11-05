@@ -25,6 +25,7 @@ import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
 import io.github.tux4us.miriquidilauncher.notes.NotesViewModel
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
 import io.github.tux4us.miriquidilauncher.calculator.CalculatorViewModel
+import io.github.tux4us.miriquidilauncher.converter.ConverterViewModel
 import io.github.tux4us.miriquidilauncher.dogs.DogViewModel
 import io.github.tux4us.miriquidilauncher.ui.LauncherScreen
 import io.github.tux4us.miriquidilauncher.ui.LauncherTheme
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
     private val notesViewModel: NotesViewModel by viewModels()
     private val systemViewModel: SystemViewModel by viewModels()
     private val calculatorViewModel: CalculatorViewModel by viewModels()
+    private val converterViewModel: ConverterViewModel by viewModels()
     private val cameraViewModel: CameraViewModel by viewModels()
     private val agendaViewModel: AgendaViewModel by viewModels()
     private val dogViewModel: DogViewModel by viewModels()
@@ -78,6 +80,7 @@ class MainActivity : ComponentActivity() {
                     notesViewModel = notesViewModel,
                     systemViewModel = systemViewModel,
                     calculatorViewModel = calculatorViewModel,
+                    converterViewModel = converterViewModel,
                     cameraViewModel = cameraViewModel,
                     agendaViewModel = agendaViewModel,
                     dogViewModel = dogViewModel,

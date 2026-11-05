@@ -16,6 +16,7 @@ object FeedHtml {
         bodyHtml: String,
         colors: ReaderColors,
         loadImages: Boolean,
+        showHeader: Boolean = true,
     ): String {
         val images = if (loadImages) "https: data:" else "data:"
         val csp = "default-src 'none'; img-src $images; media-src ${if (loadImages) "https:" else "'none'"}; style-src 'unsafe-inline'"
@@ -46,9 +47,7 @@ object FeedHtml {
             </style>
             </head>
             <body>
-            <h1>${FeedText.escapeHtml(title)}</h1>
-            <p class="meta">${FeedText.escapeHtml(meta)}</p>
-            <hr>
+            ${if (showHeader) "<h1>${FeedText.escapeHtml(title)}</h1>\n<p class=\"meta\">${FeedText.escapeHtml(meta)}</p>\n<hr>" else ""}
             ${FeedText.sanitize(bodyHtml)}
             </body>
             </html>

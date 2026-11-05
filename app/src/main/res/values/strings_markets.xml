@@ -189,4 +189,8 @@
     <string name="markets_commodity_corn">Corn</string>
     <string name="markets_commodity_coffee">Coffee</string>
     <string name="markets_commodity_sugar">Sugar</string>
+    <string name="markets_portfolio_title">Total value history</string>
+    <string name="markets_portfolio_description">Total value in euros from %3$s to %4$s, low %1$s, high %2$s</string>
+    <string name="markets_portfolio_missing">Excluding %1$d of %2$d values without price history.</string>
+    <string name="markets_portfolio_note">Total in euros, calculated with today\'s quantities and the price history of the period. Foreign currencies use today\'s exchange rate. The histories are requested individually from the price sources.</string>
 </resources>

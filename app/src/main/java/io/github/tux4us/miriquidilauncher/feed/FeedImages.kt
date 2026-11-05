@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
  */
 object FeedImages {
     private const val MAX_BYTES = 4 * 1024 * 1024
-    private const val TARGET_EDGE_PX = 320
+    const val DEFAULT_EDGE_PX = 320
     private const val TIMEOUT_MS = 10_000
 
     private val cache = object : LruCache<String, Bitmap>(8 * 1024 * 1024) {
@@ -31,11 +31,16 @@ object FeedImages {
     private val failed = LinkedHashSet<String>()
     private val limit = Semaphore(4)
 
-    suspend fun load(url: String): ImageBitmap? {
+    /**
+     * Lädt das Bild unter [url] und verkleinert es so, dass die längere Kante mindestens [edgePx] Pixel behält (so wenig
+     * Speicher wie möglich). Kleine Vorschaubilder in Listen brauchen weniger als der Standardwert.
+     */
+    suspend fun load(url: String, edgePx: Int = DEFAULT_EDGE_PX): ImageBitmap? {
         if (!url.startsWith("https://", ignoreCase = true)) return null
-        synchronized(cache) { cache.get(url) }?.let { return it.asImageBitmap() }
+        val key = if (edgePx == DEFAULT_EDGE_PX) url else "$url@$edgePx"
+        synchronized(cache) { cache.get(key) }?.let { return it.asImageBitmap() }
         if (synchronized(failed) { url in failed }) return null
-        val bitmap = limit.withPermit { withContext(Dispatchers.IO) { download(url) } }
+        val bitmap = limit.withPermit { withContext(Dispatchers.IO) { download(url, edgePx) } }
         if (bitmap == null) {
             synchronized(failed) {
                 if (failed.size >= 200) failed.remove(failed.first())
@@ -43,11 +48,11 @@ object FeedImages {
             }
             return null
         }
-        synchronized(cache) { cache.put(url, bitmap) }
+        synchronized(cache) { cache.put(key, bitmap) }
         return bitmap.asImageBitmap()
     }
 
-    private fun download(url: String): Bitmap? {
+    private fun download(url: String, edgePx: Int): Bitmap? {
         val connection = try {
             URL(url).openConnection() as HttpURLConnection
         } catch (ignored: IOException) {
@@ -70,7 +75,7 @@ object FeedImages {
                 }
                 out.toByteArray()
             }
-            decode(data)
+            decode(data, edgePx)
         } catch (ignored: IOException) {
             null
         } finally {
@@ -78,13 +83,13 @@ object FeedImages {
         }
     }
 
-    private fun decode(data: ByteArray): Bitmap? {
+    private fun decode(data: ByteArray, edgePx: Int): Bitmap? {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeByteArray(data, 0, data.size, bounds)
         val longest = maxOf(bounds.outWidth, bounds.outHeight)
         if (longest <= 0) return null
         var sample = 1
-        while (longest / (sample * 2) >= TARGET_EDGE_PX) sample *= 2
+        while (longest / (sample * 2) >= edgePx) sample *= 2
         val options = BitmapFactory.Options().apply { inSampleSize = sample }
         return BitmapFactory.decodeByteArray(data, 0, data.size, options)
     }

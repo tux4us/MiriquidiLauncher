@@ -8,6 +8,11 @@ import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +28,17 @@ data class SeriesLoad(
     val id: String = "",
     val range: String = "",
     val series: Series? = null,
+    val loading: Boolean = false,
+    val error: MarketError? = null,
+)
+
+/**
+ * Kursverläufe der Einträge von „Eigene Werte“ für den Gesamtwert-Verlauf. [series] enthält je Eintrag (Schlüssel aus
+ * [PortfolioHistory.seriesKey]) den Verlauf im Zeitraum [range]; fehlende Einträge konnten nicht geladen werden.
+ */
+data class PortfolioLoad(
+    val range: String = "",
+    val series: Map<String, Series> = emptyMap(),
     val loading: Boolean = false,
     val error: MarketError? = null,
 )
@@ -54,6 +70,9 @@ data class MarketsUiState(
     val cryptoSeries: SeriesLoad = SeriesLoad(),
     /** Eigene Werte (Aktien, Rohstoffe, Krypto). */
     val positions: List<Position> = emptyList(),
+    /** Zeitraum des Gesamtwert-Verlaufs von „Eigene Werte“. */
+    val portfolioRange: SeriesRange = SeriesRange.Month,
+    val portfolio: PortfolioLoad = PortfolioLoad(),
     val fxFrom: String = "EUR",
     val fxTo: String = "USD",
     val search: SecuritySearch = SecuritySearch.Idle,
@@ -94,6 +113,8 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
     private val sourceBlockedUntil = HashMap<String, Long>()
     private val seriesCache = HashMap<String, Pair<Long, Series>>()
     private val seriesJobs = HashMap<Slot, Job>()
+    private val positionSeriesCache = HashMap<String, Pair<Long, Series>>()
+    private var portfolioJob: Job? = null
     private var refreshJob: Job? = null
     private var activeJob: Job? = null
     private val settingsLoaded = CompletableDeferred<Unit>()
@@ -164,6 +185,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
     /** Manuelles Aktualisieren. */
     fun refresh() {
         seriesCache.clear()
+        positionSeriesCache.clear()
         startRefresh(manual = true)
         loadAllSeries()
     }
@@ -199,6 +221,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
 
     private fun loadAllSeries() {
         Slot.entries.forEach { loadSeries(it) }
+        loadPortfolio()
     }
 
     private fun idOf(slot: Slot, choice: ChartChoice): String = when (slot) {
@@ -287,6 +310,82 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun setPortfolioRange(range: SeriesRange) {
+        if (range == _state.value.portfolioRange) return
+        _state.update { it.copy(portfolioRange = range) }
+        loadPortfolio()
+    }
+
+    /**
+     * Lädt die Kursverläufe der Einträge von „Eigene Werte“ für den gewählten Zeitraum. Nur fehlende oder veraltete
+     * Verläufe werden abgerufen (höchstens drei gleichzeitig); Mengenänderungen brauchen keinen Abruf. Der Gesamtwert wird
+     * erst bei der Anzeige aus Verläufen, Mengen und Wechselkursen berechnet.
+     */
+    private fun loadPortfolio() {
+        val s = _state.value
+        if (!s.cacheLoaded) return
+        portfolioJob?.cancel()
+        val range = s.portfolioRange
+        val positions = s.positions
+        if (positions.isEmpty()) {
+            _state.update { it.copy(portfolio = PortfolioLoad(range.key)) }
+            return
+        }
+        val now = System.currentTimeMillis()
+        val ttl = if (range == SeriesRange.Day || range == SeriesRange.Week) SERIES_TTL_SHORT else SERIES_TTL_LONG
+        fun cacheKey(p: Position) = "${range.key}|${PortfolioHistory.seriesKey(p)}"
+        val have = HashMap<String, Series>()
+        val missing = ArrayList<Position>()
+        for (p in positions) {
+            val cached = positionSeriesCache[cacheKey(p)]
+            if (cached != null && now - cached.first < ttl) have[PortfolioHistory.seriesKey(p)] = cached.second else missing += p
+        }
+        if (missing.isEmpty()) {
+            _state.update { it.copy(portfolio = PortfolioLoad(range.key, have)) }
+            return
+        }
+        _state.update { it.copy(portfolio = PortfolioLoad(range.key, have.toMap(), loading = true)) }
+        portfolioJob = viewModelScope.launch {
+            val repository = MarketRepository(s.baseUrl)
+            val gate = Semaphore(PORTFOLIO_PARALLEL)
+            var error: MarketError? = null
+            coroutineScope {
+                missing.map { p ->
+                    async {
+                        gate.withPermit {
+                            val source = if (p.kind == PositionKind.Crypto) SOURCE_COINGECKO else SOURCE_YAHOO
+                            val yahooOpen = s.yahooEnabled && !sourceBlocked(SOURCE_YAHOO, System.currentTimeMillis())
+                            if (sourceBlocked(source, System.currentTimeMillis()) && !(p.kind == PositionKind.Commodity && s.stooqActive)) {
+                                error = error ?: MarketError.RATE_LIMIT
+                                return@withPermit
+                            }
+                            try {
+                                val series = repository.fetchPositionSeries(p, range, yahooOpen, s.stooqKey.takeIf { s.stooqActive })
+                                positionSeriesCache[cacheKey(p)] = System.currentTimeMillis() to series
+                                have[PortfolioHistory.seriesKey(p)] = series
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: RateLimitException) {
+                                blockSource(source, e.retryAfterSeconds)
+                                error = error ?: MarketError.RATE_LIMIT
+                            } catch (e: ApiKeyException) {
+                                error = error ?: MarketError.KEY
+                            } catch (e: IOException) {
+                                error = error ?: MarketError.NETWORK
+                            } catch (e: Exception) {
+                                error = error ?: MarketError.DATA
+                            }
+                        }
+                    }
+                }.awaitAll()
+            }
+            // Nur übernehmen, wenn der Zeitraum inzwischen nicht gewechselt hat.
+            if (_state.value.portfolioRange == range) {
+                _state.update { it.copy(portfolio = PortfolioLoad(range.key, have.toMap(), loading = false, error = error)) }
+            }
+        }
+    }
+
     private fun seriesTtl(key: String): Long =
         if (key.endsWith(":1d") || key.endsWith(":1w")) SERIES_TTL_SHORT else SERIES_TTL_LONG
 
@@ -321,6 +420,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
 
     private fun refreshAfterSourceChange() {
         seriesCache.clear()
+        positionSeriesCache.clear()
         startRefresh(manual = true)
         loadAllSeries()
     }
@@ -389,6 +489,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
                 store.setPositions(updated)
                 store.saveSnapshot(snapshot)
                 startRefresh(manual = false)
+                loadPortfolio()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: RateLimitException) {
@@ -420,18 +521,21 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         _state.update { it.copy(positions = updated) }
         viewModelScope.launch { store.setPositions(updated) }
         startRefresh(manual = false)
+        loadPortfolio()
     }
 
     fun setPositionQuantity(kind: PositionKind, symbol: String, quantity: Double) {
         val updated = PositionsLogic.setQuantity(_state.value.positions, kind, symbol, quantity)
         _state.update { it.copy(positions = updated) }
         viewModelScope.launch { store.setPositions(updated) }
+        loadPortfolio()
     }
 
     fun removePosition(kind: PositionKind, symbol: String) {
         val updated = PositionsLogic.remove(_state.value.positions, kind, symbol)
         _state.update { it.copy(positions = updated) }
         viewModelScope.launch { store.setPositions(updated) }
+        loadPortfolio()
     }
 
     // endregion
@@ -601,6 +705,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         const val AUTO_CHECK_MS = 30_000L
         const val MIN_BLOCK_SECONDS = 60L
         const val MAX_KEY_LENGTH = 200
+        const val PORTFOLIO_PARALLEL = 3
         const val SERIES_TTL_SHORT = 5L * 60_000L
         const val SERIES_TTL_LONG = 30L * 60_000L
         const val SOURCE_STOOQ = "stooq"

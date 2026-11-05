@@ -96,4 +96,13 @@ class FeedTextTest {
         assertTrue(withImages.contains("img-src https: data:"))
         assertFalse(withImages.contains("script-src"))
     }
+
+    @Test
+    fun readerDocumentCanOmitTheHeader() {
+        val colors = ReaderColors("#101010", "#eeeeee", "#999999", "#88aaff")
+        val doc = FeedHtml.readerDocument("Titel", "Meta", "<p>Inhalt</p>", colors, loadImages = true, showHeader = false)
+        assertFalse(doc.contains("<h1>"))
+        assertFalse(doc.contains("Meta</p>"))
+        assertTrue(doc.contains("<p>Inhalt</p>"))
+    }
 }

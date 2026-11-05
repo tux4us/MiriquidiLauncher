@@ -196,4 +196,23 @@ class PodcastTest {
         assertEquals(listOf("x"), PodcastLogic.allEpisodes(data).map { it.id })
         assertTrue(PodcastLogic.allEpisodes(PodcastData()).isEmpty())
     }
+
+    private fun episode(id: String, podcastUrl: String, image: String?) = Episode(
+        id = id, podcastUrl = podcastUrl, podcastTitle = "P", title = id, publishedSeconds = 1L,
+        audioUrl = "https://example.org/$id.mp3", mime = "audio/mpeg", durationSeconds = 0, notesHtml = "", link = null, imageUrl = image,
+    )
+
+    @Test fun coverUrlPrefersEpisodeImageAndFallsBackToPodcastCover() {
+        val data = PodcastData(subscriptions = listOf(Podcast("https://example.org/feed.xml", "P", imageUrl = "https://example.org/cover.jpg")))
+        assertEquals("https://example.org/ep.jpg", PodcastLogic.coverUrl(data, episode("a", "https://example.org/feed.xml", "https://example.org/ep.jpg")))
+        assertEquals("https://example.org/cover.jpg", PodcastLogic.coverUrl(data, episode("b", "https://example.org/feed.xml", null)))
+        // Die Feed-Adresse wird ohne Beachtung der Groß- und Kleinschreibung verglichen wie beim Abonnieren.
+        assertEquals("https://example.org/cover.jpg", PodcastLogic.coverUrl(data, episode("c", "HTTPS://EXAMPLE.ORG/feed.xml", null)))
+    }
+
+    @Test fun coverUrlIsNullWithoutEpisodeImageAndSubscription() {
+        assertNull(PodcastLogic.coverUrl(PodcastData(), episode("d", "https://example.org/other.xml", null)))
+        val noCover = PodcastData(subscriptions = listOf(Podcast("https://example.org/feed.xml", "P")))
+        assertNull(PodcastLogic.coverUrl(noCover, episode("e", "https://example.org/feed.xml", null)))
+    }
 }

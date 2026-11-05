@@ -49,6 +49,13 @@ object PodcastLogic {
             .sortedWith(compareByDescending<Episode> { it.publishedSeconds }.thenBy { it.id })
     }
 
+    /**
+     * Bild einer Folge: das eigene Bild der Folge, sonst das Cover des Podcasts aus dem Abo. Ohne beides (z. B. bei einer
+     * gespeicherten Folge eines nicht mehr abonnierten Podcasts ohne Folgenbild) `null`.
+     */
+    fun coverUrl(data: PodcastData, episode: Episode): String? =
+        episode.imageUrl ?: data.subscriptions.firstOrNull { it.feedUrl.equals(episode.podcastUrl, ignoreCase = true) }?.imageUrl
+
     fun isFavorite(data: PodcastData, id: String): Boolean = data.favorites.any { it.id == id }
 
     /** Schaltet den Favoritenstatus um; neue Favoriten stehen vorn. `null` bei Limit. */

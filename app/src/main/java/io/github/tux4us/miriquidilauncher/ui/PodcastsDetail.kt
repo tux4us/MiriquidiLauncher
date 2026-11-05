@@ -83,18 +83,22 @@ internal fun EpisodeDetail(
     val current = state.player.episode?.id == episode.id
     val playing = current && state.player.playing
 
-    val document = remember(episode.id) {
-        val meta = listOfNotNull(
-            episode.podcastTitle.ifBlank { null },
+    // Titel, Datum und Dauer stehen neben dem Cover über den Shownotes; das Dokument enthält nur den Text der Shownotes.
+    val meta = remember(episode.id) {
+        listOfNotNull(
             formatPublished(episode.publishedSeconds, locale).ifEmpty { null },
             if (episode.durationSeconds > 0) PodcastLogic.formatClock(episode.durationSeconds.toLong()) else null,
         ).joinToString(" · ")
+    }
+    val cover = PodcastLogic.coverUrl(data, episode)
+    val document = remember(episode.id) {
         FeedHtml.readerDocument(
             title = episode.title.ifBlank { untitled },
             meta = meta,
             bodyHtml = episode.notesHtml,
             colors = NotesColors,
             loadImages = true,
+            showHeader = false,
         )
     }
     val baseUrl = episode.link?.takeIf { it.startsWith("https://", ignoreCase = true) }
@@ -121,6 +125,23 @@ internal fun EpisodeDetail(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
+        }
+        Row(
+            Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            PodcastCover(cover, Modifier.size(96.dp), COVER_DETAIL_EDGE_PX)
+            Column(Modifier.weight(1f)) {
+                Text(
+                    episode.title.ifBlank { untitled },
+                    color = WeatherText,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (meta.isNotEmpty()) Text(meta, color = WeatherTextMuted, style = MaterialTheme.typography.bodySmall)
+            }
         }
         Row(
             Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),

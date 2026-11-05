@@ -212,6 +212,7 @@ fun MarketsScreen(viewModel: MarketsViewModel, active: Boolean, modifier: Modifi
                     onToggle = viewModel::setHoldingsVisible,
                     market = state,
                     actions = securityActions,
+                    onPortfolioRange = viewModel::setPortfolioRange,
                 )
             }
             item { FooterCard(onOpen = { openWebLink(context, it) }) }

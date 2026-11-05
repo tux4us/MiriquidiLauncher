@@ -175,6 +175,25 @@ class MarketRepository(baseUrl: String = MarketUrl.DEFAULT) {
         throw failure
     }
 
+    /**
+     * Kursverlauf eines Eintrags aus „Eigene Werte“ für den Gesamtwert-Verlauf: Aktien über Yahoo, Rohstoffe wie im
+     * Rohstoff-Diagramm (Yahoo, danach Stooq), Krypto-Werte über CoinGecko in Euro.
+     */
+    suspend fun fetchPositionSeries(position: Position, range: SeriesRange, yahoo: Boolean, stooqKey: String?): Series = when (position.kind) {
+        PositionKind.Stock -> {
+            if (!yahoo) throw IOException("Yahoo ausgeschaltet")
+            YahooParser.parseSeries(
+                get(YahooParser.chartUrl(position.symbol, range.yahooRange, range.yahooInterval), userAgent = YAHOO_USER_AGENT),
+                System.currentTimeMillis(),
+            )
+        }
+        PositionKind.Commodity -> {
+            val def = QuoteCatalog.byId(position.symbol) ?: throw IOException("Unbekannter Rohstoff")
+            fetchSeries(def, range, yahoo, stooqKey)
+        }
+        PositionKind.Crypto -> fetchCryptoSeries(position.symbol, PortfolioHistory.cryptoRange(range))
+    }
+
     /** Ethereum und die Stablecoins von CoinGecko. */
     suspend fun fetchCrypto(): CryptoData {
         val quotes = try {

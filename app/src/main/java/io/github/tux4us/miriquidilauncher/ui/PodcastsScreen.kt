@@ -207,9 +207,13 @@ private fun NoticeBanner(notice: PodcastNotice, onDismiss: () -> Unit) {
     }
 }
 
+/** Kantenlänge der Cover in Listen (56 dp) und in der Folgenansicht (96 dp), jeweils mit Reserve für dichte Displays. */
+internal const val COVER_LIST_EDGE_PX = 192
+internal const val COVER_DETAIL_EDGE_PX = 320
+
 @Composable
-internal fun PodcastCover(url: String?, modifier: Modifier = Modifier) {
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, url) { value = url?.let { FeedImages.load(it) } }
+internal fun PodcastCover(url: String?, modifier: Modifier = Modifier, edgePx: Int = COVER_LIST_EDGE_PX) {
+    val bitmap by produceState<ImageBitmap?>(initialValue = null, url, edgePx) { value = url?.let { FeedImages.load(it, edgePx) } }
     Box(modifier.clip(RoundedCornerShape(10.dp)).background(Color(0x22FFFFFF))) {
         bitmap?.let {
             Image(bitmap = it, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
@@ -461,9 +465,11 @@ private fun EpisodeRow(episode: Episode, state: PodcastsUiState, locale: Locale,
         if (resume != null) add("▶ " + PodcastLogic.formatClock(resume / 1000))
     }.filter { it.isNotBlank() }.joinToString(" · ")
     Row(
-        Modifier.fillMaxWidth().glass(RoundedCornerShape(20.dp)).clickable(onClick = onOpen).padding(start = 14.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+        Modifier.fillMaxWidth().glass(RoundedCornerShape(20.dp)).clickable(onClick = onOpen).padding(start = 10.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        PodcastCover(PodcastLogic.coverUrl(state.data, episode), Modifier.size(56.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 episode.title.ifBlank { stringResource(R.string.podcasts_untitled) },

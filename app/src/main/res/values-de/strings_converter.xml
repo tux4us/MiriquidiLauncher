@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_converter">Umrechner</string>
+
+    <string name="converter_category">Kategorie wählen</string>
+    <string name="converter_clear">Leeren</string>
+    <string name="converter_toggle_sign">Vorzeichen wechseln</string>
+
+    <string name="converter_cat_length">Längen</string>
+    <string name="converter_cat_area">Flächen</string>
+    <string name="converter_cat_volume">Volumen</string>
+    <string name="converter_cat_time">Zeit</string>
+    <string name="converter_cat_temperature">Temperatur</string>
+    <string name="converter_cat_speed">Geschwindigkeit</string>
+    <string name="converter_cat_mass">Masse</string>
+    <string name="converter_cat_force">Kraft</string>
+    <string name="converter_cat_fuel">Spritverbrauch</string>
+    <string name="converter_cat_radix">Zahlensysteme</string>
+    <string name="converter_cat_energy">Energie</string>
+    <string name="converter_cat_power">Leistung</string>
+    <string name="converter_cat_pressure">Druck</string>
+    <string name="converter_cat_angle">Winkel</string>
+    <string name="converter_cat_density">Dichte</string>
+    <string name="converter_cat_shoe">Schuhgröße</string>
+    <string name="converter_cat_clothes_women">Kleidergrößen Damen</string>
+    <string name="converter_cat_clothes_men">Kleidergrößen Herren</string>
+    <string name="converter_cat_digital">Digitale Größen</string>
+    <string name="converter_cat_prefixes">Größenpräfixe</string>
+
+    <string name="converter_note_time">Monat und Jahr sind Durchschnittswerte: ein Jahr hat 365,25 Tage, ein Monat ein Zwölftel davon.</string>
+    <string name="converter_note_fuel">Je kleiner der Wert in l/100 km, desto sparsamer das Fahrzeug; bei km/l und mpg ist es umgekehrt.</string>
+    <string name="converter_note_radix">Nur ganze Zahlen ab 0. Römische Zahlen gibt es von I bis MMMCMXCIX (1 bis 3999).</string>
+    <string name="converter_note_shoe">Richtwerte für Erwachsenenschuhe, gerundet auf halbe Größen. Die Fußlänge rechnet mit 1,5 cm Zugabe im Schuh. Hersteller weichen ab; Kinderschuhe sind nicht enthalten.</string>
+    <string name="converter_note_clothes">Richtwerte für Konfektionsgrößen; Schnitt und Buchstabengrößen unterscheiden sich je nach Hersteller. Ein Wert aus der Tabelle in einem beliebigen Feld füllt die übrigen, z. B. 38 oder M.</string>
+</resources>
