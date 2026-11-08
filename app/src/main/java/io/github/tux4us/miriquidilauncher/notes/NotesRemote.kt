@@ -22,7 +22,8 @@ class NotesRemote(
     private val user: String,
     private val password: String,
 ) {
-    suspend fun list(): List<RemoteNote> = NotesApi.parseNotes(request("GET", NotesApi.LIST_PATH, null))
+    suspend fun list(): List<RemoteNote> =
+        NotesApi.parseNotesStrict(request("GET", NotesApi.LIST_PATH, null)) ?: throw IOException("Antwort unlesbar")
 
     /** Prüft Adresse und Zugang, ohne Inhalte zu laden. */
     suspend fun check() {

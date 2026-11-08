@@ -162,6 +162,57 @@ class NotesTest {
     }
 
     @Test
+    fun syncRestoresInsteadOfDeletingWhenLocalFolderIsEmpty() {
+        // Nach einem Wechsel des Speicherorts: Zuordnung vorhanden, lokaler Ordner leer, Server unverändert.
+        val a = "A\nx"
+        val b = "B\ny"
+        val idx = listOf(entry("A.md", 1, "e1", a), entry("B.md", 2, "e2", b))
+        val ra = remote(1, "e1", a)
+        val rb = remote(2, "e2", b)
+        assertEquals(
+            listOf<SyncAction>(SyncAction.Download(ra, "A.md", "A.md"), SyncAction.Download(rb, "B.md", "B.md")),
+            NotesSync.plan(emptyList(), idx, listOf(ra, rb)),
+        )
+    }
+
+    @Test
+    fun syncRestoresOnMassDeleteButKeepsSingleDeletes() {
+        val contents = (1..10).map { "N$it\nx" }
+        val idx = contents.mapIndexed { i, c -> entry("N${i + 1}.md", i + 1L, "e", c) }
+        val remotes = contents.mapIndexed { i, c -> remote(i + 1L, "e", c) }
+        // eine lokal gelöscht: Server löschen
+        val oneMissing = contents.drop(1).mapIndexed { i, c -> LocalNote("N${i + 2}.md", c, false) }
+        assertEquals(listOf<SyncAction>(SyncAction.DeleteRemote(1, "N1.md")), NotesSync.plan(oneMissing, idx, remotes))
+        // sechs von zehn fehlen: Massenlöschung, nichts wird auf dem Server gelöscht
+        val fourLeft = contents.drop(6).mapIndexed { i, c -> LocalNote("N${i + 7}.md", c, false) }
+        val actions = NotesSync.plan(fourLeft, idx, remotes)
+        assertEquals(6, actions.size)
+        assertTrue(actions.all { it is SyncAction.Download })
+        assertTrue(NotesSync.isMassDelete(5, 10, 5).not())
+        assertTrue(NotesSync.isMassDelete(6, 10, 4))
+        assertFalse(NotesSync.isMassDelete(1, 1, 0))
+    }
+
+    @Test
+    fun syncNeverDeletesUnreadableOrIncompleteLocalNotes() {
+        val base = "T\nalt"
+        val idx = listOf(entry("T.md", 1, "e1", base))
+        val r = remote(1, "e1", base)
+        // vorhanden, aber nicht lesbar: weder löschen noch hochladen
+        assertTrue(NotesSync.plan(emptyList(), idx, listOf(r), unreadable = setOf("T.md")).isEmpty())
+        assertTrue(NotesSync.plan(emptyList(), idx, emptyList(), unreadable = setOf("T.md")).isEmpty())
+        // Ordner nicht vollständig durchsucht: nichts auf dem Server löschen
+        assertTrue(NotesSync.plan(emptyList(), idx, listOf(r), localComplete = false).isEmpty())
+    }
+
+    @Test
+    fun apiRejectsAnswersThatAreNoList() {
+        assertNull(NotesApi.parseNotesStrict("""{"message":"Wartungsmodus"}"""))
+        assertNull(NotesApi.parseNotesStrict("<html>Login</html>"))
+        assertEquals(0, NotesApi.parseNotesStrict("[]")?.size)
+    }
+
+    @Test
     fun syncDoesNotUploadReadonly() {
         val base = "T\nalt"
         val idx = listOf(entry("T.md", 1, "e1", base))

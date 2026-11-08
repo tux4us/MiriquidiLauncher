@@ -46,22 +46,44 @@ class NotesRepository(context: Context, private val store: NotesStore) {
         withContext(Dispatchers.IO) { scan(state.favorites) }
     }
 
-    private fun scan(favorites: Set<String>): List<Note> {
+    private fun scan(favorites: Set<String>): List<Note> = scanDetailed(favorites).notes
+
+    /**
+     * Ergebnis der Durchsicht des Notizordners. [unreadable]: Notiz-Dateien, die vorhanden, aber nicht lesbar oder zu
+     * groß sind. [complete] `false`, wenn ein Ordner nicht gelistet werden konnte oder die Obergrenze erreicht wurde.
+     */
+    private class Scan(val notes: List<Note>, val unreadable: Set<String>, val complete: Boolean)
+
+    private fun scanDetailed(favorites: Set<String>): Scan {
         val base = root()
-        if (!base.isDirectory) return emptyList()
+        if (!base.isDirectory) return Scan(emptyList(), emptySet(), true)
         val out = ArrayList<Note>()
+        val unreadable = HashSet<String>()
+        var complete = true
         fun walk(dir: File, prefix: String, depth: Int) {
-            val children = dir.listFiles() ?: return
+            val children = dir.listFiles()
+            if (children == null) {
+                complete = false
+                return
+            }
             for (f in children) {
-                if (out.size >= NotesLogic.MAX_NOTES) return
+                if (out.size >= NotesLogic.MAX_NOTES) {
+                    complete = false
+                    return
+                }
                 if (f.name.startsWith(".") || FileOps.isLink(f)) continue
                 val rel = prefix + f.name
                 if (f.isDirectory) {
                     if (depth < NotesLogic.MAX_DEPTH) walk(f, "$rel/", depth + 1)
-                } else if (NotesLogic.isNotePath(f.name) && f.length() <= MAX_NOTE_BYTES) {
+                } else if (NotesLogic.isNotePath(f.name)) {
+                    if (f.length() > MAX_NOTE_BYTES) {
+                        unreadable.add(rel)
+                        continue
+                    }
                     val text = try {
                         f.readText(Charsets.UTF_8)
                     } catch (ignored: IOException) {
+                        unreadable.add(rel)
                         continue
                     }
                     out.add(Note(rel, text, f.lastModified(), rel in favorites))
@@ -69,7 +91,7 @@ class NotesRepository(context: Context, private val store: NotesStore) {
             }
         }
         walk(base, "", 0)
-        return out
+        return Scan(out, unreadable, complete)
     }
 
     private fun takenPaths(): Set<String> {
@@ -261,8 +283,15 @@ class NotesRepository(context: Context, private val store: NotesStore) {
             val remote = NotesRemote(credentials.baseUrl, credentials.user, credentials.password)
             val remoteNotes = remote.list()
             val state = store.loadState()
-            val local = scan(state.favorites)
-            val actions = NotesSync.plan(local.map { LocalNote(it.path, it.content, it.favorite) }, state.index, remoteNotes)
+            val scanned = scanDetailed(state.favorites)
+            val local = scanned.notes
+            val actions = NotesSync.plan(
+                local.map { LocalNote(it.path, it.content, it.favorite) },
+                state.index,
+                remoteNotes,
+                scanned.unreadable,
+                scanned.complete,
+            )
 
             val index = LinkedHashMap<String, IndexEntry>()
             state.index.forEach { index[it.path] = it }
@@ -347,6 +376,7 @@ class NotesRepository(context: Context, private val store: NotesStore) {
 
     companion object {
         const val FOLDER = "MiriquidiNotes"
-        private const val MAX_NOTE_BYTES = 400_000L
+        /** Obergrenze je Datei; so groß, dass auch eine vom Server geladene Notiz mit [NotesLogic.MAX_NOTE_CHARS] Zeichen lesbar bleibt. */
+        private const val MAX_NOTE_BYTES = 2_000_000L
     }
 }

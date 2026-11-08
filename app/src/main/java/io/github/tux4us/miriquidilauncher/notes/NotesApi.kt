@@ -21,6 +21,19 @@ object NotesApi {
         return array.mapNotNull { parseObject(it.asObject()) }
     }
 
+    /**
+     * Wie [parseNotes], liefert aber `null`, wenn die Antwort keine Liste ist (Fehlerseite, Wartungsmodus, Objekt).
+     * Eine solche Antwort darf nie als „der Server hat keine Notizen“ gelten, sonst würden lokale Notizen entfernt.
+     */
+    fun parseNotesStrict(json: String): List<RemoteNote>? {
+        val array = try {
+            MiniJson.parse(json).asArray()
+        } catch (e: MiniJson.JsonException) {
+            null
+        } ?: return null
+        return array.mapNotNull { parseObject(it.asObject()) }
+    }
+
     fun parseNote(json: String): RemoteNote? = parseObject(MiniJson.parse(json).asObject())
 
     private fun parseObject(obj: Map<String, Any?>?): RemoteNote? {

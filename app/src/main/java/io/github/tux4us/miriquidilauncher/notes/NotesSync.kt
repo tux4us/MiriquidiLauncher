@@ -30,13 +30,47 @@ sealed interface SyncAction {
 
 /** Planung des Abgleichs zwischen lokalen Dateien und Nextcloud Notes. Reine Funktion, ohne Netzwerk und Dateien. */
 object NotesSync {
-    fun plan(local: List<LocalNote>, index: List<IndexEntry>, remote: List<RemoteNote>): List<SyncAction> {
+    /**
+     * Ab dieser Zahl geplanter Server-Löschungen gilt ein Abgleich als Massenlöschung, wenn mehr als die Hälfte der
+     * Zuordnungen betroffen ist.
+     */
+    const val MASS_DELETE_MIN = 5
+
+    /**
+     * Ob die geplanten Server-Löschungen [pending] nach einem verschwundenen lokalen Ordner aussehen (z. B. nach einem
+     * Wechsel des Speicherorts) statt nach bewusstem Löschen: der lokale Ordner enthält keine Notiz mehr, oder mindestens
+     * [MASS_DELETE_MIN] und mehr als die Hälfte aller Zuordnungen sollen gelöscht werden.
+     */
+    fun isMassDelete(pending: Int, indexSize: Int, localCount: Int): Boolean =
+        (pending >= 2 && localCount == 0) || (pending >= MASS_DELETE_MIN && pending * 2 > indexSize)
+
+    /**
+     * Plant den Abgleich.
+     *
+     * [unreadable]: Pfade, die lokal existieren, aber nicht gelesen werden konnten (zu groß, Lesefehler). Sie gelten nie als
+     * gelöscht. [localComplete] `false`, wenn der lokale Ordner nicht vollständig durchsucht werden konnte; dann wird
+     * nichts auf dem Server gelöscht. Bei einer Massenlöschung ([isMassDelete]) wird statt zu löschen die Server-Notiz
+     * lokal wiederhergestellt.
+     */
+    fun plan(
+        local: List<LocalNote>,
+        index: List<IndexEntry>,
+        remote: List<RemoteNote>,
+        unreadable: Set<String> = emptySet(),
+        localComplete: Boolean = true,
+    ): List<SyncAction> {
         val localByPath = local.associateBy { it.path }
         val indexByPath = index.associateBy { it.path }
         val indexById = index.associateBy { it.remoteId }
         val taken = HashSet(NotesLogic.takenSet(local.map { it.path }))
         val actions = ArrayList<SyncAction>()
         val dropped = HashSet<String>()
+
+        val pendingRemoteDeletes = remote.count { r ->
+            val e = indexById[r.id]
+            e != null && localByPath[e.path] == null && e.path !in unreadable && r.etag == e.etag
+        }
+        val massDelete = isMassDelete(pendingRemoteDeletes, index.size, local.size)
 
         fun targetFor(r: RemoteNote, suffix: String = ""): String {
             val base = NotesLogic.fileBase(r.title.ifBlank { NotesLogic.titleOf(r.content) }) + suffix
@@ -54,8 +88,13 @@ object NotesSync {
             val l = localByPath[entry.path]
             val remoteChanged = r.etag != entry.etag
             if (l == null) {
+                if (entry.path in unreadable) continue
                 if (!remoteChanged) {
-                    actions += SyncAction.DeleteRemote(r.id, entry.path)
+                    when {
+                        !localComplete -> Unit
+                        massDelete -> actions += SyncAction.Download(r, targetFor(r), entry.path)
+                        else -> actions += SyncAction.DeleteRemote(r.id, entry.path)
+                    }
                 } else {
                     actions += SyncAction.Download(r, targetFor(r), null)
                 }
@@ -88,6 +127,7 @@ object NotesSync {
         val remoteIds = remote.mapTo(HashSet()) { it.id }
         for (entry in index) {
             if (entry.remoteId in remoteIds) continue
+            if (entry.path in unreadable) continue
             val l = localByPath[entry.path]
             when {
                 l == null -> actions += SyncAction.DropIndex(entry.path)
