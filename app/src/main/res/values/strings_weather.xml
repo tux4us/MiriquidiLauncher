@@ -381,7 +381,7 @@ Evening: %3$s – %4$s</string>
     <string name="weather_sum_gust">Strong gusts: up to %1$s km/h at %2$s (Bft %3$s).</string>
     <string name="weather_sum_wind_shift">The wind shifts from %1$s to %2$s.</string>
     <string name="weather_sum_uv">UV index 3 or higher (sun protection recommended) from %1$s to %2$s, peak %3$s at %4$s.</string>
-    <string name="weather_sum_note">Derived from the hourly values of Open-Meteo. Guideline values: wet hour from 0.1 mm, strong gusts from 50 km/h, wind shift from 45°.</string>
+    <string name="weather_sum_note">Derived from the hourly values of Open-Meteo. Guideline values: wet hour from 0.1 mm, strong gusts from 50 km/h, wind shift from 45°, fog at visibility below 1 km.</string>
     <string name="weather_dewpoint_value">Dew point: %1$s °C</string>
     <string name="weather_section_pressure">Air pressure (next 24 hours)</string>
     <string name="weather_pressure_chart">Air pressure in hPa</string>
@@ -406,4 +406,27 @@ Evening: %3$s – %4$s</string>
     <string name="weather_detail_sun_protection">Sun protection recommended (UV 3 or higher)</string>
     <string name="weather_background_toggle">Animated weather background</string>
     <string name="weather_background_hint">Off: the launcher wallpaper with a dark overlay. With system animations disabled, a still image is shown.</string>
+
+    <!-- Stage B: additional Open-Meteo fields -->
+    <string name="weather_cloud_value">Cloud cover %1$d %%</string>
+    <string name="weather_visibility_value">Visibility %1$s km</string>
+    <string name="weather_sum_visibility">Visibility below 1 km (fog) from %1$s to %2$s, lowest %3$s m at %4$s.</string>
+    <string name="weather_detail_humidity">Humidity: %1$s %%</string>
+    <string name="weather_detail_dewpoint">Dew point: %1$s°</string>
+    <string name="weather_detail_cloud">Cloud cover: %1$s %%</string>
+    <string name="weather_detail_visibility">Visibility: %1$s km</string>
+    <string name="weather_detail_snowfall">Snowfall: %1$s cm</string>
+    <string name="weather_detail_precip_total">Precipitation: %1$s mm</string>
+    <string name="weather_section_snow">Snow and freezing level (next 24 hours)</string>
+    <string name="weather_snow_fall">Snowfall: %1$s cm</string>
+    <string name="weather_snow_depth">Snow depth: %1$s cm</string>
+    <string name="weather_snow_freezing">Freezing level: %1$s to %2$s m</string>
+    <string name="weather_snow_freezing_single">Freezing level: %1$s m</string>
+    <string name="weather_snow_coldest">Low %1$s° at %2$s</string>
+    <string name="weather_snow_frost">Frost possible: low below 0°.</string>
+    <string name="weather_snow_note">Snow depth and freezing level are model values from Open-Meteo for the location and can differ on site, especially in the mountains. The card appears with snow, snow cover or a low of up to 2°.</string>
+    <string name="weather_air_eaqi">European Air Quality Index: %1$s (%2$s)</string>
+    <string name="weather_air_dust">Dust: %1$s µg/m³</string>
+    <string name="weather_air_so2">Sulphur dioxide: %1$s µg/m³</string>
+    <string name="weather_air_co">Carbon monoxide: %1$s µg/m³</string>
 </resources>

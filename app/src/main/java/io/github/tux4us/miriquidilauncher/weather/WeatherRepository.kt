@@ -51,15 +51,17 @@ class WeatherRepository {
 
     private fun forecastUrl(p: GeoPlace, server: WeatherServer?) = WeatherEndpoints.forecastBase(server) + "/v1/forecast?latitude=${coord(p.latitude)}&longitude=${coord(p.longitude)}" +
         "&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,surface_pressure," +
-        "wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,is_day" +
+        "wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,is_day,cloud_cover" +
         "&hourly=temperature_2m,apparent_temperature,precipitation,precipitation_probability,weather_code,wind_speed_10m," +
-        "wind_gusts_10m,wind_direction_10m,cape,surface_pressure,uv_index,shortwave_radiation" +
+        "wind_gusts_10m,wind_direction_10m,cape,surface_pressure,uv_index,shortwave_radiation," +
+        "relative_humidity_2m,cloud_cover,visibility,snowfall,snow_depth,freezing_level_height" +
         "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max," +
-        "wind_gusts_10m_max,uv_index_max,sunshine_duration,sunrise,sunset" +
+        "wind_gusts_10m_max,uv_index_max,sunshine_duration,sunrise,sunset,precipitation_sum" +
         "&timezone=auto&forecast_days=7&past_days=1&wind_speed_unit=kmh" + WeatherEndpoints.keyParam(server)
 
     private fun airUrl(p: GeoPlace, server: WeatherServer?) = WeatherEndpoints.airBase(server) + "/v1/air-quality?latitude=${coord(p.latitude)}&longitude=${coord(p.longitude)}" +
-        "&hourly=pm10,pm2_5,nitrogen_dioxide,ozone,birch_pollen,grass_pollen,alder_pollen,mugwort_pollen,olive_pollen,ragweed_pollen" +
+        "&hourly=pm10,pm2_5,nitrogen_dioxide,ozone,birch_pollen,grass_pollen,alder_pollen,mugwort_pollen,olive_pollen,ragweed_pollen," +
+        "european_aqi,dust,sulphur_dioxide,carbon_monoxide" +
         "&timezone=auto&forecast_days=3" + WeatherEndpoints.keyParam(server)
 
     private suspend fun get(url: String): String = withContext(Dispatchers.IO) {

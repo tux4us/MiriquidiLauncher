@@ -381,7 +381,7 @@ Abends: %3$s – %4$s</string>
     <string name="weather_sum_gust">Starke Böen: bis %1$s km/h um %2$s (Bft %3$s).</string>
     <string name="weather_sum_wind_shift">Der Wind dreht von %1$s auf %2$s.</string>
     <string name="weather_sum_uv">UV-Index ab 3 (Sonnenschutz empfohlen) von %1$s bis %2$s, Maximum %3$s um %4$s.</string>
-    <string name="weather_sum_note">Ausgewertet aus den Stundenwerten von Open-Meteo. Richtwerte: nasse Stunde ab 0,1 mm, starke Böen ab 50 km/h, Winddrehung ab 45°.</string>
+    <string name="weather_sum_note">Ausgewertet aus den Stundenwerten von Open-Meteo. Richtwerte: nasse Stunde ab 0,1 mm, starke Böen ab 50 km/h, Winddrehung ab 45°, Nebel bei Sichtweite unter 1 km.</string>
     <string name="weather_dewpoint_value">Taupunkt: %1$s °C</string>
     <string name="weather_section_pressure">Luftdruck (nächste 24 Stunden)</string>
     <string name="weather_pressure_chart">Luftdruck in hPa</string>
@@ -406,4 +406,27 @@ Abends: %3$s – %4$s</string>
     <string name="weather_detail_sun_protection">Sonnenschutz empfohlen (UV ab 3)</string>
     <string name="weather_background_toggle">Animierter Wetter-Hintergrund</string>
     <string name="weather_background_hint">Aus: Hintergrundbild des Launchers mit Abdunklung. Sind die Systemanimationen abgeschaltet, steht ein Standbild.</string>
+
+    <!-- Stufe B: zusätzliche Open-Meteo-Felder -->
+    <string name="weather_cloud_value">Bewölkung %1$d %%</string>
+    <string name="weather_visibility_value">Sichtweite %1$s km</string>
+    <string name="weather_sum_visibility">Sichtweite unter 1 km (Nebel) von %1$s bis %2$s, geringste %3$s m um %4$s.</string>
+    <string name="weather_detail_humidity">Luftfeuchtigkeit: %1$s %%</string>
+    <string name="weather_detail_dewpoint">Taupunkt: %1$s°</string>
+    <string name="weather_detail_cloud">Bewölkung: %1$s %%</string>
+    <string name="weather_detail_visibility">Sichtweite: %1$s km</string>
+    <string name="weather_detail_snowfall">Neuschnee: %1$s cm</string>
+    <string name="weather_detail_precip_total">Niederschlag: %1$s mm</string>
+    <string name="weather_section_snow">Schnee und Nullgradgrenze (nächste 24 Stunden)</string>
+    <string name="weather_snow_fall">Neuschnee: %1$s cm</string>
+    <string name="weather_snow_depth">Schneehöhe: %1$s cm</string>
+    <string name="weather_snow_freezing">Nullgradgrenze: %1$s bis %2$s m</string>
+    <string name="weather_snow_freezing_single">Nullgradgrenze: %1$s m</string>
+    <string name="weather_snow_coldest">Tiefstwert %1$s° um %2$s</string>
+    <string name="weather_snow_frost">Frost möglich: Tiefstwert unter 0°.</string>
+    <string name="weather_snow_note">Schneehöhe und Nullgradgrenze sind Modellwerte von Open-Meteo für den Ort und können vor Ort, besonders im Gebirge, abweichen. Die Karte erscheint bei Schnee, Schneedecke oder einem Tiefstwert bis 2°.</string>
+    <string name="weather_air_eaqi">Europäischer Luftqualitätsindex: %1$s (%2$s)</string>
+    <string name="weather_air_dust">Mineralstaub: %1$s µg/m³</string>
+    <string name="weather_air_so2">Schwefeldioxid: %1$s µg/m³</string>
+    <string name="weather_air_co">Kohlenmonoxid: %1$s µg/m³</string>
 </resources>

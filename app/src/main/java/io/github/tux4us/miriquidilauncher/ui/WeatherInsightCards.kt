@@ -50,6 +50,7 @@ internal fun SummaryCard(report: WeatherReport, hourStart: LocalDateTime) {
     val extremes = remember(upcoming) { WeatherInsights.extremes(upcoming) }
     val wind = remember(upcoming) { WeatherInsights.windOutlook(upcoming) }
     val uv = remember(report, hourStart) { WeatherInsights.uvWindow(hours, hourStart) }
+    val fog = remember(report, hourStart) { WeatherInsights.lowVisibilityWindow(hours, hourStart) }
     SectionCard(stringResource(R.string.weather_section_summary)) {
         val first = rain.first
         if (first == null) {
@@ -106,6 +107,15 @@ internal fun SummaryCard(report: WeatherReport, hourStart: LocalDateTime) {
                 stringResource(
                     R.string.weather_sum_uv,
                     timeLabel(u.start, today), timeLabel(u.end, today), oneDecimal(u.peakUv), timeLabel(u.peakTime, today),
+                ),
+            )
+        }
+        fog?.let { f ->
+            Text(
+                stringResource(
+                    R.string.weather_sum_visibility,
+                    timeLabel(f.start, today), timeLabel(f.end, today),
+                    f.minVisibilityM.roundToInt().toString(), timeLabel(f.minTime, today),
                 ),
             )
         }
@@ -172,3 +182,39 @@ internal fun UvCard(window: WeatherInsights.UvWindow, hours: List<HourPoint>, to
         Text(stringResource(R.string.weather_uv_note), style = MaterialTheme.typography.bodySmall, color = WeatherTextMuted)
     }
 }
+
+/** Schnee, Schneehöhe und Nullgradgrenze der nächsten 24 Stunden (nur bei Schnee, Schneedecke oder Frostnähe). */
+@Composable
+internal fun SnowCard(outlook: WeatherInsights.SnowOutlook, today: LocalDate) {
+    SectionCard(stringResource(R.string.weather_section_snow)) {
+        if (outlook.snowfallCm > 0.0) Text(stringResource(R.string.weather_snow_fall, oneDecimal(outlook.snowfallCm)))
+        if (outlook.maxSnowDepthM >= 0.01) {
+            Text(stringResource(R.string.weather_snow_depth, (outlook.maxSnowDepthM * 100.0).roundToInt().toString()))
+        }
+        val low = outlook.freezingMinM
+        val high = outlook.freezingMaxM
+        if (low != null && high != null) {
+            val a = roundTo50(low)
+            val b = roundTo50(high)
+            Text(
+                if (a == b) {
+                    stringResource(R.string.weather_snow_freezing_single, a.toString())
+                } else {
+                    stringResource(R.string.weather_snow_freezing, a.toString(), b.toString())
+                },
+            )
+        }
+        Text(
+            stringResource(
+                R.string.weather_snow_coldest,
+                outlook.coldest.temperature.roundToInt().toString(), timeLabel(outlook.coldest.time, today),
+            ),
+        )
+        if (outlook.coldest.temperature < 0.0) Text(stringResource(R.string.weather_snow_frost), fontWeight = FontWeight.Medium)
+        Text(stringResource(R.string.weather_snow_note), style = MaterialTheme.typography.bodySmall, color = WeatherTextMuted)
+    }
+}
+
+/** Rundet auf 50 m (die Nullgradgrenze ist ohnehin nur auf diese Genauigkeit sinnvoll). */
+private fun roundTo50(meters: Double): Int = ((meters / 50.0).roundToInt()) * 50
+

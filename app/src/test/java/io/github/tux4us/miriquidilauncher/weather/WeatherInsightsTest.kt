@@ -258,4 +258,86 @@ class WeatherInsightsTest {
         assertEquals(1, WeatherInsights.airDays(list, day).size)
         assertTrue(WeatherInsights.airDays(emptyList(), day).isEmpty())
     }
+
+    // --- Stufe B: Sicht, Schnee, Feuchte ---
+
+    private fun hourB(
+        h: Int,
+        temp: Double = 10.0,
+        visibility: Double? = null,
+        humidity: Double? = null,
+        snowfall: Double? = null,
+        depth: Double? = null,
+        freezing: Double? = null,
+    ) = hour(h, temp = temp).copy(
+        visibility = visibility, relativeHumidity = humidity, snowfall = snowfall, snowDepth = depth, freezingLevel = freezing,
+    )
+
+    @Test fun lowVisibilityWindowFindsFog() {
+        val hours = dayHours { hourB(it, visibility = if (it in 5..8) 400.0 + it else 20000.0) }
+        val w = WeatherInsights.lowVisibilityWindow(hours, t0)!!
+        assertEquals(t0.plusHours(5), w.start)
+        assertEquals(t0.plusHours(9), w.end)
+        assertEquals(405.0, w.minVisibilityM, 1e-9)
+        assertEquals(t0.plusHours(5), w.minTime)
+    }
+
+    @Test fun lowVisibilityNullWhenClearOrMissing() {
+        assertNull(WeatherInsights.lowVisibilityWindow(dayHours { hourB(it, visibility = 1000.0) }, t0))
+        assertNull(WeatherInsights.lowVisibilityWindow(dayHours { hourB(it) }, t0))
+    }
+
+    @Test fun lowVisibilityIgnoresPastHours() {
+        val hours = dayHours { hourB(it, visibility = if (it < 6) 200.0 else 15000.0) }
+        assertNull(WeatherInsights.lowVisibilityWindow(hours, t0.plusHours(6)))
+    }
+
+    @Test fun snowOutlookWithSnowfallAndFreezingLevel() {
+        val hours = dayHours { hourB(it, temp = 3.0, snowfall = if (it in 10..12) 0.5 else 0.0, depth = 0.12, freezing = 1200.0 + it * 10) }
+        val s = WeatherInsights.snowOutlook(hours, t0)!!
+        assertEquals(1.5, s.snowfallCm, 1e-9)
+        assertEquals(0.12, s.maxSnowDepthM, 1e-9)
+        assertEquals(1200.0, s.freezingMinM!!, 1e-9)
+        assertEquals(1430.0, s.freezingMaxM!!, 1e-9)
+    }
+
+    @Test fun snowOutlookShownForFrostWithoutSnow() {
+        val hours = dayHours { hourB(it, temp = if (it == 5) 1.5 else 8.0) }
+        val s = WeatherInsights.snowOutlook(hours, t0)!!
+        assertEquals(5, s.coldest.time.hour)
+        assertNull(s.freezingMinM)
+        assertEquals(0.0, s.snowfallCm, 1e-9)
+    }
+
+    @Test fun snowOutlookNullWhenWarmAndNoSnow() {
+        assertNull(WeatherInsights.snowOutlook(dayHours { hourB(it, temp = 12.0) }, t0))
+        assertNull(WeatherInsights.snowOutlook(emptyList(), t0))
+    }
+
+    @Test fun snowOutlookShownForSnowCoverEvenWhenWarm() {
+        assertNotNull(WeatherInsights.snowOutlook(dayHours { hourB(it, temp = 6.0, depth = 0.05) }, t0))
+        assertNull(WeatherInsights.snowOutlook(dayHours { hourB(it, temp = 6.0, depth = 0.005) }, t0))
+    }
+
+    @Test fun dewPointFromHumidity() {
+        assertEquals(10.0, WeatherInsights.dewPoint(hourB(0, temp = 20.0, humidity = 52.5))!!, 0.6)
+        assertEquals(20.0, WeatherInsights.dewPoint(hourB(0, temp = 20.0, humidity = 100.0))!!, 0.3)
+        assertNull(WeatherInsights.dewPoint(hourB(0, temp = 20.0)))
+    }
+
+    @Test fun hourAtMatchesTruncatedHour() {
+        val hours = dayHours { hour(it) }
+        assertEquals(14, WeatherInsights.hourAt(hours, t0.plusHours(14).plusMinutes(37))!!.time.hour)
+        assertNull(WeatherInsights.hourAt(hours, t0.plusDays(3)))
+    }
+
+    @Test fun eaqiLevels() {
+        assertEquals(0, WeatherMath.eaqiLevel(19.9))
+        assertEquals(1, WeatherMath.eaqiLevel(20.0))
+        assertEquals(2, WeatherMath.eaqiLevel(59.0))
+        assertEquals(3, WeatherMath.eaqiLevel(60.0))
+        assertEquals(4, WeatherMath.eaqiLevel(99.0))
+        assertEquals(5, WeatherMath.eaqiLevel(100.0))
+    }
 }
+

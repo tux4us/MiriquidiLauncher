@@ -37,6 +37,12 @@ object WeatherInsights {
     /** Mindestzahl Stundenwerte, damit ein Tag als vollständig gilt. */
     const val COMPLETE_DAY_HOURS = 20
 
+    /** Sichtweite (m), unterhalb der Nebel gemeldet wird (meteorologische Definition: unter 1 km). */
+    const val FOG_VISIBILITY_M = 1000.0
+
+    /** Tiefstwert (°C), ab dem die Karte Schnee und Nullgradgrenze auch ohne Schnee erscheint (Richtwert). */
+    const val FROST_RELEVANT_C = 2.0
+
     // --- Niederschlag ---------------------------------------------------------------------------
 
     /** Zusammenhängender Niederschlag; [end] ist das Ende der letzten nassen Stunde. */
@@ -301,4 +307,66 @@ object WeatherInsights {
                 val level = WeatherMath.pollenLevel(topGrains)
                 AirDay(date, pm, WeatherMath.aqiLevel(pm), if (level == 0) null else topType, level)
             }
+
+    // --- Sicht, Schnee, Feuchte (Daten ab Stufe B; fehlen sie, bleibt das Ergebnis leer) ---------
+
+    /** Stunde, die zu [time] gehört (auf die volle Stunde abgeschnitten), oder `null`. */
+    fun hourAt(hours: List<HourPoint>, time: LocalDateTime): HourPoint? {
+        val key = time.withMinute(0).withSecond(0).withNano(0)
+        return hours.firstOrNull { it.time == key }
+    }
+
+    /** Taupunkt (°C) einer Stunde aus Temperatur und relativer Luftfeuchte; `null` ohne Luftfeuchte. */
+    fun dewPoint(hour: HourPoint): Double? =
+        hour.relativeHumidity?.let { WeatherMath.dewPoint(hour.temperature, it.toInt().coerceIn(1, 100)) }
+
+    data class VisibilityWindow(
+        val start: LocalDateTime,
+        val end: LocalDateTime,
+        val minVisibilityM: Double,
+        val minTime: LocalDateTime,
+    )
+
+    /** Erstes zusammenhängendes Fenster mit Sichtweite unter [FOG_VISIBILITY_M] ab [from]; `null`, wenn es keins gibt. */
+    fun lowVisibilityWindow(hours: List<HourPoint>, from: LocalDateTime, count: Int = 24): VisibilityWindow? {
+        val slice = upcoming(hours, from, count)
+        fun low(h: HourPoint) = (h.visibility ?: Double.MAX_VALUE) < FOG_VISIBILITY_M
+        val startIndex = slice.indexOfFirst(::low)
+        if (startIndex < 0) return null
+        var end = startIndex
+        while (end + 1 < slice.size && low(slice[end + 1])) end++
+        val part = slice.subList(startIndex, end + 1)
+        val min = part.minByOrNull { it.visibility!! }!!
+        return VisibilityWindow(part.first().time, part.last().time.plusHours(1), min.visibility!!, min.time)
+    }
+
+    /**
+     * @property snowfallCm Neuschnee der nächsten Stunden in cm
+     * @property maxSnowDepthM höchste Schneehöhe in Metern
+     * @property freezingMinM niedrigste Nullgradgrenze in Metern oder `null`
+     * @property freezingMaxM höchste Nullgradgrenze in Metern oder `null`
+     * @property coldest kälteste Stunde
+     */
+    data class SnowOutlook(
+        val snowfallCm: Double,
+        val maxSnowDepthM: Double,
+        val freezingMinM: Double?,
+        val freezingMaxM: Double?,
+        val coldest: HourPoint,
+    )
+
+    /**
+     * Schnee und Nullgradgrenze; `null`, wenn weder Schnee fällt oder liegt noch der Tiefstwert unter
+     * [FROST_RELEVANT_C] liegt (dann ist die Karte nicht nötig).
+     */
+    fun snowOutlook(hours: List<HourPoint>, from: LocalDateTime, count: Int = 24): SnowOutlook? {
+        val slice = upcoming(hours, from, count)
+        if (slice.isEmpty()) return null
+        val snowfall = slice.sumOf { it.snowfall ?: 0.0 }
+        val depth = slice.maxOf { it.snowDepth ?: 0.0 }
+        val coldest = slice.minByOrNull { it.temperature }!!
+        if (snowfall <= 0.0 && depth < 0.01 && coldest.temperature > FROST_RELEVANT_C) return null
+        val levels = slice.mapNotNull { it.freezingLevel }
+        return SnowOutlook(snowfall, depth, levels.minOrNull(), levels.maxOrNull(), coldest)
+    }
 }

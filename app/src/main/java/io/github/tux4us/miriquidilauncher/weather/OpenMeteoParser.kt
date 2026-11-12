@@ -26,6 +26,7 @@ object OpenMeteoParser {
             windGusts = cur["wind_gusts_10m"].asDouble() ?: 0.0,
             uvIndex = cur["uv_index"].asDouble() ?: 0.0,
             isDay = (cur["is_day"].asDouble() ?: 1.0) >= 1.0,
+            cloudCover = cur["cloud_cover"].asDouble()?.toInt()?.coerceIn(0, 100),
         )
         return ForecastData(offset, current, parseHours(root["hourly"].asObject()), parseDays(root["daily"].asObject()))
     }
@@ -45,6 +46,12 @@ object OpenMeteoParser {
         val pressure = hourly["surface_pressure"].asArray()
         val uv = hourly["uv_index"].asArray()
         val radiation = hourly["shortwave_radiation"].asArray()
+        val humidity = hourly["relative_humidity_2m"].asArray()
+        val clouds = hourly["cloud_cover"].asArray()
+        val visibility = hourly["visibility"].asArray()
+        val snowfall = hourly["snowfall"].asArray()
+        val snowDepth = hourly["snow_depth"].asArray()
+        val freezing = hourly["freezing_level_height"].asArray()
         val out = ArrayList<HourPoint>(times.size)
         for (i in times.indices) {
             val time = parseDateTime(times.stringAt(i)) ?: continue
@@ -63,6 +70,12 @@ object OpenMeteoParser {
                 pressure = pressure.doubleAt(i),
                 uvIndex = uv.doubleAt(i) ?: 0.0,
                 shortwaveRadiation = radiation.doubleAt(i),
+                relativeHumidity = humidity.doubleAt(i),
+                cloudCover = clouds.doubleAt(i),
+                visibility = visibility.doubleAt(i),
+                snowfall = snowfall.doubleAt(i),
+                snowDepth = snowDepth.doubleAt(i),
+                freezingLevel = freezing.doubleAt(i),
             )
         }
         return out
@@ -81,6 +94,7 @@ object OpenMeteoParser {
         val sun = daily["sunshine_duration"].asArray()
         val rise = daily["sunrise"].asArray()
         val set = daily["sunset"].asArray()
+        val precipSum = daily["precipitation_sum"].asArray()
         val out = ArrayList<DayPoint>(times.size)
         for (i in times.indices) {
             val date = try {
@@ -100,6 +114,7 @@ object OpenMeteoParser {
                 sunshineMinutes = (sun.doubleAt(i) ?: 0.0) / 60.0,
                 sunrise = parseDateTime(rise.stringAt(i)),
                 sunset = parseDateTime(set.stringAt(i)),
+                precipitationSum = precipSum.doubleAt(i),
             )
         }
         return out
@@ -112,6 +127,10 @@ object OpenMeteoParser {
         val pm10 = hourly["pm10"].asArray()
         val no2 = hourly["nitrogen_dioxide"].asArray()
         val ozone = hourly["ozone"].asArray()
+        val eaqi = hourly["european_aqi"].asArray()
+        val dust = hourly["dust"].asArray()
+        val so2 = hourly["sulphur_dioxide"].asArray()
+        val co = hourly["carbon_monoxide"].asArray()
         val out = ArrayList<AirHour>(times.size)
         for (i in times.indices) {
             val time = parseDateTime(times.stringAt(i)) ?: continue
@@ -126,6 +145,10 @@ object OpenMeteoParser {
                 no2 = no2.doubleAt(i) ?: 0.0,
                 ozone = ozone.doubleAt(i) ?: 0.0,
                 pollen = pollen,
+                europeanAqi = eaqi.doubleAt(i),
+                dust = dust.doubleAt(i),
+                sulphurDioxide = so2.doubleAt(i),
+                carbonMonoxide = co.doubleAt(i),
             )
         }
         return out

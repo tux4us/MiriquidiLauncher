@@ -28,13 +28,35 @@ object WeatherScene {
         val stars: Float,         // 0..1 Sichtbarkeit
         val lightning: Boolean,
         val slant: Float,         // horizontale Verschiebung je vertikaler Einheit (Niederschlag)
-        val drift: Float          // Wolkentempo mit Vorzeichen (Bildbreiten pro Sekunde)
+        val drift: Float,         // Wolkentempo mit Vorzeichen (Bildbreiten pro Sekunde)
+        val moonIllumination: Float = 1f, // 0..1 beleuchteter Anteil der Mondscheibe
+        val moonLitRight: Boolean = true  // beleuchtete Seite des Mondes: rechts (Nordhalbkugel, zunehmend) oder links
     )
 
     enum class Kind { CLEAR, CLOUD, FOG, RAIN, SNOW, STORM }
 
 
-    fun build(code: Int, isDay: Boolean, cloudCover: Int?, windKmh: Double, windDir: Double?): Scene {
+    /** Bewölkungsgrad, ab dem Sonne und Mond nicht mehr gezeichnet werden. */
+    const val CELESTIAL_MAX_CLOUD = 0.85f
+
+    /**
+     * Beleuchtete Seite des Mondes: Auf der Nordhalbkugel ist der zunehmende Mond rechts beleuchtet, der abnehmende
+     * links; auf der Südhalbkugel ist es umgekehrt. [ageDays] = Mondalter (0 = Neumond).
+     */
+    fun moonLitRight(ageDays: Double, latitude: Double): Boolean {
+        val waxing = ageDays < WeatherMath.SYNODIC_PERIOD_DAYS / 2.0
+        return waxing == (latitude >= 0.0)
+    }
+
+    fun build(
+        code: Int,
+        isDay: Boolean,
+        cloudCover: Int?,
+        windKmh: Double,
+        windDir: Double?,
+        moonIllumination: Float = 1f,
+        moonLitRight: Boolean = true,
+    ): Scene {
         var kind = Kind.CLEAR
         var rain = 0f
         var snow = 0f
@@ -118,16 +140,21 @@ object WeatherScene {
         val slant = sign * windFrac * 0.55f
         val drift = sign * (0.008f + 0.03f * windFrac)
 
-        val clearish = cloudFrac < 0.6f && kind == Kind.CLEAR
+        // Sonne und Mond erscheinen auch bei Wolken (gedämpft durch die Wolkenschicht), nicht bei Nebel und Niederschlag.
+        val celestial = (kind == Kind.CLEAR || kind == Kind.CLOUD) && cloudFrac < CELESTIAL_MAX_CLOUD
+        // Nachts bleiben bei Wolken noch Sterne sichtbar; bei Nebel und Niederschlag gilt weiter 1 - Bewölkung.
+        val starVisibility = if (kind == Kind.CLEAR || kind == Kind.CLOUD) 1f - 0.6f * cloudFrac else 1f - cloudFrac
         return Scene(
             skyTop = top, skyBottom = bottom,
             cloudFrac = cloudFrac, cloudTint = tint,
             fog = fog, rain = rain, snow = snow,
-            sun = isDay && clearish,
-            moon = !isDay && clearish,
-            stars = if (!isDay) (1f - cloudFrac).coerceIn(0f, 1f) else 0f,
+            sun = isDay && celestial,
+            moon = !isDay && celestial,
+            stars = if (!isDay) starVisibility.coerceIn(0f, 1f) else 0f,
             lightning = lightning,
-            slant = slant, drift = drift
+            slant = slant, drift = drift,
+            moonIllumination = moonIllumination.coerceIn(0f, 1f),
+            moonLitRight = moonLitRight,
         )
     }
 

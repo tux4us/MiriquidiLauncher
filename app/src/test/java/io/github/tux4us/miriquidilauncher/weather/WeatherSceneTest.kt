@@ -126,4 +126,74 @@ class WeatherSceneTest {
         val c = WeatherScene.lerpColor(0x80FF0000.toInt(), 0x80FF0000.toInt(), 0.3f)
         assertEquals(0x80FF0000.toInt(), c)
     }
+
+    // --- Nachbesserung: Sonne/Mond bei Wolken, Sterne, Mondphase ---
+
+    @Test fun partlyCloudyShowsSunAndMoon() {
+        assertTrue(scene(2).sun)
+        assertTrue(scene(2, isDay = false).moon)
+        assertTrue(scene(0, cover = 70).sun)
+        assertTrue(scene(1, cover = 84).sun)
+    }
+
+    @Test fun heavyCloudHidesSunAndMoon() {
+        assertFalse(scene(0, cover = 85).sun)
+        assertFalse(scene(0, isDay = false, cover = 90).moon)
+        assertFalse(scene(3).sun)
+    }
+
+    @Test fun fogAndPrecipitationNeverShowSunOrMoon() {
+        for (code in intArrayOf(45, 61, 73, 95)) {
+            assertFalse(scene(code).sun)
+            assertFalse(scene(code, isDay = false).moon)
+        }
+    }
+
+    @Test fun nightStarsStayVisibleUnderClouds() {
+        assertTrue(scene(2, isDay = false).stars > 0.6f)
+        // bedeckt: leicht sichtbar (Nachtmodus), aber deutlich schwächer als bei klarem Himmel
+        val overcast = scene(3, isDay = false).stars
+        assertTrue(overcast in 0.3f..0.5f)
+        assertTrue(overcast < scene(0, isDay = false).stars)
+        assertEquals(0f, scene(2, isDay = true).stars, 0f)
+    }
+
+    @Test fun starsInFogAndPrecipitationUnchanged() {
+        assertEquals(0.5f, scene(45, isDay = false).stars, 1e-6f)
+        assertEquals(0.1f, scene(61, isDay = false).stars, 1e-6f)
+        assertEquals(0f, scene(95, isDay = false).stars, 1e-6f)
+    }
+
+    @Test fun moonPhaseIsPassedThroughAndClamped() {
+        val s = WeatherScene.build(0, false, null, 5.0, 270.0, 0.25f, false)
+        assertEquals(0.25f, s.moonIllumination, 1e-6f)
+        assertFalse(s.moonLitRight)
+        assertEquals(1f, WeatherScene.build(0, false, null, 5.0, 270.0, 3f, true).moonIllumination, 0f)
+        assertEquals(0f, WeatherScene.build(0, false, null, 5.0, 270.0, -1f, true).moonIllumination, 0f)
+        assertEquals(1f, scene(0, isDay = false).moonIllumination, 0f)
+    }
+
+    @Test fun moonLitSideFollowsAgeAndHemisphere() {
+        // zunehmend (Alter < halbe Periode): Nordhalbkugel rechts, Südhalbkugel links
+        assertTrue(WeatherScene.moonLitRight(5.0, 50.0))
+        assertFalse(WeatherScene.moonLitRight(5.0, -30.0))
+        // abnehmend: Nordhalbkugel links, Südhalbkugel rechts
+        assertFalse(WeatherScene.moonLitRight(20.0, 50.0))
+        assertTrue(WeatherScene.moonLitRight(20.0, -30.0))
+        // Äquator zählt wie Nordhalbkugel
+        assertTrue(WeatherScene.moonLitRight(5.0, 0.0))
+    }
+
+    @Test fun moonFromMathMatchesKnownPhase() {
+        // Vollmond 2026-11-24 ca. 14:53 UTC: beleuchteter Anteil nahe 100 %
+        val full = WeatherMath.moon(java.time.Instant.parse("2026-11-24T15:00:00Z"))
+        assertTrue(full.illuminationPercent > 95.0)
+        // Neumond 2026-11-09 ca. 22:02 UTC: nahe 0 %
+        val newMoon = WeatherMath.moon(java.time.Instant.parse("2026-11-09T22:00:00Z"))
+        assertTrue(newMoon.illuminationPercent < 5.0)
+        // eine Woche nach Neumond: zunehmend
+        val waxing = WeatherMath.moon(java.time.Instant.parse("2026-11-17T00:00:00Z"))
+        assertTrue(waxing.ageDays < WeatherMath.SYNODIC_PERIOD_DAYS / 2.0)
+    }
 }
+

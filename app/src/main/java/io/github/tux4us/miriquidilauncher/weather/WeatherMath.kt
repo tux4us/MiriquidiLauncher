@@ -73,6 +73,16 @@ object WeatherMath {
         else -> 5
     }
 
+    /** Stufe 0–5 aus dem Europäischen Luftqualitätsindex (EAQI, Stufen der EUA: 20/40/60/80/100). */
+    fun eaqiLevel(index: Double): Int = when {
+        index < 20 -> 0
+        index < 40 -> 1
+        index < 60 -> 2
+        index < 80 -> 3
+        index < 100 -> 4
+        else -> 5
+    }
+
     /** Pollenstufe 0–4 aus Körnern pro m³ (Skala angelehnt an den DWD). */
     fun pollenLevel(grainsPerM3: Double): Int = when {
         grainsPerM3 < 1 -> 0

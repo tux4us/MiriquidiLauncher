@@ -159,6 +159,11 @@ internal fun hourDetail(context: Context, h: HourPoint): DetailContent {
     h.pressure?.let { lines += context.getString(R.string.weather_detail_pressure, it.roundToInt().toString()) }
     if (h.cape > 0) lines += context.getString(R.string.weather_detail_cape, h.cape.roundToInt().toString())
     if (h.uvIndex >= WeatherInsights.UV_PROTECTION) lines += context.getString(R.string.weather_detail_sun_protection)
+    h.relativeHumidity?.let { lines += context.getString(R.string.weather_detail_humidity, it.roundToInt().toString()) }
+    WeatherInsights.dewPoint(h)?.let { lines += context.getString(R.string.weather_detail_dewpoint, it.roundToInt().toString()) }
+    h.cloudCover?.let { lines += context.getString(R.string.weather_detail_cloud, it.roundToInt().toString()) }
+    h.visibility?.let { lines += context.getString(R.string.weather_detail_visibility, kilometers(it)) }
+    h.snowfall?.takeIf { it > 0.0 }?.let { lines += context.getString(R.string.weather_detail_snowfall, oneDecimal(it)) }
     return DetailContent(context.getString(R.string.weather_detail_hour_title, h.time.format(TimeFormat), description), lines)
 }
 
@@ -176,8 +181,12 @@ internal fun dayDetail(context: Context, d: DayPoint, label: String, hours: List
     if (d.sunrise != null && d.sunset != null) {
         lines += context.getString(R.string.weather_detail_sun, d.sunrise.format(TimeFormat), d.sunset.format(TimeFormat))
     }
-    WeatherInsights.dayStats(hours, d)?.let { stats ->
-        lines += context.getString(R.string.weather_detail_precip_sum, oneDecimal(stats.precipSumMm), stats.wetHours.toString())
+    val stats = WeatherInsights.dayStats(hours, d)
+    if (stats == null) {
+        d.precipitationSum?.let { lines += context.getString(R.string.weather_detail_precip_total, oneDecimal(it)) }
+    }
+    if (stats != null) {
+        lines += context.getString(R.string.weather_detail_precip_sum, oneDecimal(d.precipitationSum ?: stats.precipSumMm), stats.wetHours.toString())
         val dayAvg = stats.dayAvg
         val nightAvg = stats.nightAvg
         if (dayAvg != null && nightAvg != null) {

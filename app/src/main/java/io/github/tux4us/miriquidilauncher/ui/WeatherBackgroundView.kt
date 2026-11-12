@@ -7,13 +7,16 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RadialGradient
+import android.graphics.RectF
 import android.graphics.Shader
 import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
 import android.view.View
 import io.github.tux4us.miriquidilauncher.weather.WeatherScene
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.sin
 import kotlin.random.Random
@@ -105,6 +108,9 @@ class WeatherBackgroundView @JvmOverloads constructor(
 
     private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val corePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val moonPath = Path()
+    private val moonRect = RectF()
+    private val moonEllipse = RectF()
     private val cloudPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val flashPaint = Paint().apply { color = Color.WHITE }
 
@@ -143,9 +149,21 @@ class WeatherBackgroundView @JvmOverloads constructor(
      * @param cloudCoverPercent Bewölkung in % oder null, wenn nicht bekannt
      * @param windKmh Windgeschwindigkeit in km/h
      * @param windDirDeg Windrichtung in Grad (meteorologisch: Richtung, aus der der Wind weht)
+     * @param moonIllumination beleuchteter Anteil der Mondscheibe, 0..1
+     * @param moonLitRight `true`, wenn die rechte Seite des Mondes beleuchtet ist
      */
-    fun setCondition(weatherCode: Int, isDay: Boolean, cloudCoverPercent: Int?, windKmh: Double, windDirDeg: Double?) {
-        val next = WeatherScene.build(weatherCode, isDay, cloudCoverPercent, windKmh, windDirDeg)
+    fun setCondition(
+        weatherCode: Int,
+        isDay: Boolean,
+        cloudCoverPercent: Int?,
+        windKmh: Double,
+        windDirDeg: Double?,
+        moonIllumination: Float = 1f,
+        moonLitRight: Boolean = true,
+    ) {
+        val next = WeatherScene.build(
+            weatherCode, isDay, cloudCoverPercent, windKmh, windDirDeg, moonIllumination, moonLitRight,
+        )
         val c = smooth(fade)
         fromTop = lerpColor(fromTop, scene.skyTop, c)
         fromBottom = lerpColor(fromBottom, scene.skyBottom, c)
@@ -326,15 +344,49 @@ class WeatherBackgroundView @JvmOverloads constructor(
             intArrayOf((glowColor and 0x00FFFFFF) or (glowAlpha shl 24), glowColor and 0x00FFFFFF),
             null, Shader.TileMode.CLAMP
         )
-        glowPaint.alpha = (255 * vis * pulse).toInt().coerceIn(0, 255)
+        // Der Glow des Mondes folgt der Mondphase.
+        val phaseGlow = if (scene.sun) 1f else 0.35f + 0.65f * scene.moonIllumination
+        glowPaint.alpha = (255 * vis * pulse * phaseGlow).toInt().coerceIn(0, 255)
         val r = w * (if (scene.sun) 0.55f else 0.38f) * pulse
         canvas.save(); canvas.translate(cx, cy); canvas.scale(r, r)
         canvas.drawCircle(0f, 0f, 1f, glowPaint)
         canvas.restore()
 
-        corePaint.color = if (scene.sun) 0xFFFFE2A8.toInt() else 0xFFE8EEF8.toInt()
-        corePaint.alpha = ((if (scene.sun) 150 else 170) * vis).toInt().coerceIn(0, 255)
-        canvas.drawCircle(cx, cy, w * (if (scene.sun) 0.05f else 0.032f), corePaint)
+        if (scene.sun) {
+            corePaint.color = 0xFFFFE2A8.toInt()
+            corePaint.alpha = (150 * vis).toInt().coerceIn(0, 255)
+            canvas.drawCircle(cx, cy, w * 0.05f, corePaint)
+        } else {
+            drawMoonDisc(canvas, cx, cy, w * 0.04f, vis)
+        }
+    }
+
+    /**
+     * Mondscheibe mit Phase: schwach sichtbare dunkle Scheibe (Erdlicht) und der beleuchtete Teil als Fläche aus
+     * Halbkreis und Terminator-Ellipse (Sichel unter 50 %, sonst Gibbous).
+     */
+    private fun drawMoonDisc(canvas: Canvas, cx: Float, cy: Float, r: Float, vis: Float) {
+        val k = scene.moonIllumination
+        corePaint.color = 0xFFE8EEF8.toInt()
+        corePaint.alpha = (45 * vis).toInt().coerceIn(0, 255)
+        canvas.drawCircle(cx, cy, r, corePaint)
+        if (k < 0.03f) return
+        corePaint.alpha = (170 * vis).toInt().coerceIn(0, 255)
+        if (k > 0.97f) {
+            canvas.drawCircle(cx, cy, r, corePaint)
+            return
+        }
+        val rx = r * abs(1f - 2f * k)
+        moonRect.set(cx - r, cy - r, cx + r, cy + r)
+        moonEllipse.set(cx - rx, cy - r, cx + rx, cy + r)
+        moonPath.reset()
+        moonPath.arcTo(moonRect, -90f, 180f, true)
+        moonPath.arcTo(moonEllipse, 90f, if (k < 0.5f) -180f else 180f, false)
+        moonPath.close()
+        canvas.save()
+        if (!scene.moonLitRight) canvas.scale(-1f, 1f, cx, cy)
+        canvas.drawPath(moonPath, corePaint)
+        canvas.restore()
     }
 
     private fun drawBlob(canvas: Canvas, cx: Float, cy: Float, rx: Float, ry: Float) {

@@ -23,6 +23,8 @@ data class CurrentWeather(
     val windGusts: Double,
     val uvIndex: Double,
     val isDay: Boolean,
+    /** Bewölkung in %; `null`, wenn die Quelle sie nicht liefert. */
+    val cloudCover: Int? = null,
 )
 
 /** Stundenwerte; alle Zeiten sind Ortszeit des Standorts. */
@@ -41,6 +43,18 @@ data class HourPoint(
     val uvIndex: Double,
     /** Globalstrahlung in W/m²; `null`, wenn die Quelle sie nicht liefert (z. B. ältere Berichte). */
     val shortwaveRadiation: Double? = null,
+    /** Relative Luftfeuchte in %; `null`, wenn die Quelle sie nicht liefert (alle folgenden Felder ebenso). */
+    val relativeHumidity: Double? = null,
+    /** Bewölkung in %. */
+    val cloudCover: Double? = null,
+    /** Sichtweite in Metern. */
+    val visibility: Double? = null,
+    /** Neuschnee in cm je Stunde. */
+    val snowfall: Double? = null,
+    /** Schneehöhe in Metern. */
+    val snowDepth: Double? = null,
+    /** Höhe der Nullgradgrenze in Metern. */
+    val freezingLevel: Double? = null,
 )
 
 data class DayPoint(
@@ -55,6 +69,8 @@ data class DayPoint(
     val sunshineMinutes: Double,
     val sunrise: LocalDateTime?,
     val sunset: LocalDateTime?,
+    /** Niederschlagssumme des Tages in mm laut Quelle; `null`, wenn nicht geliefert. */
+    val precipitationSum: Double? = null,
 )
 
 enum class PollenType(val apiKey: String) {
@@ -73,6 +89,14 @@ data class AirHour(
     val no2: Double,
     val ozone: Double,
     val pollen: Map<PollenType, Double>,
+    /** Europäischer Luftqualitätsindex (EAQI); `null`, wenn die Quelle ihn nicht liefert (alle folgenden Felder ebenso). */
+    val europeanAqi: Double? = null,
+    /** Mineralstaub in µg/m³. */
+    val dust: Double? = null,
+    /** Schwefeldioxid in µg/m³. */
+    val sulphurDioxide: Double? = null,
+    /** Kohlenmonoxid in µg/m³. */
+    val carbonMonoxide: Double? = null,
 )
 
 data class ForecastData(

@@ -131,7 +131,7 @@ fun WeatherScreen(viewModel: WeatherViewModel, active: Boolean, dogsShown: Boole
     val sky = state.backgroundAnimated && skyReport != null
     CompositionLocalProvider(LocalContentColor provides WeatherText) {
     Box(modifier.fillMaxSize()) {
-    if (sky && skyReport != null) WeatherBackground(skyReport.forecast.current, active)
+    if (sky && skyReport != null) WeatherBackground(skyReport.forecast.current, skyReport.place.latitude, active)
     LazyColumn(
         modifier = Modifier.fillMaxSize().then(if (sky) Modifier else Modifier.background(WeatherPageScrim)),
         contentPadding = WindowInsets.safeDrawing.asPaddingValues(),
@@ -348,6 +348,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.weatherSections(
 
     val pressure = WeatherInsights.pressureOutlook(report.forecast.hours, hourStart)
     val uvWindow = WeatherInsights.uvWindow(report.forecast.hours, hourStart)
+    val snow = WeatherInsights.snowOutlook(report.forecast.hours, hourStart)
 
     item { CurrentCard(report) }
     if (upcoming.size >= 2) item { SummaryCard(report, hourStart) }
@@ -357,6 +358,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.weatherSections(
     item { ThunderCard(report.forecast.hours, now) }
     // Die Karte „Hunde-Wetter“ erscheint nur bei eingeblendeter Hunde-Scope.
     if (dogsShown) item { DogWeatherCard(report, now) }
+    if (snow != null) item { SnowCard(snow, hourStart.toLocalDate()) }
     item { AirCard(report.air, hourStart) }
     if (pressure != null) item { PressureCard(pressure) }
     item { BioCard(report, hourStart) }
@@ -416,6 +418,10 @@ private fun CurrentCard(report: WeatherReport) {
         Text(stringResource(R.string.weather_gusts_value, c.windGusts.roundToInt().toString()))
         Text(stringResource(R.string.weather_humidity_value, c.humidity))
         Text(stringResource(R.string.weather_dewpoint_value, WeatherMath.dewPoint(c.temperature, c.humidity).roundToInt().toString()))
+        val hourNow = WeatherInsights.hourAt(report.forecast.hours, report.forecast.localNow())
+        val cloud = c.cloudCover ?: hourNow?.cloudCover?.roundToInt()
+        if (cloud != null) Text(stringResource(R.string.weather_cloud_value, cloud))
+        hourNow?.visibility?.let { Text(stringResource(R.string.weather_visibility_value, kilometers(it))) }
         Text(stringResource(R.string.weather_pressure_value, c.pressure.roundToInt().toString()))
         Text(stringResource(R.string.weather_precip_value, oneDecimal(c.precipitation)))
         Text(stringResource(R.string.weather_uv_value, oneDecimal(c.uvIndex), uvLevels[WeatherMath.uvLevel(c.uvIndex)]))
@@ -561,6 +567,12 @@ private fun AirCard(air: List<AirHour>, hourStart: LocalDateTime) {
         Text(stringResource(R.string.weather_air_pm10, oneDecimal(hour.pm10)))
         Text(stringResource(R.string.weather_air_no2, oneDecimal(hour.no2)))
         Text(stringResource(R.string.weather_air_ozone, oneDecimal(hour.ozone)))
+        hour.europeanAqi?.let { eaqi ->
+            Text(stringResource(R.string.weather_air_eaqi, eaqi.roundToInt().toString(), aqiLevels[WeatherMath.eaqiLevel(eaqi)]))
+        }
+        hour.dust?.let { Text(stringResource(R.string.weather_air_dust, oneDecimal(it))) }
+        hour.sulphurDioxide?.let { Text(stringResource(R.string.weather_air_so2, oneDecimal(it))) }
+        hour.carbonMonoxide?.let { Text(stringResource(R.string.weather_air_co, it.roundToInt().toString())) }
         Text(stringResource(R.string.weather_pollen_title), style = MaterialTheme.typography.titleSmall)
         val active = PollenType.values().mapNotNull { type ->
             val grains = hour.pollen[type] ?: return@mapNotNull null
@@ -732,6 +744,9 @@ private fun thunderColor(level: ThunderLevel): Color = when (level) {
     ThunderLevel.MODERATE -> Color(0xFFFFB300)
     ThunderLevel.HIGH -> Color(0xFFE53935)
 }
+
+/** Meter als Kilometer mit einer Nachkommastelle. */
+internal fun kilometers(meters: Double): String = String.format(Locale.getDefault(), "%.1f", meters / 1000.0)
 
 internal fun oneDecimal(v: Double): String = String.format(Locale.getDefault(), "%.1f", v)
 
