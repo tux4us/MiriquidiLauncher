@@ -23,7 +23,7 @@ import kotlin.math.roundToInt
 
 /**
  * Liniendiagramm der Temperatur. [labels] enthält pro Wert eine Beschriftung der x-Achse (leer = keine);
- * [description] ist der Text für Screenreader.
+ * [description] ist der Text für Screenreader, [unit] die Einheit der Achsenbeschriftung.
  */
 @Composable
 fun TemperatureChart(
@@ -31,6 +31,7 @@ fun TemperatureChart(
     labels: List<String>,
     description: String,
     modifier: Modifier = Modifier,
+    unit: String = "°",
 ) {
     if (values.size < 2) return
     val measurer = rememberTextMeasurer()
@@ -56,8 +57,8 @@ fun TemperatureChart(
 
         drawLine(grid, Offset(left, top), Offset(right, top), 1.dp.toPx())
         drawLine(grid, Offset(left, bottom), Offset(right, bottom), 1.dp.toPx())
-        val maxText = measurer.measure("${max.roundToInt()}°", labelStyle)
-        val minText = measurer.measure("${min.roundToInt()}°", labelStyle)
+        val maxText = measurer.measure("${max.roundToInt()}$unit", labelStyle)
+        val minText = measurer.measure("${min.roundToInt()}$unit", labelStyle)
         drawText(maxText, topLeft = Offset(0f, top - maxText.size.height / 2f))
         drawText(minText, topLeft = Offset(0f, bottom - minText.size.height / 2f))
 

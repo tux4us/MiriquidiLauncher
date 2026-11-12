@@ -7,6 +7,7 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -48,6 +49,13 @@ class WeatherStore(context: Context) {
             personM = it[HEIGHT_PERSON] ?: ShadowHeights.DEFAULT_PERSON_M,
             objectM = it[HEIGHT_OBJECT] ?: ShadowHeights.DEFAULT_OBJECT_M,
         )
+    }
+
+    /** Animierter Wetter-Hintergrund (Standard: ein). Nur auf dem Gerät, nicht im Backup. */
+    val backgroundAnimated: Flow<Boolean> = safeData.map { it[BACKGROUND_ANIMATED] ?: true }
+
+    suspend fun saveBackgroundAnimated(enabled: Boolean) {
+        store.edit { it[BACKGROUND_ANIMATED] = enabled }
     }
 
     suspend fun saveShadowHeights(heights: ShadowHeights) {
@@ -140,6 +148,7 @@ class WeatherStore(context: Context) {
         val CACHE_FORECAST = stringPreferencesKey("cache_forecast")
         val CACHE_AIR = stringPreferencesKey("cache_air")
         val CACHE_TIME = longPreferencesKey("cache_time")
+        val BACKGROUND_ANIMATED = booleanPreferencesKey("background_animated")
         val HEIGHT_PERSON = doublePreferencesKey("height_person")
         val HEIGHT_OBJECT = doublePreferencesKey("height_object")
         val SERVER_FORECAST = stringPreferencesKey("server_forecast")

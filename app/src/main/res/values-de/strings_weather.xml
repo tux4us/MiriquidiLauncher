@@ -368,4 +368,42 @@ Abends: %3$s – %4$s</string>
         <item>starke Böen</item>
         <item>Starkregen</item>
     </string-array>
+
+    <!-- Wetter-Auswertungen aus den vorhandenen Stundendaten -->
+    <string name="weather_section_summary">Zusammenfassung (nächste 24 Stunden)</string>
+    <string name="weather_sum_dry">Trocken: kein Niederschlag in den nächsten 24 Stunden.</string>
+    <string name="weather_sum_rain_now_until">Aktuell Niederschlag, voraussichtlich bis ca. %1$s (%2$s mm).</string>
+    <string name="weather_sum_rain_now_ongoing">Aktuell Niederschlag, der den ganzen Zeitraum anhält (%1$s mm).</string>
+    <string name="weather_sum_rain_later">Niederschlag von %1$s bis ca. %2$s (%3$s mm).</string>
+    <string name="weather_sum_rain_later_ongoing">Niederschlag ab %1$s, hält bis zum Ende des Zeitraums an (%2$s mm).</string>
+    <string name="weather_sum_rain_next">Danach erneut Niederschlag ab %1$s.</string>
+    <string name="weather_sum_temp">Höchstwert %1$s° um %2$s, Tiefstwert %3$s° um %4$s.</string>
+    <string name="weather_sum_gust">Starke Böen: bis %1$s km/h um %2$s (Bft %3$s).</string>
+    <string name="weather_sum_wind_shift">Der Wind dreht von %1$s auf %2$s.</string>
+    <string name="weather_sum_uv">UV-Index ab 3 (Sonnenschutz empfohlen) von %1$s bis %2$s, Maximum %3$s um %4$s.</string>
+    <string name="weather_sum_note">Ausgewertet aus den Stundenwerten von Open-Meteo. Richtwerte: nasse Stunde ab 0,1 mm, starke Böen ab 50 km/h, Winddrehung ab 45°.</string>
+    <string name="weather_dewpoint_value">Taupunkt: %1$s °C</string>
+    <string name="weather_section_pressure">Luftdruck (nächste 24 Stunden)</string>
+    <string name="weather_pressure_chart">Luftdruck in hPa</string>
+    <string name="weather_pressure_trend_rising">Steigend: %1$s hPa in 24 Stunden.</string>
+    <string name="weather_pressure_trend_steady">Gleichbleibend: %1$s hPa in 24 Stunden.</string>
+    <string name="weather_pressure_trend_falling">Fallend: %1$s hPa in 24 Stunden.</string>
+    <string name="weather_pressure_past">Letzte 3 Stunden: %1$s hPa.</string>
+    <string name="weather_pressure_note">Luftdruck am Standort laut Open-Meteo, nicht auf Meereshöhe umgerechnet. Als gleichbleibend gilt eine Änderung unter 1 hPa je 3 Stunden (Richtwert).</string>
+    <string name="weather_section_uv">UV-Index (nächste 24 Stunden)</string>
+    <string name="weather_uv_window">Sonnenschutz empfohlen (UV ab 3) von %1$s bis %2$s, Maximum %3$s um %4$s.</string>
+    <string name="weather_uv_none">Kein UV-Index ab 3 in den nächsten 24 Stunden.</string>
+    <string name="weather_uv_note">Der Schwellenwert 3 stammt von der WHO. Wolken senken den Wert nur teilweise, im Schnee und auf Wasser kann er höher ausfallen.</string>
+    <string name="weather_wind_peak">Stärkste Böe: %1$s km/h um %2$s. Höchste Windgeschwindigkeit: %3$s km/h um %4$s.</string>
+    <string name="weather_wind_shift">Der Wind dreht von %1$s auf %2$s.</string>
+    <string name="weather_air_days_title">Vorschau je Tag</string>
+    <string name="weather_air_day_line">%1$s: Luft %2$s (PM2,5 bis %3$s µg/m³), %4$s</string>
+    <string name="weather_air_day_pollen">Pollen: %1$s, %2$s</string>
+    <string name="weather_air_day_pollen_none">kaum Pollen</string>
+    <string name="weather_detail_precip_sum">Niederschlag: %1$s mm in %2$s Stunden</string>
+    <string name="weather_detail_day_night">Durchschnitt: Tag %1$s°, Nacht %2$s°</string>
+    <string name="weather_detail_dry_window">Trocken bei Tageslicht: %1$s bis %2$s</string>
+    <string name="weather_detail_sun_protection">Sonnenschutz empfohlen (UV ab 3)</string>
+    <string name="weather_background_toggle">Animierter Wetter-Hintergrund</string>
+    <string name="weather_background_hint">Aus: Hintergrundbild des Launchers mit Abdunklung. Sind die Systemanimationen abgeschaltet, steht ein Standbild.</string>
 </resources>

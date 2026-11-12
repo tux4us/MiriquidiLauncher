@@ -483,6 +483,7 @@ fun LauncherScreen(
                     Scope.Weather -> WeatherScreen(
                         viewModel = weatherViewModel,
                         active = currentScope == Scope.Weather,
+                        dogsShown = dogsShown,
                     )
                     Scope.Calendar -> CalendarScreen(
                         viewModel = calendarViewModel,

@@ -34,6 +34,8 @@ data class WeatherUiState(
     val shadowHeights: ShadowHeights = ShadowHeights(ShadowHeights.DEFAULT_PERSON_M, ShadowHeights.DEFAULT_OBJECT_M),
     /** `true`, wenn ein eigener Wetterserver eingetragen ist. */
     val customServer: Boolean = false,
+    /** Animierter Wetter-Hintergrund eingeschaltet. */
+    val backgroundAnimated: Boolean = true,
 ) {
     /** `true`, wenn der angezeigte Bericht nicht aus dem aktuellen Abruf stammt (Fehler beim Aktualisieren). */
     val showsStaleData: Boolean get() = report != null && error != null
@@ -64,6 +66,9 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             store.shadowHeights.collect { heights -> _state.update { it.copy(shadowHeights = heights) } }
+        }
+        viewModelScope.launch {
+            store.backgroundAnimated.collect { on -> _state.update { it.copy(backgroundAnimated = on) } }
         }
     }
 
@@ -241,6 +246,11 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         if (personM !in ShadowHeights.PERSON_RANGE || objectM !in ShadowHeights.OBJECT_RANGE) return false
         viewModelScope.launch { store.saveShadowHeights(ShadowHeights(personM, objectM)) }
         return true
+    }
+
+    fun setBackgroundAnimated(enabled: Boolean) {
+        _state.update { it.copy(backgroundAnimated = enabled) }
+        viewModelScope.launch { store.saveBackgroundAnimated(enabled) }
     }
 
     fun clearSearch() {

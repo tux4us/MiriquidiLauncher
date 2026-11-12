@@ -368,4 +368,42 @@ Evening: %3$s – %4$s</string>
         <item>strong gusts</item>
         <item>heavy rain</item>
     </string-array>
+
+    <!-- Weather insights derived from the loaded hourly data -->
+    <string name="weather_section_summary">Summary (next 24 hours)</string>
+    <string name="weather_sum_dry">Dry: no precipitation in the next 24 hours.</string>
+    <string name="weather_sum_rain_now_until">Precipitation now, expected until about %1$s (%2$s mm).</string>
+    <string name="weather_sum_rain_now_ongoing">Precipitation now, lasting through the whole period (%1$s mm).</string>
+    <string name="weather_sum_rain_later">Precipitation from %1$s until about %2$s (%3$s mm).</string>
+    <string name="weather_sum_rain_later_ongoing">Precipitation from %1$s, lasting until the end of the period (%2$s mm).</string>
+    <string name="weather_sum_rain_next">More precipitation from %1$s.</string>
+    <string name="weather_sum_temp">High %1$s° at %2$s, low %3$s° at %4$s.</string>
+    <string name="weather_sum_gust">Strong gusts: up to %1$s km/h at %2$s (Bft %3$s).</string>
+    <string name="weather_sum_wind_shift">The wind shifts from %1$s to %2$s.</string>
+    <string name="weather_sum_uv">UV index 3 or higher (sun protection recommended) from %1$s to %2$s, peak %3$s at %4$s.</string>
+    <string name="weather_sum_note">Derived from the hourly values of Open-Meteo. Guideline values: wet hour from 0.1 mm, strong gusts from 50 km/h, wind shift from 45°.</string>
+    <string name="weather_dewpoint_value">Dew point: %1$s °C</string>
+    <string name="weather_section_pressure">Air pressure (next 24 hours)</string>
+    <string name="weather_pressure_chart">Air pressure in hPa</string>
+    <string name="weather_pressure_trend_rising">Rising: %1$s hPa in 24 hours.</string>
+    <string name="weather_pressure_trend_steady">Steady: %1$s hPa in 24 hours.</string>
+    <string name="weather_pressure_trend_falling">Falling: %1$s hPa in 24 hours.</string>
+    <string name="weather_pressure_past">Last 3 hours: %1$s hPa.</string>
+    <string name="weather_pressure_note">Air pressure at the location according to Open-Meteo, not reduced to sea level. A change below 1 hPa per 3 hours counts as steady (guideline value).</string>
+    <string name="weather_section_uv">UV index (next 24 hours)</string>
+    <string name="weather_uv_window">Sun protection recommended (UV 3 or higher) from %1$s to %2$s, peak %3$s at %4$s.</string>
+    <string name="weather_uv_none">No UV index of 3 or higher in the next 24 hours.</string>
+    <string name="weather_uv_note">The threshold of 3 comes from the WHO. Clouds only reduce the value in part; on snow and water it can be higher.</string>
+    <string name="weather_wind_peak">Strongest gust: %1$s km/h at %2$s. Highest wind speed: %3$s km/h at %4$s.</string>
+    <string name="weather_wind_shift">The wind shifts from %1$s to %2$s.</string>
+    <string name="weather_air_days_title">Outlook by day</string>
+    <string name="weather_air_day_line">%1$s: air %2$s (PM2.5 up to %3$s µg/m³), %4$s</string>
+    <string name="weather_air_day_pollen">pollen: %1$s, %2$s</string>
+    <string name="weather_air_day_pollen_none">little pollen</string>
+    <string name="weather_detail_precip_sum">Precipitation: %1$s mm over %2$s hours</string>
+    <string name="weather_detail_day_night">Average: day %1$s°, night %2$s°</string>
+    <string name="weather_detail_dry_window">Dry in daylight: %1$s to %2$s</string>
+    <string name="weather_detail_sun_protection">Sun protection recommended (UV 3 or higher)</string>
+    <string name="weather_background_toggle">Animated weather background</string>
+    <string name="weather_background_hint">Off: the launcher wallpaper with a dark overlay. With system animations disabled, a still image is shown.</string>
 </resources>

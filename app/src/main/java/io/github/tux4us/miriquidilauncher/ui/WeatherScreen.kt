@@ -37,6 +37,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -80,6 +82,7 @@ import io.github.tux4us.miriquidilauncher.weather.PollenType
 import io.github.tux4us.miriquidilauncher.weather.ThunderLevel
 import io.github.tux4us.miriquidilauncher.weather.Thunderstorm
 import io.github.tux4us.miriquidilauncher.weather.WeatherError
+import io.github.tux4us.miriquidilauncher.weather.WeatherInsights
 import io.github.tux4us.miriquidilauncher.weather.WeatherMath
 import io.github.tux4us.miriquidilauncher.weather.WeatherReport
 import io.github.tux4us.miriquidilauncher.weather.WeatherUiState
@@ -99,10 +102,10 @@ internal val TimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm"
 
 /**
  * Wetterseite rechts neben dem Launcher. [active] ist `true`, solange die Seite sichtbar ist; dann werden
- * veraltete Daten aktualisiert.
+ * veraltete Daten aktualisiert. [dogsShown] = Hunde-Scope ist eingeblendet (steuert die Karte „Hunde-Wetter“).
  */
 @Composable
-fun WeatherScreen(viewModel: WeatherViewModel, active: Boolean, modifier: Modifier = Modifier) {
+fun WeatherScreen(viewModel: WeatherViewModel, active: Boolean, dogsShown: Boolean, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(active) {
         if (active) viewModel.onScreenShown()
@@ -124,9 +127,13 @@ fun WeatherScreen(viewModel: WeatherViewModel, active: Boolean, modifier: Modifi
         )
     }
 
+    val skyReport = state.report
+    val sky = state.backgroundAnimated && skyReport != null
     CompositionLocalProvider(LocalContentColor provides WeatherText) {
+    Box(modifier.fillMaxSize()) {
+    if (sky && skyReport != null) WeatherBackground(skyReport.forecast.current, active)
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(WeatherPageScrim),
+        modifier = Modifier.fillMaxSize().then(if (sky) Modifier else Modifier.background(WeatherPageScrim)),
         contentPadding = WindowInsets.safeDrawing.asPaddingValues(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -153,10 +160,17 @@ fun WeatherScreen(viewModel: WeatherViewModel, active: Boolean, modifier: Modifi
             item { StatusMessage(state, onRequestLocation = requestLocation) }
             val report = state.report
             if (report != null) {
-                weatherSections(report, state.shadowHeights, onDetail = { detail = it }, onEditShadow = { editShadow = true })
+                weatherSections(
+                    report, state.shadowHeights, dogsShown,
+                    backgroundAnimated = state.backgroundAnimated,
+                    onToggleBackground = viewModel::setBackgroundAnimated,
+                    onDetail = { detail = it },
+                    onEditShadow = { editShadow = true },
+                )
             }
         }
         item { Spacer(Modifier.size(8.dp)) }
+    }
     }
     }
 }
@@ -322,6 +336,9 @@ private fun StatusMessage(state: WeatherUiState, onRequestLocation: () -> Unit) 
 private fun androidx.compose.foundation.lazy.LazyListScope.weatherSections(
     report: WeatherReport,
     heights: ShadowHeights,
+    dogsShown: Boolean,
+    backgroundAnimated: Boolean,
+    onToggleBackground: (Boolean) -> Unit,
     onDetail: (DetailContent) -> Unit,
     onEditShadow: () -> Unit,
 ) {
@@ -329,18 +346,25 @@ private fun androidx.compose.foundation.lazy.LazyListScope.weatherSections(
     val hourStart = now.withMinute(0).withSecond(0).withNano(0)
     val upcoming = report.forecast.hours.filter { !it.time.isBefore(hourStart) }.take(24)
 
+    val pressure = WeatherInsights.pressureOutlook(report.forecast.hours, hourStart)
+    val uvWindow = WeatherInsights.uvWindow(report.forecast.hours, hourStart)
+
     item { CurrentCard(report) }
+    if (upcoming.size >= 2) item { SummaryCard(report, hourStart) }
     if (upcoming.size >= 2) item { HourlyCard(upcoming, onDetail) }
     if (upcoming.size >= 2) item { WindCard(upcoming) }
-    if (report.forecast.days.isNotEmpty()) item { DailyCard(report.forecast.days, now, onDetail) }
+    if (report.forecast.days.isNotEmpty()) item { DailyCard(report.forecast.days, report.forecast.hours, now, onDetail) }
     item { ThunderCard(report.forecast.hours, now) }
-    item { DogWeatherCard(report, now) }
+    // Die Karte „Hunde-Wetter“ erscheint nur bei eingeblendeter Hunde-Scope.
+    if (dogsShown) item { DogWeatherCard(report, now) }
     item { AirCard(report.air, hourStart) }
+    if (pressure != null) item { PressureCard(pressure) }
     item { BioCard(report, hourStart) }
+    if (uvWindow != null) item { UvCard(uvWindow, upcoming, hourStart.toLocalDate()) }
     item { SunCard(report, now, heights, onDetail, onEditShadow) }
     item { DaylightCard(report.forecast.days, now) }
     item { MoonCard() }
-    item { Footer() }
+    item { Footer(backgroundAnimated, onToggleBackground) }
 }
 
 /** Inhalt eines Detaildialogs; Titel und Zeilen sind bereits übersetzt. */
@@ -391,6 +415,7 @@ private fun CurrentCard(report: WeatherReport) {
         )
         Text(stringResource(R.string.weather_gusts_value, c.windGusts.roundToInt().toString()))
         Text(stringResource(R.string.weather_humidity_value, c.humidity))
+        Text(stringResource(R.string.weather_dewpoint_value, WeatherMath.dewPoint(c.temperature, c.humidity).roundToInt().toString()))
         Text(stringResource(R.string.weather_pressure_value, c.pressure.roundToInt().toString()))
         Text(stringResource(R.string.weather_precip_value, oneDecimal(c.precipitation)))
         Text(stringResource(R.string.weather_uv_value, oneDecimal(c.uvIndex), uvLevels[WeatherMath.uvLevel(c.uvIndex)]))
@@ -443,7 +468,7 @@ private fun HourlyCard(hours: List<HourPoint>, onDetail: (DetailContent) -> Unit
 }
 
 @Composable
-private fun DailyCard(days: List<DayPoint>, now: LocalDateTime, onDetail: (DetailContent) -> Unit) {
+private fun DailyCard(days: List<DayPoint>, hours: List<HourPoint>, now: LocalDateTime, onDetail: (DetailContent) -> Unit) {
     val context = LocalContext.current
     val codes = stringArrayResource(R.array.weather_codes)
     val format = remember { DateTimeFormatter.ofPattern("EEE d.M.", Locale.getDefault()) }
@@ -455,7 +480,7 @@ private fun DailyCard(days: List<DayPoint>, now: LocalDateTime, onDetail: (Detai
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .clickable { onDetail(dayDetail(context, day, if (day.date == now.toLocalDate()) today else day.date.format(format))) }
+                    .clickable { onDetail(dayDetail(context, day, if (day.date == now.toLocalDate()) today else day.date.format(format), hours)) }
                     .padding(vertical = 4.dp),
             ) {
                 Text(
@@ -516,6 +541,9 @@ private fun ThunderCard(hours: List<HourPoint>, now: LocalDateTime) {
 
 @Composable
 private fun AirCard(air: List<AirHour>, hourStart: LocalDateTime) {
+    val airDays = remember(air, hourStart.toLocalDate()) { WeatherInsights.airDays(air, hourStart.toLocalDate()) }
+    val dayFormat = remember { DateTimeFormatter.ofPattern("EEE d.M.", Locale.getDefault()) }
+    val todayLabel = stringResource(R.string.weather_today)
     val aqiLevels = stringArrayResource(R.array.weather_aqi_levels)
     val pollenLevels = stringArrayResource(R.array.weather_pollen_levels)
     val pollenNames = stringArrayResource(R.array.weather_pollen_types)
@@ -546,6 +574,19 @@ private fun AirCard(air: List<AirHour>, hourStart: LocalDateTime) {
                 LevelDot(levelColor(level, 4), pollenLevels[level]) {
                     Text("${pollenNames[type.ordinal]}: ${pollenLevels[level]} (${grains.roundToInt()}/m³)")
                 }
+            }
+        }
+        if (airDays.size >= 2) {
+            Text(stringResource(R.string.weather_air_days_title), style = MaterialTheme.typography.titleSmall)
+            airDays.forEach { d ->
+                val pollenText = d.topPollen?.let { type ->
+                    stringResource(R.string.weather_air_day_pollen, pollenNames[type.ordinal], pollenLevels[d.pollenLevel])
+                } ?: stringResource(R.string.weather_air_day_pollen_none)
+                val label = if (d.date == hourStart.toLocalDate()) todayLabel else d.date.format(dayFormat)
+                Text(
+                    stringResource(R.string.weather_air_day_line, label, aqiLevels[d.aqiLevel], oneDecimal(d.pm25Max), pollenText),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
         }
     }
@@ -632,9 +673,25 @@ private fun BioRow(indicator: BioIndicator, levels: Array<String>) {
 }
 
 @Composable
-private fun Footer() {
+private fun Footer(backgroundAnimated: Boolean, onToggleBackground: (Boolean) -> Unit) {
     val context = LocalContext.current
     Column(Modifier.padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Switch(
+                checked = backgroundAnimated,
+                onCheckedChange = onToggleBackground,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color(0xFF141A22),
+                    checkedTrackColor = WeatherText,
+                    uncheckedThumbColor = WeatherText,
+                    uncheckedTrackColor = Color(0x33FFFFFF),
+                    uncheckedBorderColor = Color(0x99FFFFFF),
+                ),
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(stringResource(R.string.weather_background_toggle))
+        }
+        Text(stringResource(R.string.weather_background_hint), style = MaterialTheme.typography.bodySmall, color = WeatherTextMuted)
         AttributionLink(R.string.weather_attr_open_meteo, "https://open-meteo.com/") { openWebLink(context, it) }
         AttributionLink(R.string.weather_attr_cams, "https://atmosphere.copernicus.eu/") { openWebLink(context, it) }
         AttributionLink(R.string.weather_attr_osm, "https://www.openstreetmap.org/copyright") { openWebLink(context, it) }
@@ -678,7 +735,7 @@ private fun thunderColor(level: ThunderLevel): Color = when (level) {
 
 internal fun oneDecimal(v: Double): String = String.format(Locale.getDefault(), "%.1f", v)
 
-private fun signed(v: Double): String = String.format(Locale.getDefault(), "%+.1f", v)
+internal fun signed(v: Double): String = String.format(Locale.getDefault(), "%+.1f", v)
 
 private fun formatMillis(millis: Long, utcOffsetSeconds: Int): String =
     Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.ofTotalSeconds(utcOffsetSeconds)).format(TimeFormat)

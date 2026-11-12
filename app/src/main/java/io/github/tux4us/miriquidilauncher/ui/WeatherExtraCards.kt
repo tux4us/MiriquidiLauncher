@@ -49,6 +49,7 @@ import io.github.tux4us.miriquidilauncher.weather.DayPoint
 import io.github.tux4us.miriquidilauncher.weather.HourPoint
 import io.github.tux4us.miriquidilauncher.weather.ShadowHeights
 import io.github.tux4us.miriquidilauncher.weather.SunMath
+import io.github.tux4us.miriquidilauncher.weather.WeatherInsights
 import io.github.tux4us.miriquidilauncher.weather.WeatherMath
 import io.github.tux4us.miriquidilauncher.weather.WeatherReport
 
@@ -157,10 +158,11 @@ internal fun hourDetail(context: Context, h: HourPoint): DetailContent {
     )
     h.pressure?.let { lines += context.getString(R.string.weather_detail_pressure, it.roundToInt().toString()) }
     if (h.cape > 0) lines += context.getString(R.string.weather_detail_cape, h.cape.roundToInt().toString())
+    if (h.uvIndex >= WeatherInsights.UV_PROTECTION) lines += context.getString(R.string.weather_detail_sun_protection)
     return DetailContent(context.getString(R.string.weather_detail_hour_title, h.time.format(TimeFormat), description), lines)
 }
 
-internal fun dayDetail(context: Context, d: DayPoint, label: String): DetailContent {
+internal fun dayDetail(context: Context, d: DayPoint, label: String, hours: List<HourPoint>): DetailContent {
     val codes = context.resources.getStringArray(R.array.weather_codes)
     val uvLevels = context.resources.getStringArray(R.array.weather_uv_levels)
     val description = WeatherMath.weatherCodeIndex(d.weatherCode)?.let { codes[it] } ?: "–"
@@ -174,6 +176,19 @@ internal fun dayDetail(context: Context, d: DayPoint, label: String): DetailCont
     if (d.sunrise != null && d.sunset != null) {
         lines += context.getString(R.string.weather_detail_sun, d.sunrise.format(TimeFormat), d.sunset.format(TimeFormat))
     }
+    WeatherInsights.dayStats(hours, d)?.let { stats ->
+        lines += context.getString(R.string.weather_detail_precip_sum, oneDecimal(stats.precipSumMm), stats.wetHours.toString())
+        val dayAvg = stats.dayAvg
+        val nightAvg = stats.nightAvg
+        if (dayAvg != null && nightAvg != null) {
+            lines += context.getString(R.string.weather_detail_day_night, dayAvg.roundToInt().toString(), nightAvg.roundToInt().toString())
+        }
+        val dryStart = stats.dryStart
+        val dryEnd = stats.dryEnd
+        if (dryStart != null && dryEnd != null) {
+            lines += context.getString(R.string.weather_detail_dry_window, dryStart.format(TimeFormat), dryEnd.format(TimeFormat))
+        }
+    }
     return DetailContent(context.getString(R.string.weather_detail_hour_title, label, description), lines)
 }
 
@@ -185,7 +200,25 @@ internal fun dayDetail(context: Context, d: DayPoint, label: String): DetailCont
 internal fun WindCard(hours: List<HourPoint>) {
     val dirs = stringArrayResource(R.array.weather_wind_dirs)
     val beaufort = stringArrayResource(R.array.weather_beaufort)
+    val outlook = remember(hours) { WeatherInsights.windOutlook(hours) }
     SectionCard(stringResource(R.string.weather_section_wind)) {
+        outlook?.let { o ->
+            Text(
+                stringResource(
+                    R.string.weather_wind_peak,
+                    o.peakGust.windGusts.roundToInt().toString(), o.peakGust.time.format(TimeFormat),
+                    o.peakSpeed.windSpeed.roundToInt().toString(), o.peakSpeed.time.format(TimeFormat),
+                ),
+            )
+            if (o.directionShift) {
+                Text(
+                    stringResource(
+                        R.string.weather_wind_shift,
+                        dirs[WeatherMath.compassIndex(o.fromDegrees)], dirs[WeatherMath.compassIndex(o.toDegrees)],
+                    ),
+                )
+            }
+        }
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             hours.forEach { h ->
                 val bft = WeatherMath.beaufort(h.windSpeed)
