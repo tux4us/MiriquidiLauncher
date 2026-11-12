@@ -12,8 +12,8 @@ android {
         applicationId = "io.github.tux4us.miriquidilauncher"
         minSdk = 26
         targetSdk = 36
-        versionCode = 33
-        versionName = "0.7.4"
+        versionCode = 34
+        versionName = "0.8.0"
     }
 
     buildTypes {
@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.hls)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

@@ -62,6 +62,15 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
+    <!-- Optional: Scope "Musik". Liest Audiodateien nur über die Mediathek des Geräts (MediaStore), solange die Seite
+         geöffnet ist; ab Android 13 mit READ_MEDIA_AUDIO, bis Android 12 gilt READ_EXTERNAL_STORAGE (oben). Die
+         Berechtigung wird erst beim Tippen auf "Zugriff erlauben" angefragt. Kein Mikrofon: Der Equalizer arbeitet im
+         Wiedergabestrom, ohne Visualizer. WAKE_LOCK und ACCESS_WIFI_STATE nutzt Media3, damit Radiostreams bei
+         ausgeschaltetem Bildschirm weiterlaufen (WAKE_MODE_NETWORK). -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <!-- Optional: QR-Scanner im Suchfeld und Scope "Kamera". Die Kamera wird erst beim Öffnen des Scanners bzw. der
          Kamera-Seite angefragt. Der Scanner liest nur QR-Codes (Dekodierung auf dem Gerät mit ZXing) und speichert
          oder sendet keine Bilder. Die Kamera-Seite speichert Fotos und Videos nur in der Mediathek des Geräts
@@ -86,10 +95,14 @@
         </intent>
     </queries>
 
+    <!-- usesCleartextTraffic="true" gilt nur, damit Radiostreams ohne TLS laufen können, wenn der Nutzer in der Scope
+         "Musik" den Schalter "http-Streams erlauben" einschaltet (Standard: aus). Jeder andere Netzwerkzugriff der App
+         erzwingt https im Code (Prüfung: Market, Notizen/Nextcloud, Podcasts, Wetter, Feed, Feed-Bilder), und beide
+         WebViews blockieren http-Anfragen. -->
     <application
         android:allowBackup="false"
         android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="false"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -116,6 +129,16 @@
              Bluetooth und Kopfhörertasten die Mediensitzung steuern können. -->
         <service
             android:name=".podcasts.PlaybackService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
+        </service>
+
+        <!-- Musikwiedergabe (Media3) mit eigener Mediensitzung, Benachrichtigung und Kennung neben dem Podcast-Dienst. -->
+        <service
+            android:name=".music.MusicService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>

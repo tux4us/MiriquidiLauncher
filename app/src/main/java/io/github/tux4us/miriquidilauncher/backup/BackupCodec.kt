@@ -33,6 +33,7 @@ import io.github.tux4us.miriquidilauncher.podcasts.PodcastData
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastLogic
 import io.github.tux4us.miriquidilauncher.weather.GeoPlace
 import io.github.tux4us.miriquidilauncher.dogs.DogCodec
+import io.github.tux4us.miriquidilauncher.music.MusicCodec
 import io.github.tux4us.miriquidilauncher.weather.MiniJson
 import io.github.tux4us.miriquidilauncher.weather.ShadowHeights
 import io.github.tux4us.miriquidilauncher.weather.WeatherEndpoints
@@ -144,6 +145,7 @@ object BackupCodec {
         }
         data.agendaEnabled?.let { sb.append(",\n  \"agendaEnabled\": ").append(it) }
         data.dogs?.let { sb.append(",\n  \"dogs\": ").append(DogCodec.encode(it)) }
+        data.music?.let { sb.append(",\n  \"music\": ").append(MusicCodec.encodeBackup(it)) }
     }
 
     fun decode(text: String, maxBytes: Int = MAX_BYTES): BackupData {
@@ -227,6 +229,7 @@ object BackupCodec {
             notesSettings = root["notesSettings"].asObject()?.let { parseNotesSettings(it) },
             agendaEnabled = root["agendaEnabled"] as? Boolean,
             dogs = root["dogs"].asObject()?.let { DogCodec.fromMap(it) },
+            music = root["music"].asObject()?.let { MusicCodec.decodeBackup(it) },
         )
     }
 

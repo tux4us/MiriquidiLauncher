@@ -414,6 +414,7 @@ private fun backupMessageText(message: BackupMessage): String = when (message) {
             s.notes?.let { stringResource(R.string.settings_backup_imported_notes, it) },
             s.podcasts?.let { stringResource(R.string.settings_backup_imported_podcasts, it) },
             s.markets?.let { stringResource(R.string.settings_backup_imported_markets, it) },
+            s.musicStations?.let { stringResource(R.string.settings_backup_imported_music, it, s.musicPlaylists ?: 0) },
         ).fold(base) { text, part -> "$text $part" }
     }
     BackupMessage.InvalidFile -> stringResource(R.string.settings_backup_invalid)

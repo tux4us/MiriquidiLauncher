@@ -97,6 +97,7 @@ import io.github.tux4us.miriquidilauncher.feed.FeedViewModel
 import io.github.tux4us.miriquidilauncher.markets.MarketsViewModel
 import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
 import io.github.tux4us.miriquidilauncher.notes.NotesViewModel
+import io.github.tux4us.miriquidilauncher.music.MusicViewModel
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
 import io.github.tux4us.miriquidilauncher.weather.WeatherViewModel
 import androidx.core.content.ContextCompat
@@ -158,6 +159,7 @@ fun LauncherScreen(
     feedViewModel: FeedViewModel,
     marketsViewModel: MarketsViewModel,
     podcastsViewModel: PodcastsViewModel,
+    musicViewModel: MusicViewModel,
     galleryViewModel: GalleryViewModel,
     notesViewModel: NotesViewModel,
     systemViewModel: SystemViewModel,
@@ -467,6 +469,7 @@ fun LauncherScreen(
                         onRestored = {
                             weatherViewModel.reloadFromStore()
                             podcastsViewModel.reloadFromStore()
+                            musicViewModel.reloadFromStore()
                             marketsViewModel.reloadFromStore()
                             feedViewModel.reloadFromStore()
                             calculatorViewModel.reloadFromStore()
@@ -492,6 +495,10 @@ fun LauncherScreen(
                     Scope.Podcasts -> PodcastsScreen(
                         viewModel = podcastsViewModel,
                         active = currentScope == Scope.Podcasts,
+                    )
+                    Scope.Music -> MusicScreen(
+                        viewModel = musicViewModel,
+                        active = currentScope == Scope.Music,
                     )
                     Scope.Gallery -> GalleryScreen(
                         viewModel = galleryViewModel,

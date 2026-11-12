@@ -5,8 +5,8 @@ Stand: 1. November 2026 · gilt für MiriquidiLauncher ab Version 0.6.8 · [Engl
 ## 1. Kurzfassung
 
 - Der Entwickler betreibt **keinen Server** für den Launcher. Es gibt **kein Benutzerkonto, keine Werbung, keine Nutzungsanalyse, keine Absturzberichte und keine Google-Dienste**. Der Entwickler erhält keine Daten aus der App.
-- Persönliche Daten (Favoriten, Notizen, Hundeprofile, Kurse-Bestand, Podcast-Abos, Rechner-Verlauf u. a.) werden **nur auf dem Gerät** gespeichert.
-- Einige Seiten (Wetter, Kurse, FeedReader, Notizen mit Nextcloud, Podcasts) rufen Daten **direkt vom Gerät aus bei Drittanbietern** ab, und zwar erst, wenn du die Seite benutzt. Diese Seiten (Wetter, FeedReader, Podcasts, Kurse) sind nach der Installation und nach dem Zurücksetzen der App **ausgeblendet**; der Launcher stellt für sie keine Verbindung her, bis du sie in den Einstellungen (Karte „Scopes“) einblendest und im Hinweisdialog zustimmst. Ein eingespieltes Backup kann sie nicht ohne diese Zustimmung einblenden. Die Verbindungen sind ausschließlich per HTTPS. Die Empfänger sehen dabei mindestens deine IP-Adresse (Abschnitt 5).
+- Persönliche Daten (Favoriten, Notizen, Hundeprofile, Kurse-Bestand, Podcast-Abos, Radiosender und Wiedergabelisten, Rechner-Verlauf u. a.) werden **nur auf dem Gerät** gespeichert.
+- Einige Seiten (Wetter, Kurse, FeedReader, Notizen mit Nextcloud, Podcasts) rufen Daten **direkt vom Gerät aus bei Drittanbietern** ab, und zwar erst, wenn du die Seite benutzt. Diese Seiten (Wetter, FeedReader, Podcasts, Kurse) sind nach der Installation und nach dem Zurücksetzen der App **ausgeblendet**; der Launcher stellt für sie keine Verbindung her, bis du sie in den Einstellungen (Karte „Scopes“) einblendest und im Hinweisdialog zustimmst. Ein eingespieltes Backup kann sie nicht ohne diese Zustimmung einblenden. Die Verbindungen sind per HTTPS; einzige Ausnahme sind Radiostreams, wenn du in der Scope „Musik“ den Schalter „http-Streams erlauben“ (standardmäßig aus) einschaltest. Die Scope „Musik“ selbst ist keine Netzwerk-Scope: Lokale Musik funktioniert ohne Netzwerk; die Sendersuche im Verzeichnis ist erst nach einer eigenen Zustimmung in der Scope aktiv. Die Empfänger sehen dabei mindestens deine IP-Adresse (Abschnitt 5).
 - Berechtigungen werden **erst bei der ersten Nutzung** der jeweiligen Funktion angefragt und sind widerrufbar (Abschnitt 6).
 
 ## 2. Verantwortlicher und Kontakt
@@ -44,6 +44,7 @@ Soweit die App auf Informationen im Endgerät zugreift oder dort speichert, gesc
 | Hunde | Hundeprofile (Name, Rasse, Geburtsdatum, Gewicht, Chipnummer, Besitzer und Telefonnummer, Tierarzt, Versicherung, Hinweise), Fälligkeiten, Auswahl der Angaben auf der Notfallkarte | Interner App-Speicher |
 | Kurse | Eigener Bestand („Eigene Werte“), Diagrammauswahl, Datenquellen, optional Stooq-Schlüssel | Interner App-Speicher (Schlüssel verschlüsselt) |
 | Podcasts | Abos, Favoriten, Hörposition, Gehört-Markierungen, Zwischenspeicher der Feeds, heruntergeladene Folgen | Interner App-Speicher |
+| Musik | Gespeicherte Radiosender (Import und Export als .json-Datei nur auf deinen Wunsch über den Systemdialog), Wiedergabelisten und Favoriten (als Kennungen der Mediathek), Equalizer-Einstellungen, Schalter für Sendersuche, http und Senderlogos; die Musikdateien selbst werden nur gelesen | Interner App-Speicher |
 | FeedReader | Nextcloud-Adresse und Benutzername, App-Passwort (verschlüsselt), lokale Feeds, Gelesen-Markierungen, zwischengespeicherte Artikel | Interner App-Speicher |
 | Notizen | Markdown-Dateien im app-eigenen Dokumentenordner (`Android/data/<Paket>/files/Documents/MiriquidiNotes`), Favoriten, Sortierung, optional Nextcloud-Zugang (Passwort verschlüsselt) | App-Speicher |
 | Rechner | Winkelmodus, Speicherwert, letztes Ergebnis, Verlauf (begrenzt) | Interner App-Speicher |
@@ -67,7 +68,7 @@ Auf deinen Wunsch liest der Launcher aus einer von dir gewählten Sicherungsdate
 
 ## 5. Netzwerkverbindungen
 
-Alle Verbindungen laufen verschlüsselt über HTTPS (unverschlüsseltes HTTP ist gesperrt). Die App sendet bei jeder Anfrage technisch bedingt deine **IP-Adresse** und den Programmkennzeichner (User-Agent) `MiriquidiLauncher/<Version>`. Es werden keine Werbe-, Geräte- oder Konto-Kennungen gesendet. Ein Abruf erfolgt nur, wenn du die jeweilige Seite öffnest oder aktualisierst; es gibt keinen Hintergrundabruf mit Ausnahme der Wiedergabe oder des Downloads von Podcast-Folgen, die du gestartet hast.
+Alle Verbindungen laufen verschlüsselt über HTTPS (unverschlüsseltes HTTP ist gesperrt). Einzige Ausnahme: Radiostreams über http, nur mit eingeschaltetem Schalter „http-Streams erlauben“ in der Scope „Musik“; solche Streams sind nicht verschlüsselt und können im Netzwerk mitgelesen oder verändert werden. Die App sendet bei jeder Anfrage technisch bedingt deine **IP-Adresse** und den Programmkennzeichner (User-Agent) `MiriquidiLauncher/<Version>`. Es werden keine Werbe-, Geräte- oder Konto-Kennungen gesendet. Ein Abruf erfolgt nur, wenn du die jeweilige Seite öffnest oder aktualisierst; es gibt keinen Hintergrundabruf mit Ausnahme der Wiedergabe oder des Downloads von Podcast-Folgen und der Wiedergabe von Radiosendern, die du gestartet hast.
 
 | Funktion | Empfänger | Übertragene Daten | Auslöser |
 |---|---|---|---|
@@ -78,6 +79,7 @@ Alle Verbindungen laufen verschlüsselt über HTTPS (unverschlüsseltes HTTP ist
 | FeedReader (Nextcloud) | deine eigene Nextcloud-Instanz | Benutzername und App-Passwort (Anmeldung), Gelesen-Status, Abonnements | Öffnen oder Aktualisieren |
 | FeedReader (lokale Feeds) | die Server der Feeds, die du abonniert hast; bei eingeschaltetem „Bilder laden“ auch deren Bildserver | Abruf der Feed-Adresse, ggf. Bild-Adressen | Öffnen oder Aktualisieren |
 | Notizen (optional) | deine eigene Nextcloud-Instanz (Notes) | Zugangsdaten, Notiztexte zum Abgleich | Abgleich |
+| Musik, Radio | Nur nach Zustimmung zur Sendersuche: Verzeichnis radio-browser.info (Community-Server, Adresse wird über `all.api.radio-browser.info` ermittelt); Server der abgespielten Radiosender; Server der Senderlogos (abschaltbar) | Suchbegriff bzw. Land, Stream-Adresse, Logo-Adresse | Sendersuche, Abspielen eines Senders, Anzeigen der Senderliste |
 | Podcasts | Server der abonnierten Podcasts und ihrer Medien; Verzeichnis nach deiner Wahl: Apple iTunes Search (`itunes.apple.com`) oder fyyd (`api.fyyd.de`) | Feed- und Medienadresse, Adressen der Cover und Folgenbilder (Vorschaubilder in den Listen und der Folgenansicht); bei der Suche dein Suchbegriff | Aktualisieren, Abspielen, Download, Suche, Anzeigen der Folgenlisten |
 | Links, Websuche | der von dir gewählte Browser bzw. die von ihm genutzte Suchmaschine; ohne Browser mit Websuche DuckDuckGo | Suchbegriff bzw. Adresse | Tippen auf einen Link bzw. „Im Web suchen“ |
 
@@ -87,7 +89,7 @@ Die Wetterdaten von Open-Meteo stehen unter CC BY 4.0; Näheres in `THIRD_PARTY_
 
 ## 6. Berechtigungen
 
-Alle Berechtigungen sind optional und werden erst beim Gebrauch der Funktion angefragt (Ausnahme: `INTERNET` und die Vordergrunddienst-Berechtigung für Podcasts, die Android ohne Abfrage erteilt). Ohne sie bleibt die jeweilige Funktion eingeschränkt.
+Alle Berechtigungen sind optional und werden erst beim Gebrauch der Funktion angefragt (Ausnahme: `INTERNET`, `WAKE_LOCK`, `ACCESS_WIFI_STATE` und die Vordergrunddienst-Berechtigung für Podcasts und Musik, die Android ohne Abfrage erteilt). Ohne sie bleibt die jeweilige Funktion eingeschränkt.
 
 | Berechtigung | Zweck | Verlässt das Gerät? |
 |---|---|---|
@@ -98,9 +100,11 @@ Alle Berechtigungen sind optional und werden erst beim Gebrauch der Funktion ang
 | `ACCESS_COARSE_LOCATION` | Grober Standort für die Wetterseite, nur auf Tippen | nur als Koordinaten an Open-Meteo/Nominatim |
 | `CAMERA`, `RECORD_AUDIO` | QR-Scanner (Dekodierung mit ZXing auf dem Gerät), Kamera-Seite; Ton bei Videos | nein |
 | `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`, `READ_MEDIA_VISUAL_USER_SELECTED`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` (bis Android 10) | Galerie | nein |
+| `READ_MEDIA_AUDIO` (ab Android 13; davor `READ_EXTERNAL_STORAGE`) | Musik-Scope: lokale Musik über die Mediathek auflisten und abspielen | nein |
+| `WAKE_LOCK`, `ACCESS_WIFI_STATE` | Wiedergabe von Radiostreams bei ausgeschaltetem Bildschirm (Media3) | nein |
 | `PACKAGE_USAGE_STATS` | Nur Daten- und Cachegrößen anderer Apps (Systemseite); die Nutzungsdaten (welche App wann lief) werden nicht gelesen | nein |
 | `REQUEST_DELETE_PACKAGES` | Apps auf Wunsch deinstallieren | nein |
-| `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Benachrichtigung und Vordergrunddienst der Podcast-Wiedergabe | nein |
+| `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Benachrichtigung und Vordergrunddienst der Podcast- und Musikwiedergabe | nein |
 
 Die App verwendet **kein** `QUERY_ALL_PACKAGES`; sie sieht nur Apps mit Launcher-Aktivität und Kamera-Apps.
 

@@ -6,6 +6,7 @@ import io.github.tux4us.miriquidilauncher.camera.CameraSettings
 import io.github.tux4us.miriquidilauncher.data.AppGroup
 import io.github.tux4us.miriquidilauncher.data.FavoriteContact
 import io.github.tux4us.miriquidilauncher.dogs.DogData
+import io.github.tux4us.miriquidilauncher.music.MusicData
 import io.github.tux4us.miriquidilauncher.feed.FeedSnapshot
 import io.github.tux4us.miriquidilauncher.markets.ChartChoice
 import io.github.tux4us.miriquidilauncher.markets.ChartCurrency
@@ -56,6 +57,8 @@ data class BackupData(
     val agendaEnabled: Boolean? = null,
     /** Hundeprofile mit Fälligkeiten und Angaben der Notfallkarte (persönliche Daten); nur in der Backup-Datei, nie im QR-Code. */
     val dogs: DogData? = null,
+    /** Radiosender, Wiedergabelisten, Favoriten und Equalizer der Musik-Scope; Zustimmung und http-Schalter gehören zum Gerät. Nur in der Backup-Datei. */
+    val music: MusicData? = null,
 )
 
 /** Ausgeblendete Scopes und die Reihenfolge aller Scopes (Namen). Unbekannte Namen werden beim Einspielen verworfen. */

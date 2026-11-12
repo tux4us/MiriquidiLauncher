@@ -27,6 +27,9 @@ import io.github.tux4us.miriquidilauncher.podcasts.PodcastData
 import io.github.tux4us.miriquidilauncher.podcasts.SearchProvider
 import io.github.tux4us.miriquidilauncher.weather.GeoPlace
 import io.github.tux4us.miriquidilauncher.weather.ShadowHeights
+import io.github.tux4us.miriquidilauncher.music.MusicData
+import io.github.tux4us.miriquidilauncher.music.Playlist
+import io.github.tux4us.miriquidilauncher.music.Station
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -386,6 +389,28 @@ class BackupCodecTest {
             ),
         )
         assertEquals(complete, file(complete))
+    }
+
+    @Test fun musicBackupKeepsStationsAndListsButNeverTheDeviceSwitches() {
+        val music = MusicData(
+            stations = listOf(Station("abc", "Testradio", "https://example.org/stream")),
+            favoriteTracks = listOf(3L, 5L),
+            playlists = listOf(Playlist("p1", "Wandern", listOf(1L, 2L))),
+            shuffle = true,
+            radioEnabled = true,
+            allowHttp = true,
+            showLogos = false,
+        )
+        val decoded = file(full.copy(music = music)).music!!
+        assertEquals(music.stations, decoded.stations)
+        assertEquals(music.favoriteTracks, decoded.favoriteTracks)
+        assertEquals(music.playlists, decoded.playlists)
+        assertTrue(decoded.shuffle)
+        assertEquals(false, decoded.showLogos)
+        // Zustimmung zur Sendersuche und http-Schalter gehören zum Gerät und kommen nie aus der Datei.
+        assertEquals(false, decoded.radioEnabled)
+        assertEquals(false, decoded.allowHttp)
+        assertNull(file(full).music)
     }
 
     // endregion

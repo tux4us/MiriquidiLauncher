@@ -5,8 +5,8 @@ Last updated: 1 November 2026 · applies to MiriquidiLauncher 0.6.8 and later ·
 ## 1. Summary
 
 - The developer operates **no server** for the launcher. There is **no user account, no advertising, no usage analytics, no crash reporting and no Google services**. The developer receives no data from the app.
-- Personal data (favourites, notes, dog profiles, holdings on the markets page, podcast subscriptions, calculator history, etc.) is stored **on the device only**.
-- Some pages (weather, markets, feed reader, notes with Nextcloud, podcasts) fetch data **directly from your device from third parties** and only when you use the page. These pages (weather, feed reader, podcasts, markets) are **hidden** after installation and after resetting the app; the launcher makes no connection for them until you show them in the settings ("Scopes" card) and agree in the notice dialog. An imported backup cannot show them without this consent. All connections use HTTPS. The recipients see at least your IP address (section 5).
+- Personal data (favourites, notes, dog profiles, holdings on the markets page, podcast subscriptions, radio stations and playlists, calculator history, etc.) is stored **on the device only**.
+- Some pages (weather, markets, feed reader, notes with Nextcloud, podcasts) fetch data **directly from your device from third parties** and only when you use the page. These pages (weather, feed reader, podcasts, markets) are **hidden** after installation and after resetting the app; the launcher makes no connection for them until you show them in the settings ("Scopes" card) and agree in the notice dialog. An imported backup cannot show them without this consent. Connections use HTTPS; the only exception are radio streams when you switch on "Allow http streams" (off by default) in the Music scope. The Music scope itself is not a network scope: local music works without any network access; the station directory search is active only after a separate consent inside the scope. The recipients see at least your IP address (section 5).
 - Permissions are requested **on first use** of the respective feature and can be revoked at any time (section 6).
 
 ## 2. Controller and contact
@@ -40,6 +40,7 @@ For network requests (section 5), **your device** sends the request directly to 
 | Dogs | Dog profiles (name, breed, birth date, weight, chip number, owner and phone number, vet, insurance, notes), due dates, selection of fields shown on the emergency card | App-internal storage |
 | Markets | Your own holdings, chart selection, data sources, optional Stooq key | App-internal storage (key encrypted) |
 | Podcasts | Subscriptions, favourites, playback position, played marks, feed cache, downloaded episodes | App-internal storage |
+| Music | Saved radio stations (import and export as a .json file only on request via the system dialog), playlists and favourites (as media library ids), equalizer settings, switches for station search, http and station logos; the music files themselves are only read | App-internal storage |
 | Feed reader | Nextcloud address and user name, app password (encrypted), local feeds, read marks, cached articles | App-internal storage |
 | Notes | Markdown files in the app-specific documents folder (`Android/data/<package>/files/Documents/MiriquidiNotes`), favourites, sorting, optionally Nextcloud credentials (password encrypted) | App storage |
 | Calculator | Angle mode, memory, last result, history (limited) | App-internal storage |
@@ -63,7 +64,7 @@ On request, the launcher reads only the dog profiles (file `backup_data.json`) f
 
 ## 5. Network connections
 
-All connections use HTTPS (plain HTTP is blocked). For technical reasons, every request transmits your **IP address** and the program identifier (user agent) `MiriquidiLauncher/<version>`. No advertising, device or account identifiers are sent. Requests are made only when you open or refresh the respective page; there are no background requests except for playback or download of podcast episodes that you started.
+All connections use HTTPS (plain HTTP is blocked). The only exception: radio streams over http, only with the switch "Allow http streams" in the Music scope turned on; such streams are unencrypted and can be read or altered on the network. For technical reasons, every request transmits your **IP address** and the program identifier (user agent) `MiriquidiLauncher/<version>`. No advertising, device or account identifiers are sent. Requests are made only when you open or refresh the respective page; there are no background requests except for playback or download of podcast episodes and playback of radio stations that you started.
 
 | Feature | Recipient | Data transmitted | Trigger |
 |---|---|---|---|
@@ -74,6 +75,7 @@ All connections use HTTPS (plain HTTP is blocked). For technical reasons, every 
 | Feed reader (Nextcloud) | Your own Nextcloud instance | User name and app password (login), read status, subscriptions | Opening or refreshing |
 | Feed reader (local feeds) | The servers of the feeds you subscribed to; with "load images" enabled also their image servers | Request of the feed address, possibly image addresses | Opening or refreshing |
 | Notes (optional) | Your own Nextcloud instance (Notes) | Credentials, note texts for synchronisation | Synchronisation |
+| Music, radio | Only after consent to the station search: directory radio-browser.info (community servers, address resolved via `all.api.radio-browser.info`); servers of the stations you play; servers of station logos (can be switched off) | Search term or country, stream address, logo address | Station search, playing a station, showing the station list |
 | Podcasts | Servers of the subscribed podcasts and their media; directory of your choice: Apple iTunes Search (`itunes.apple.com`) or fyyd (`api.fyyd.de`) | Feed and media address, addresses of covers and episode images (thumbnails in the lists and the episode view); your search term when searching | Refreshing, playing, downloading, searching, showing episode lists |
 | Links, web search | The browser you choose or its search engine; without a browser with web search, DuckDuckGo | Search term or address | Tapping a link or "Search the web" |
 
@@ -81,7 +83,7 @@ The recipients are controllers in their own right. What else they process and wh
 
 ## 6. Permissions
 
-All permissions are optional and requested on use (exceptions: `INTERNET` and the foreground service permission for podcasts, which Android grants without a prompt). Without them the respective feature is limited.
+All permissions are optional and requested on use (exceptions: `INTERNET`, `WAKE_LOCK`, `ACCESS_WIFI_STATE` and the foreground service permission for podcasts and music, which Android grants without a prompt). Without them the respective feature is limited.
 
 | Permission | Purpose | Leaves the device? |
 |---|---|---|
@@ -92,9 +94,11 @@ All permissions are optional and requested on use (exceptions: `INTERNET` and th
 | `ACCESS_COARSE_LOCATION` | Coarse location for the weather page, only when you tap | only as coordinates to Open-Meteo/Nominatim |
 | `CAMERA`, `RECORD_AUDIO` | QR scanner (decoded on the device with ZXing), camera page; sound for videos | no |
 | `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`, `READ_MEDIA_VISUAL_USER_SELECTED`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` (up to Android 10) | Gallery | no |
+| `READ_MEDIA_AUDIO` (Android 13+; before that `READ_EXTERNAL_STORAGE`) | Music scope: list and play local music via the media library | no |
+| `WAKE_LOCK`, `ACCESS_WIFI_STATE` | Playing radio streams with the screen off (Media3) | no |
 | `PACKAGE_USAGE_STATS` | Only data and cache sizes of other apps (system page); usage data (which app ran when) is not read | no |
 | `REQUEST_DELETE_PACKAGES` | Uninstall apps on request | no |
-| `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Notification and foreground service for podcast playback | no |
+| `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Notification and foreground service for podcast and music playback | no |
 
 The app does **not** use `QUERY_ALL_PACKAGES`; it sees only apps with a launcher activity and camera apps.
 

@@ -190,6 +190,14 @@ internal fun EpisodeDetail(
                             if (request.isForMainFrame) openPodcastLink(view.context, request.url.toString())
                             return true
                         }
+
+                        // Da die App http für Radiostreams zulässt, blockiert die Ansicht jede unverschlüsselte Anfrage selbst.
+                        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): android.webkit.WebResourceResponse? =
+                            if (request.url.scheme.equals("http", ignoreCase = true)) {
+                                android.webkit.WebResourceResponse("text/plain", "utf-8", 403, "Blocked", emptyMap(), java.io.ByteArrayInputStream(ByteArray(0)))
+                            } else {
+                                null
+                            }
                     }
                     webViewHolder[0] = this
                 }

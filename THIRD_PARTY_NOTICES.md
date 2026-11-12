@@ -10,7 +10,7 @@ MiriquidiLauncher steht unter der GNU General Public License, Version 3 oder sp�
 | Kotlin Standard Library (JetBrains) | Sprache |
 | kotlinx.coroutines (JetBrains) | Nebenläufigkeit |
 | AndroidX CameraX (Core, Camera2, Lifecycle, View, Video, Extensions) | Kamera des QR-Scanners und Scope „Kamera“ (Foto, Video, Hersteller-Erweiterungen); die Erweiterungen nutzen die Herstellerbibliotheken des Geräts, keine Google-Dienste |
-| AndroidX Media3 (ExoPlayer, Session; Apache-2.0) | Podcast-Wiedergabe mit Vordergrunddienst und Mediensitzung, keine Google-Dienste |
+| AndroidX Media3 (ExoPlayer, HLS, Session; Apache-2.0) | Podcast- und Musikwiedergabe (lokal und Radiostreams, auch HLS) mit Vordergrunddienst und Mediensitzung, keine Google-Dienste |
 | ZXing core (Copyright ZXing authors) | Erkennung von QR-Codes, vollständig auf dem Gerät |
 
 Nur für Tests: JUnit 4 (EPL-1.0), kotlinx-coroutines-test (Apache-2.0). Beides ist nicht im APK enthalten.
@@ -31,6 +31,7 @@ Die Symbole in `app/src/main/res/drawable/` mit der Kopfzeile `SPDX-License-Iden
 | CoinGecko (Ethereum, Stablecoins) | Öffentliche API ohne Schlüssel, Namensnennung verlangt, niedrige Ratenbegrenzung | Kursseite, Fußzeile (verlinkt) |
 | Stooq (optional) | Nur mit persönlichem API-Schlüssel des Nutzers, Bedingungen des Dienstes; standardmäßig aus | Kursseite, Datenquellen, Fußzeile (verlinkt) |
 | Apple iTunes Search API (Podcast-Suche) | Öffentliche Schnittstelle ohne Schlüssel; es gelten die Nutzungsbedingungen von Apple, keine Zusage zur Verfügbarkeit; abgefragt wird nur auf Wunsch des Nutzers auf der Podcast-Seite | Podcast-Seite, Verzeichnis-Auswahl |
+| radio-browser.info (Sendersuche) | Freies, von der Community betriebenes Verzeichnis ohne Schlüssel; es gelten die Hinweise des Projekts, keine Zusage zur Verfügbarkeit; abgefragt wird nur nach Zustimmung in der Scope | Musik-Scope, Reiter Radio, Suche |
 | fyyd (Podcast-Suche) | Öffentliche Schnittstelle ohne Schlüssel; es gelten die Bedingungen des Dienstes; abgefragt wird nur auf Wunsch des Nutzers | Podcast-Seite, Verzeichnis-Auswahl |
 | Frankfurter (Wechselkurse, Referenzkurse der EZB) | Frei nutzbar, Quelle EZB | Kursseite, Fußzeile (verlinkt) |
 | Nextcloud Notes und Nextcloud News (eigene Instanz des Nutzers) | Schnittstellen der Nextcloud (Server unter AGPL-3.0); nur mit Zugang des Nutzers, nur HTTPS, kein Code übernommen | Notizen, FeedReader |

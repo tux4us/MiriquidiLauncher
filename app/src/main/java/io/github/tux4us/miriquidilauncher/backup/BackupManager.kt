@@ -19,6 +19,7 @@ import io.github.tux4us.miriquidilauncher.calendar.AgendaStore
 import io.github.tux4us.miriquidilauncher.camera.CameraSettingsStore
 import io.github.tux4us.miriquidilauncher.data.AppGroupsStore
 import io.github.tux4us.miriquidilauncher.dogs.DogStore
+import io.github.tux4us.miriquidilauncher.music.MusicStore
 import io.github.tux4us.miriquidilauncher.data.CameraStore
 import io.github.tux4us.miriquidilauncher.data.FavoriteContactsStore
 import io.github.tux4us.miriquidilauncher.data.FavoritesStore
@@ -50,6 +51,8 @@ data class ImportSummary(
     /** Anzahl der Podcast-Abos bzw. der Werte im Kurse-Bestand; `null` = nicht im Backup. */
     val podcasts: Int? = null,
     val markets: Int? = null,
+    val musicStations: Int? = null,
+    val musicPlaylists: Int? = null,
 )
 
 /**
@@ -78,6 +81,7 @@ class BackupManager(context: Context) {
     private val cameraAppStore = CameraStore(appContext)
     private val agendaStore = AgendaStore(appContext)
     private val dogStore = DogStore(appContext)
+    private val musicStore = MusicStore(appContext)
 
     /** Aktueller Bestand als Backup-JSON. */
     private suspend fun snapshot(includeContacts: Boolean, includeFileOnlyData: Boolean): String {
@@ -103,6 +107,7 @@ class BackupManager(context: Context) {
             notesSettings = if (includeFileOnlyData) notesStore.settings().let { BackupNotesSettings(it.sort, it.ascending) } else null,
             agendaEnabled = if (includeFileOnlyData) agendaStore.enabled.first() else null,
             dogs = if (includeFileOnlyData) dogStore.load() else null,
+            music = if (includeFileOnlyData) musicStore.load() else null,
         )
         return BackupCodec.encode(data, Instant.now().toString())
     }
@@ -191,6 +196,8 @@ class BackupManager(context: Context) {
             data.appFavorites.size, data.contactFavorites?.size, data.weatherFavorites.size, restoredNotes,
             podcasts = data.podcasts?.subscriptions?.size,
             markets = data.markets?.positions?.size,
+            musicStations = data.music?.stations?.size,
+            musicPlaylists = data.music?.playlists?.size,
         )
     }
 
@@ -245,6 +252,11 @@ class BackupManager(context: Context) {
         data.notesSettings?.let { notesStore.saveSort(it.sort, it.ascending) }
         data.agendaEnabled?.let { agendaStore.setEnabled(it) }
         data.dogs?.let { dogStore.save(it) }
+        data.music?.let { restored ->
+            // Zustimmung zur Sendersuche und http-Schalter gehören zum Gerät und kommen nie aus dem Backup.
+            val current = musicStore.load()
+            musicStore.save(restored.copy(radioEnabled = current.radioEnabled, allowHttp = current.allowHttp))
+        }
     }
 
     /** Der Schlüssel bleibt nur erhalten, wenn die Adresse dieselbe ist; sonst muss er neu eingegeben werden. */

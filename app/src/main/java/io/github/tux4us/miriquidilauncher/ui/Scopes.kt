@@ -22,6 +22,7 @@ enum class Scope(@StringRes val label: Int, @DrawableRes val icon: Int, val canH
     Calendar(R.string.scope_calendar, R.drawable.ic_calendar),
     Feed(R.string.scope_feed, R.drawable.ic_feed, network = true),
     Podcasts(R.string.scope_podcasts, R.drawable.ic_podcasts, network = true),
+    Music(R.string.scope_music, R.drawable.ic_music),
     Markets(R.string.scope_markets, R.drawable.ic_markets, network = true),
     Calculator(R.string.scope_calculator, R.drawable.ic_calculator),
     Converter(R.string.scope_converter, R.drawable.ic_converter),

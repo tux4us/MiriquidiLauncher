@@ -23,6 +23,7 @@ import io.github.tux4us.miriquidilauncher.feed.FeedViewModel
 import io.github.tux4us.miriquidilauncher.markets.MarketsViewModel
 import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
 import io.github.tux4us.miriquidilauncher.notes.NotesViewModel
+import io.github.tux4us.miriquidilauncher.music.MusicViewModel
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
 import io.github.tux4us.miriquidilauncher.calculator.CalculatorViewModel
 import io.github.tux4us.miriquidilauncher.converter.ConverterViewModel
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
     private val feedViewModel: FeedViewModel by viewModels()
     private val marketsViewModel: MarketsViewModel by viewModels()
     private val podcastsViewModel: PodcastsViewModel by viewModels()
+    private val musicViewModel: MusicViewModel by viewModels()
     private val galleryViewModel: GalleryViewModel by viewModels()
     private val notesViewModel: NotesViewModel by viewModels()
     private val systemViewModel: SystemViewModel by viewModels()
@@ -76,6 +78,7 @@ class MainActivity : ComponentActivity() {
                     feedViewModel = feedViewModel,
                     marketsViewModel = marketsViewModel,
                     podcastsViewModel = podcastsViewModel,
+                    musicViewModel = musicViewModel,
                     galleryViewModel = galleryViewModel,
                     notesViewModel = notesViewModel,
                     systemViewModel = systemViewModel,
