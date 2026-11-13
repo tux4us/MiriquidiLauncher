@@ -265,7 +265,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private companion object {
-        const val STALE_AFTER_MS = 30 * 60 * 1000L
+        const val STALE_AFTER_MS = 15 * 60 * 1000L
         const val SEARCH_DEBOUNCE_MS = 400L
         const val MIN_QUERY_LENGTH = 2
     }

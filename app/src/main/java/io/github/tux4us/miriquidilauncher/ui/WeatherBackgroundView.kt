@@ -325,8 +325,8 @@ class WeatherBackgroundView @JvmOverloads constructor(
         val t = if (animate) timeSec else 0f
         val alphaA = 0.55f + 0.45f * sin(t * 1.1f + starPhase[0])
         val alphaB = 0.55f + 0.45f * sin(t * 0.8f + starPhase[1])
-        starPaints[0].alpha = (200 * vis * alphaA).toInt().coerceIn(0, 255)
-        starPaints[1].alpha = (200 * vis * alphaB).toInt().coerceIn(0, 255)
+        starPaints[0].alpha = (255 * vis * alphaA).toInt().coerceIn(0, 255)
+        starPaints[1].alpha = (255 * vis * alphaB).toInt().coerceIn(0, 255)
         canvas.drawPoints(starPts[0], 0, a, starPaints[0])
         canvas.drawPoints(starPts[1], 0, b, starPaints[1])
     }
@@ -334,11 +334,11 @@ class WeatherBackgroundView @JvmOverloads constructor(
     private fun drawSunMoon(canvas: Canvas, w: Float, h: Float, c: Float, animate: Boolean) {
         if (!scene.sun && !scene.moon) return
         val cx = w * 0.80f
-        val cy = h * 0.13f + 24f * dp
+        val cy = h * 0.02f + 34f * dp
         val vis = c * (1f - scene.cloudFrac * 0.7f)
         val pulse = if (animate) 0.9f + 0.1f * sin(timeSec * 0.6f) else 1f
         val glowColor = if (scene.sun) 0xFFFFC870.toInt() else 0xFFA9C4FF.toInt()
-        val glowAlpha = if (scene.sun) 0x66 else 0x30
+        val glowAlpha = if (scene.sun) 0x90 else 0x50
         glowPaint.shader = RadialGradient(
             0f, 0f, 1f,
             intArrayOf((glowColor and 0x00FFFFFF) or (glowAlpha shl 24), glowColor and 0x00FFFFFF),
@@ -354,7 +354,7 @@ class WeatherBackgroundView @JvmOverloads constructor(
 
         if (scene.sun) {
             corePaint.color = 0xFFFFE2A8.toInt()
-            corePaint.alpha = (150 * vis).toInt().coerceIn(0, 255)
+            corePaint.alpha = (220 * vis).toInt().coerceIn(0, 255)
             canvas.drawCircle(cx, cy, w * 0.05f, corePaint)
         } else {
             drawMoonDisc(canvas, cx, cy, w * 0.04f, vis)
@@ -368,10 +368,10 @@ class WeatherBackgroundView @JvmOverloads constructor(
     private fun drawMoonDisc(canvas: Canvas, cx: Float, cy: Float, r: Float, vis: Float) {
         val k = scene.moonIllumination
         corePaint.color = 0xFFE8EEF8.toInt()
-        corePaint.alpha = (45 * vis).toInt().coerceIn(0, 255)
+        corePaint.alpha = (60 * vis).toInt().coerceIn(0, 255)
         canvas.drawCircle(cx, cy, r, corePaint)
         if (k < 0.03f) return
-        corePaint.alpha = (170 * vis).toInt().coerceIn(0, 255)
+        corePaint.alpha = (235 * vis).toInt().coerceIn(0, 255)
         if (k > 0.97f) {
             canvas.drawCircle(cx, cy, r, corePaint)
             return
@@ -402,7 +402,7 @@ class WeatherBackgroundView @JvmOverloads constructor(
         if (frac < 0.04f) return
         updateCloudShader()
         val n = ceil(frac * MAX_CLOUDS).toInt().coerceIn(1, MAX_CLOUDS)
-        cloudPaint.alpha = ((35 + 70 * frac) * c).toInt().coerceIn(0, 255)
+        cloudPaint.alpha = ((55 + 95 * frac) * c).toInt().coerceIn(0, 255)
         for (i in 0 until n) {
             val x = cloudX[i] * w
             val y = cloudY[i] * h
@@ -416,7 +416,7 @@ class WeatherBackgroundView @JvmOverloads constructor(
     private fun drawFog(canvas: Canvas, w: Float, h: Float, c: Float) {
         if (scene.fog <= 0f) return
         updateCloudShader()
-        cloudPaint.alpha = (45 * scene.fog * c).toInt().coerceIn(0, 255)
+        cloudPaint.alpha = (70 * scene.fog * c).toInt().coerceIn(0, 255)
         for (i in 0 until FOG_LAYERS) {
             drawBlob(canvas, fogX[i] * w, fogY[i] * h, w * 0.9f, h * 0.09f)
         }
@@ -439,8 +439,8 @@ class WeatherBackgroundView @JvmOverloads constructor(
                 rainNearPts[nr++] = px; rainNearPts[nr++] = py; rainNearPts[nr++] = tx; rainNearPts[nr++] = ty
             }
         }
-        rainFarPaint.alpha = (70 * c).toInt().coerceIn(0, 255)
-        rainNearPaint.alpha = (110 * c).toInt().coerceIn(0, 255)
+        rainFarPaint.alpha = (105 * c).toInt().coerceIn(0, 255)
+        rainNearPaint.alpha = (160 * c).toInt().coerceIn(0, 255)
         canvas.drawLines(rainFarPts, 0, f, rainFarPaint)
         canvas.drawLines(rainNearPts, 0, nr, rainNearPaint)
     }
@@ -459,7 +459,7 @@ class WeatherBackgroundView @JvmOverloads constructor(
             pts[cnt[g]++] = snowY[i] * h
         }
         for (g in 0 until 3) {
-            snowPaints[g].alpha = (150 * c).toInt().coerceIn(0, 255)
+            snowPaints[g].alpha = (215 * c).toInt().coerceIn(0, 255)
             canvas.drawPoints(snowPts[g], 0, cnt[g], snowPaints[g])
         }
     }
@@ -479,7 +479,7 @@ class WeatherBackgroundView @JvmOverloads constructor(
     /** Feste Abdunklung nach unten, damit Kartentexte auch bei hellen Szenen lesbar bleiben. */
     private fun drawScrim(canvas: Canvas, w: Float, h: Float) {
         if (scrimKeyH != h) {
-            scrimPaint.shader = LinearGradient(0f, 0f, 0f, h, 0x00000000, 0x66000000, Shader.TileMode.CLAMP)
+            scrimPaint.shader = LinearGradient(0f, 0f, 0f, h, 0x00000000, 0x55000000, Shader.TileMode.CLAMP)
             scrimKeyH = h
         }
         canvas.drawRect(0f, 0f, w, h, scrimPaint)
