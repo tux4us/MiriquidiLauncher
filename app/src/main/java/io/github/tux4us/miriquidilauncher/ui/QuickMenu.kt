@@ -189,8 +189,9 @@ fun QuickMenuButton(
  *
  * Das Overlay muss im Wurzel-Layout liegen, das das ganze Fenster ausfüllt, weil [layout] in
  * Fensterkoordinaten berechnet ist. Es wird nur gezeichnet, solange das Menü offen ist. Die Einträge sind
- * antippbar; die Zeilen lassen sich bei mehr Einträgen als sichtbarem Platz mit dem Finger scrollen
- * (Zeile 0 liegt unten). Tippen neben das Panel schließt das Menü.
+ * antippbar. Das Panel ist so hoch, dass alle Zeilen sichtbar sind; nur wenn der Platz nicht reicht, lassen
+ * sich die Zeilen mit dem Finger scrollen (Zeile 0 liegt unten). Das Panel nutzt den Glas-Stil. Tippen neben
+ * das Panel schließt das Menü.
  *
  * Die Kopfzeile zeigt den [title] des Menüs.
  */
@@ -218,7 +219,7 @@ fun QuickMenuOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.45f))
+            .background(Color.Black.copy(alpha = 0.25f))
             .pointerInput(Unit) {
                 detectTapGestures { currentOnEvent(QuickMenuEvent.Dismiss) }
             },
@@ -238,8 +239,8 @@ fun QuickMenuOverlay(
                         scaleY = 0.92f + 0.08f * progress
                         transformOrigin = TransformOrigin(0.5f, 1f)
                     }
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    // Glas-Stil wie Suchfeld und Button-Leiste: das Hintergrundbild scheint durch.
+                    .glass(RoundedCornerShape(28.dp))
                     // Tippen auf die Kopfzeile oder das Polster darf das Menü nicht schließen.
                     .pointerInput(Unit) { detectTapGestures { } },
             ) {
@@ -252,7 +253,7 @@ fun QuickMenuOverlay(
                 ) {
                     Text(
                         text = title,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = WeatherTextMuted,
                         style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -273,7 +274,7 @@ fun QuickMenuOverlay(
                         ) {
                             Text(
                                 text = emptyHint,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = WeatherTextMuted,
                                 style = MaterialTheme.typography.bodySmall,
                                 maxLines = 3,
                                 overflow = TextOverflow.Ellipsis,
@@ -359,7 +360,7 @@ private fun MenuCell(
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = entry.caption,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color.White,
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center,
                     maxLines = 1,

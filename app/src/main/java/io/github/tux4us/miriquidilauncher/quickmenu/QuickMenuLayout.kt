@@ -18,7 +18,6 @@ data class Bounds(val left: Float, val top: Float, val right: Float, val bottom:
  * @property cellHeight Höhe einer Zelle (mit Beschriftung höher als ohne)
  * @property headerHeight Höhe der Kopfzeile oberhalb des Grids (Titel des Menüs)
  * @property maxColumns höchstens so viele Spalten
- * @property maxRows höchstens so viele sichtbare Zeilen
  */
 data class QuickMenuMetrics(
     val cellWidth: Float,
@@ -28,7 +27,6 @@ data class QuickMenuMetrics(
     val edgeMargin: Float,
     val padding: Float,
     val maxColumns: Int,
-    val maxRows: Int,
 ) {
     companion object {
         /**
@@ -44,11 +42,9 @@ data class QuickMenuMetrics(
                 edgeMargin = 16f * density,
                 padding = 12f * density,
                 maxColumns = DEFAULT_MAX_COLUMNS,
-                maxRows = DEFAULT_MAX_ROWS,
             )
 
         const val DEFAULT_MAX_COLUMNS = 4
-        const val DEFAULT_MAX_ROWS = 4
     }
 }
 
@@ -60,9 +56,9 @@ data class QuickMenuMetrics(
  * untersten Zeile, direkt über dem Button; weitere Einträge folgen nach rechts und dann zeilenweise nach
  * oben.
  *
- * Das Menü zeigt höchstens [visibleRows] Zeilen, begrenzt durch [QuickMenuMetrics.maxRows] und den Platz
- * oberhalb des Buttons. Gibt es mehr Zeilen ([totalRows]), scrollt die Oberfläche mit dem Finger; die Geometrie
- * hängt davon nicht ab.
+ * Die Höhe des Panels richtet sich nach der Anzahl der Einträge: Es zeigt alle Zeilen ([totalRows]), damit
+ * kein Eintrag unbemerkt außerhalb des sichtbaren Bereichs liegt. Nur wenn der Platz oberhalb des Buttons
+ * nicht reicht, zeigt es [visibleRows] < [totalRows] Zeilen und die Oberfläche scrollt mit dem Finger.
  *
  * Indizes in der Schnittstelle sind immer Indizes in der Eintragsliste (0 = erster Eintrag), Spalten zählen
  * von links ab 0.
@@ -112,7 +108,7 @@ class QuickMenuLayout private constructor(
             val fittingRows = floor((availableHeight - metrics.headerHeight - metrics.padding) / metrics.cellHeight)
                 .toInt()
                 .coerceAtLeast(0)
-            val visibleRows = minOf(totalRows, metrics.maxRows, fittingRows)
+            val visibleRows = minOf(totalRows, fittingRows)
 
             val shownRows = if (showsEmptyHint) 1 else visibleRows
             val panelHeight = metrics.headerHeight + shownRows * metrics.cellHeight + metrics.padding

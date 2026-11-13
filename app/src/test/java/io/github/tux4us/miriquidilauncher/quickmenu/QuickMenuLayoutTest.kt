@@ -12,7 +12,7 @@ import org.junit.Test
  *
  * Bei 3 Einträgen (3 Spalten, 1 Zeile): Panel (60, 568)–(300, 688).
  *
- * Bei 30 Einträgen (4 Spalten, 8 Zeilen, 4 sichtbar): Panel (24, 364)–(336, 688).
+ * Bei 30 Einträgen (4 Spalten, 8 Zeilen, alle sichtbar): Panel (24, 92)–(336, 688).
  */
 class QuickMenuLayoutTest {
     private val metrics = QuickMenuMetrics.fromDensity(1f)
@@ -51,9 +51,21 @@ class QuickMenuLayoutTest {
     }
 
     @Test
-    fun visibleRowsAreLimitedByMaxRows() {
-        assertEquals(4, layout(30).visibleRows)
-        assertEquals(8, layout(30).totalRows)
+    fun panelGrowsToShowAllRows() {
+        val l = layout(30)
+        assertEquals(8, l.totalRows)
+        assertEquals(8, l.visibleRows)
+        // Kopfzeile 40 + 8 Zeilen * 68 + Polster 12 = 596
+        assertEquals(596f, l.panel.height, 0.001f)
+        assertEquals(92f, l.panel.top, 0.001f)
+    }
+
+    @Test
+    fun rowsBeyondAvailableSpaceScroll() {
+        // verfügbar 688 - 40 = 648, (648 - 52) / 68 = 8,76 -> 8 von 10 Zeilen
+        val l = layout(40)
+        assertEquals(10, l.totalRows)
+        assertEquals(8, l.visibleRows)
     }
 
     @Test
