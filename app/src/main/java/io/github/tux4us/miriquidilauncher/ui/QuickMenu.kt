@@ -239,8 +239,9 @@ fun QuickMenuOverlay(
                         scaleY = 0.92f + 0.08f * progress
                         transformOrigin = TransformOrigin(0.5f, 1f)
                     }
-                    // Glas-Stil wie Suchfeld und Button-Leiste: das Hintergrundbild scheint durch.
-                    .glass(RoundedCornerShape(28.dp))
+                    // Glas-Stil: unten fast deckend, damit die unterste Reihe über dem Suchfeld gut lesbar
+                    // bleibt; nach oben zunehmend durchsichtig, sodass das Hintergrundbild durchscheint.
+                    .glass(RoundedCornerShape(28.dp), GlassBaseFadingUp)
                     // Tippen auf die Kopfzeile oder das Polster darf das Menü nicht schließen.
                     .pointerInput(Unit) { detectTapGestures { } },
             ) {
