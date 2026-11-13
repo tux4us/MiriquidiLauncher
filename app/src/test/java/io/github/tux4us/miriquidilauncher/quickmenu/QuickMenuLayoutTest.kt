@@ -138,4 +138,41 @@ class QuickMenuLayoutTest {
         assertEquals(96f, l.cellWidth, 0.001f)
     }
 
+    @Test
+    fun cellsShrinkToAddColumnsWhenRowsDoNotFit() {
+        // Breite 300: innen 300 - 32 - 24 = 244, normal 3 Spalten (72). 30 Einträge = 10 Zeilen, Platz für 8.
+        // Mit 4 Spalten zu je 61 (>= 54) sind es 8 Zeilen: alles sichtbar.
+        val l = layout(30, width = 300f)
+        assertEquals(4, l.columns)
+        assertEquals(61f, l.cellWidth, 0.001f)
+        assertEquals(8, l.totalRows)
+        assertEquals(8, l.visibleRows)
+        assertEquals(268f, l.panel.width, 0.001f)
+    }
+
+    @Test
+    fun cellsKeepNormalWidthWhenRowsFit() {
+        val l = layout(9, width = 300f)
+        assertEquals(3, l.columns)
+        assertEquals(72f, l.cellWidth, 0.001f)
+        assertEquals(3, l.visibleRows)
+    }
+
+    @Test
+    fun shrunkCellsStillScrollWhenScreenIsTooSmall() {
+        val l = layout(40, width = 300f)
+        assertEquals(4, l.columns)
+        assertEquals(10, l.totalRows)
+        assertEquals(8, l.visibleRows)
+    }
+
+    @Test
+    fun cellsDoNotShrinkBelowMinimumWidth() {
+        // Breite 250: innen 194, normal 2 Spalten. 3 Spalten = 64,67 (>= 54) erlaubt, 4 Spalten = 48,5 nicht.
+        val l = layout(30, width = 250f)
+        assertEquals(3, l.columns)
+        assertEquals(194f / 3f, l.cellWidth, 0.001f)
+        assertEquals(10, l.totalRows)
+        assertEquals(8, l.visibleRows)
+    }
 }
