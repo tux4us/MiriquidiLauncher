@@ -1,6 +1,10 @@
 # MiriquidiLauncher
 
-Android-Launcher mit Home-Seite, Scope-Menü, Favoriten-Menüs, App-Grid und funktionaler Suche. Kotlin, Jetpack Compose, ohne Google-Dienste. Er entstand aus einer persönlichen Erinnerung an den früheren Ubuntu-Touch-Launcher und dessen modulare Scopes. Als Hommage an dieses Konzept wurde das Grundprinzip der Scopes in einer vollständig eigenständigen, neu entwickelten Form auf Android umgesetzt. Netzwerkzugriff gibt es nur für die Wetterseite, die Kursseite, den FeedReader (Nextcloud) und die Podcast-Seite, ohne Tracking und ohne Konto. Diese Scopes und die Hundescope (speziell für Hundehalter) sind nach Installation oder App-Zurücksetzung ausgeblendet; bis zur ausdrücklichen Zustimmung (Hinweisdialog beim Einblenden in den Einstellungen) wird keine Verbindung hergestellt.
+Android-Launcher mit Home-Seite, Scope-Menü, Favoriten-Menüs, App-Grid und funktionaler Suche. Kotlin, Jetpack Compose, ohne Google-Dienste. 
+
+Er entstand aus einer persönlichen Erinnerung an den früheren Ubuntu-Touch-Launcher und dessen modulare Scopes. Als Hommage an dieses Konzept wurde das Grundprinzip der Scopes in einer vollständig eigenständigen, neu entwickelten Form auf Android umgesetzt. 
+
+Netzwerkzugriff gibt es nur für die Wetterseite, die Kursseite, den FeedReader (Nextcloud) und die Podcast-Seite, ohne Tracking und ohne Konto. Diese Scopes und die Hundescope (speziell für Hundehalter) sind nach Installation oder App-Zurücksetzung ausgeblendet; bis zur ausdrücklichen Zustimmung (Hinweisdialog beim Einblenden in den Einstellungen) wird keine Verbindung hergestellt.
 
 ## Datenschutz
 
