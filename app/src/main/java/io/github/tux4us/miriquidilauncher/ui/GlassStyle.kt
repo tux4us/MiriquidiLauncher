@@ -9,10 +9,24 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 
+/** Farbton der Glasfläche (ohne Deckkraft). */
+private val GlassTone = Color(0xFF14181F)
+
 /** Grundfläche des Glas-Stils: dunkel, zu 50 % durchsichtig, damit das Hintergrundbild durchscheint. */
-private val GlassBase = Color(0xFF14181F).copy(alpha = 0.50f)
+private val GlassBase = GlassTone.copy(alpha = 0.50f)
+
+/**
+ * Grundfläche mit Verlauf: unten fast deckend, nach oben zunehmend durchsichtig. Für Panels, die direkt über
+ * anderen Bedienelementen (z. B. dem Suchfeld) aufklappen, damit die unterste Reihe gut lesbar bleibt.
+ */
+internal val GlassBaseFadingUp: Brush = Brush.verticalGradient(
+    0f to GlassTone.copy(alpha = 0.30f),
+    0.55f to GlassTone.copy(alpha = 0.55f),
+    1f to GlassTone.copy(alpha = 0.88f),
+)
 
 /** Glanzlicht oben, Schatten unten: lässt die Fläche leicht erhaben wirken. */
 private val GlassSheen = Brush.verticalGradient(
@@ -32,9 +46,12 @@ private val GlassRim = Brush.verticalGradient(
  * Schlagschatten. Der Schatten wird von Android nur außerhalb der Form gezeichnet, die Fläche bleibt also
  * durchsichtig. Für Suchfeld, Button-Leiste und Karten auf der Startseite.
  */
-fun Modifier.glass(shape: Shape): Modifier = this
+fun Modifier.glass(shape: Shape): Modifier = glass(shape, SolidColor(GlassBase))
+
+/** Glas-Stil mit eigener Grundfläche [base], z. B. [GlassBaseFadingUp]; Glanz, Rand und Schatten wie oben. */
+fun Modifier.glass(shape: Shape, base: Brush): Modifier = this
     .shadow(elevation = 6.dp, shape = shape, clip = false, ambientColor = Color.Black, spotColor = Color.Black)
     .clip(shape)
-    .background(GlassBase)
+    .background(base)
     .background(GlassSheen)
     .border(width = 1.dp, brush = GlassRim, shape = shape)
