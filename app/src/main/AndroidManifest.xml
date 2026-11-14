@@ -44,10 +44,12 @@
     <!-- Erforderlich für ACTION_DELETE (App deinstallieren) ab Android 9. -->
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
-    <!-- Optional: Scope "System", Karte "Cache je App". Der Nutzungszugriff ist ein Spezialzugriff, den der Nutzer in den
-         Systemeinstellungen selbst erteilt; ohne ihn bleibt die Karte bei einem Hinweis.
-         - PACKAGE_USAGE_STATS (Nutzungszugriff): nur um die Daten- und Cachegrößen anderer Apps zu lesen
-           (StorageStatsManager). Die Nutzungsdaten selbst (welche App wann lief) werden nicht gelesen.
+    <!-- Optional: Nutzungszugriff (Spezialzugriff, den der Nutzer in den Systemeinstellungen selbst erteilt; ohne ihn
+         bleiben die betroffenen Funktionen bei einem Hinweis).
+         - PACKAGE_USAGE_STATS: (1) Scope "System", Karte "Cache je App": Daten- und Cachegrößen anderer Apps
+           (StorageStatsManager). (2) App-Übersicht (Button links neben dem Suchfeld): Vordergrund-/Hintergrundwechsel
+           der Apps der letzten drei Tage (UsageStatsManager.queryEvents), nur im Arbeitsspeicher zur Liste "zuletzt
+           verwendet" verdichtet, nicht gespeichert und nicht gesendet.
          - READ_EXTERNAL_STORAGE (nur bis Android 12): Medienzugriff der Scope "Galerie" (siehe unten). -->
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />

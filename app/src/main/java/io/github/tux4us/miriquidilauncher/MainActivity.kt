@@ -28,6 +28,7 @@ import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
 import io.github.tux4us.miriquidilauncher.calculator.CalculatorViewModel
 import io.github.tux4us.miriquidilauncher.converter.ConverterViewModel
 import io.github.tux4us.miriquidilauncher.dogs.DogViewModel
+import io.github.tux4us.miriquidilauncher.recents.RecentsViewModel
 import io.github.tux4us.miriquidilauncher.ui.LauncherScreen
 import io.github.tux4us.miriquidilauncher.ui.LauncherTheme
 import io.github.tux4us.miriquidilauncher.ui.LauncherViewModel
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
     private val cameraViewModel: CameraViewModel by viewModels()
     private val agendaViewModel: AgendaViewModel by viewModels()
     private val dogViewModel: DogViewModel by viewModels()
+    private val recentsViewModel: RecentsViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
 
     private var contactsGranted by mutableStateOf(false)
@@ -87,6 +89,7 @@ class MainActivity : ComponentActivity() {
                     cameraViewModel = cameraViewModel,
                     agendaViewModel = agendaViewModel,
                     dogViewModel = dogViewModel,
+                    recentsViewModel = recentsViewModel,
                     settingsViewModel = settingsViewModel,
                     contactsGranted = contactsGranted,
                     onRequestContacts = {
@@ -108,6 +111,7 @@ class MainActivity : ComponentActivity() {
             viewModel.refreshSearch()
         }
     }
+
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)

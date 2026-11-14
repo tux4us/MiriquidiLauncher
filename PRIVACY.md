@@ -96,7 +96,7 @@ All permissions are optional and requested on use (exceptions: `INTERNET`, `WAKE
 | `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`, `READ_MEDIA_VISUAL_USER_SELECTED`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` (up to Android 10) | Gallery | no |
 | `READ_MEDIA_AUDIO` (Android 13+; before that `READ_EXTERNAL_STORAGE`) | Music scope: list and play local music via the media library | no |
 | `WAKE_LOCK`, `ACCESS_WIFI_STATE` | Playing radio streams with the screen off (Media3) | no |
-| `PACKAGE_USAGE_STATS` | Only data and cache sizes of other apps (system page); usage data (which app ran when) is not read | no |
+| `PACKAGE_USAGE_STATS` (usage access, only with your consent in the system settings) | System page: data and cache sizes of other apps. Recent apps view: times at which apps moved to the foreground or background in the last three days, only to build the "recently used" list; they are condensed in memory, not stored and not sent. Only the apps you removed from the view are stored (package name and time, local, not in the backup) | no |
 | `REQUEST_DELETE_PACKAGES` | Uninstall apps on request | no |
 | `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Notification and foreground service for podcast and music playback | no |
 

@@ -89,6 +89,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import io.github.tux4us.miriquidilauncher.R
+import io.github.tux4us.miriquidilauncher.recents.RecentsViewModel
 import io.github.tux4us.miriquidilauncher.calendar.AgendaUiState
 import io.github.tux4us.miriquidilauncher.calendar.AgendaView
 import io.github.tux4us.miriquidilauncher.calendar.AgendaViewModel
@@ -168,6 +169,7 @@ fun LauncherScreen(
     cameraViewModel: CameraViewModel,
     agendaViewModel: AgendaViewModel,
     dogViewModel: DogViewModel,
+    recentsViewModel: RecentsViewModel,
     settingsViewModel: SettingsViewModel,
     contactsGranted: Boolean,
     onRequestContacts: () -> Unit,
@@ -186,6 +188,8 @@ fun LauncherScreen(
     val cameraBusy by cameraViewModel.busy.collectAsStateWithLifecycle()
     val agendaState by agendaViewModel.state.collectAsStateWithLifecycle()
     val dogState by dogViewModel.state.collectAsStateWithLifecycle()
+    val recentsState by recentsViewModel.state.collectAsStateWithLifecycle()
+    var recentsOpen by remember { mutableStateOf(false) }
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
     // Die Karte „Hunde“ erscheint nur bei eingeblendeter Hunde-Scope.
     val dogsShown = Scope.Dogs.name !in hiddenScopes
@@ -352,6 +356,7 @@ fun LauncherScreen(
     LaunchedEffect(viewModel, pagerState, sidePagerState) {
         viewModel.homePressed.collect {
             menuState = QuickMenuState.Closed
+            recentsOpen = false
             focusManager.clearFocus()
             keyboardController?.hide()
             if (sidePagerState.currentPage != SIDE_PAGE_LAUNCHER) sidePagerState.animateScrollToPage(SIDE_PAGE_LAUNCHER)
@@ -403,6 +408,12 @@ fun LauncherScreen(
                             onScanQr = {
                                 focusManager.clearFocus()
                                 scannerOpen = true
+                            },
+                            onOpenRecents = {
+                                focusManager.clearFocus()
+                                keyboardController?.hide()
+                                menuState = QuickMenuState.Closed
+                                recentsOpen = true
                             },
                             query = query,
                             searchState = searchState,
@@ -567,6 +578,25 @@ fun LauncherScreen(
             QrScannerScreen(onClose = { scannerOpen = false })
         }
 
+        if (recentsOpen) {
+            RecentsOverlay(
+                state = recentsState,
+                launcherViewModel = viewModel,
+                onLaunch = { entry ->
+                    recentsOpen = false
+                    launchApp(entry)
+                },
+                onDismissApp = recentsViewModel::dismiss,
+                onDismissAll = {
+                    recentsViewModel.dismissAllShown()
+                    recentsOpen = false
+                },
+                onGrantUsageAccess = { openUsageAccessSettings(context) },
+                onResume = { recentsViewModel.refresh(apps) },
+                onClose = { recentsOpen = false },
+            )
+        }
+
         val overlayLayout = menuLayout
         if (menuState.isOpen && overlayLayout != null) {
             val entries = when (activeKind) {
@@ -685,6 +715,7 @@ private fun HomePage(
     onQuickMenuEvent: (QuickMenuKind, QuickMenuEvent) -> Unit,
     onQuickMenuAnchorChanged: (QuickMenuKind, Bounds) -> Unit,
     onScanQr: () -> Unit,
+    onOpenRecents: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -723,6 +754,8 @@ private fun HomePage(
         }
         // Während der Suche bekommen die Ergebnisse den Platz (vor allem bei geöffneter Tastatur).
         Row(verticalAlignment = Alignment.CenterVertically) {
+            RecentsButton(onClick = onOpenRecents)
+            Spacer(Modifier.width(8.dp))
             SearchField(
                 query = query,
                 onQueryChange = onQueryChange,

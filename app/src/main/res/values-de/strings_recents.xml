@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="recents_open">Zuletzt verwendete Apps</string>
+    <string name="recents_title">Zuletzt verwendete Apps</string>
+    <string name="recents_empty">Keine zuletzt verwendeten Apps gefunden.</string>
+    <string name="recents_permission">Die Liste der zuletzt verwendeten Apps braucht den Nutzungszugriff. Du erteilst ihn selbst in den Systemeinstellungen; der Launcher liest nur, wann eine App zuletzt im Vordergrund war, und speichert nichts.</string>
+    <string name="recents_permission_grant">Nutzungszugriff erteilen</string>
+    <string name="recents_clear_all">Alle entfernen</string>
+</resources>

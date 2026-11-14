@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="recents_open">Recent apps</string>
+    <string name="recents_title">Recent apps</string>
+    <string name="recents_empty">No recently used apps found.</string>
+    <string name="recents_permission">The list of recent apps needs usage access. You grant it yourself in the system settings; the launcher only reads when an app was last in the foreground and stores nothing.</string>
+    <string name="recents_permission_grant">Grant usage access</string>
+    <string name="recents_clear_all">Remove all</string>
+</resources>

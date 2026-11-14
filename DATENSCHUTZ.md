@@ -102,7 +102,7 @@ Alle Berechtigungen sind optional und werden erst beim Gebrauch der Funktion ang
 | `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`, `READ_MEDIA_VISUAL_USER_SELECTED`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` (bis Android 10) | Galerie | nein |
 | `READ_MEDIA_AUDIO` (ab Android 13; davor `READ_EXTERNAL_STORAGE`) | Musik-Scope: lokale Musik über die Mediathek auflisten und abspielen | nein |
 | `WAKE_LOCK`, `ACCESS_WIFI_STATE` | Wiedergabe von Radiostreams bei ausgeschaltetem Bildschirm (Media3) | nein |
-| `PACKAGE_USAGE_STATS` | Nur Daten- und Cachegrößen anderer Apps (Systemseite); die Nutzungsdaten (welche App wann lief) werden nicht gelesen | nein |
+| `PACKAGE_USAGE_STATS` (Nutzungszugriff, nur auf deine Zustimmung in den Systemeinstellungen) | Systemseite: Daten- und Cachegrößen anderer Apps. App-Übersicht: Zeitpunkte, zu denen Apps der letzten drei Tage in den Vordergrund oder Hintergrund wechselten, nur um die Liste „zuletzt verwendet“ zu bilden; sie werden im Arbeitsspeicher verdichtet, nicht gespeichert und nicht gesendet. Gespeichert wird nur, welche Apps du aus der Übersicht entfernt hast (Paketname und Zeitpunkt, lokal, nicht im Backup) | nein |
 | `REQUEST_DELETE_PACKAGES` | Apps auf Wunsch deinstallieren | nein |
 | `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Benachrichtigung und Vordergrunddienst der Podcast- und Musikwiedergabe | nein |
 
