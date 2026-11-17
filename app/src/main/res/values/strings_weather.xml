@@ -383,6 +383,18 @@ Evening: %3$s – %4$s</string>
     <string name="weather_sum_uv">UV index 3 or higher (sun protection recommended) from %1$s to %2$s, peak %3$s at %4$s.</string>
     <string name="weather_sum_note">Derived from the hourly values of Open-Meteo. Guideline values: wet hour from 0.1 mm, strong gusts from 50 km/h, wind shift from 45°, fog at visibility below 1 km.</string>
     <string name="weather_dewpoint_value">Dew point: %1$s °C</string>
+    <string name="weather_ground_value">Ground surface: %1$s °C</string>
+    <string name="weather_section_rain_soon">Rain in the next hour</string>
+    <string name="weather_soon_dry">Dry: no precipitation expected in the next hour.</string>
+    <string name="weather_soon_now_until">It is raining, expected to continue for about %1$d more minutes (%2$s mm in the next hour).</string>
+    <string name="weather_soon_now_ongoing">It is raining and the precipitation is expected to last the whole next hour (%1$s mm).</string>
+    <string name="weather_soon_starts">Precipitation starts in about %1$d minutes and lasts about %2$d minutes (%3$s mm in the next hour).</string>
+    <string name="weather_soon_starts_ongoing">Precipitation starts in about %1$d minutes and lasts until the end of the hour (%2$s mm).</string>
+    <string name="weather_soon_chart">Precipitation per 15 minutes (mm)</string>
+    <string name="weather_soon_note">Model forecast in 15-minute steps, not a radar measurement. Computed directly in Central Europe and North America, derived from hourly values elsewhere.</string>
+    <string name="weather_detail_apparent">Feels like: %1$s° to %2$s°</string>
+    <string name="weather_detail_snowfall">Snowfall: %1$s cm</string>
+    <string name="weather_detail_precip_hours">Hours with precipitation: %1$s</string>
     <string name="weather_section_pressure">Air pressure (next 24 hours)</string>
     <string name="weather_pressure_chart">Air pressure in hPa</string>
     <string name="weather_pressure_trend_rising">Rising: %1$s hPa in 24 hours.</string>
@@ -415,7 +427,6 @@ Evening: %3$s – %4$s</string>
     <string name="weather_detail_dewpoint">Dew point: %1$s°</string>
     <string name="weather_detail_cloud">Cloud cover: %1$s %%</string>
     <string name="weather_detail_visibility">Visibility: %1$s km</string>
-    <string name="weather_detail_snowfall">Snowfall: %1$s cm</string>
     <string name="weather_detail_precip_total">Precipitation: %1$s mm</string>
     <string name="weather_section_snow">Snow and freezing level (next 24 hours)</string>
     <string name="weather_snow_fall">Snowfall: %1$s cm</string>

@@ -110,6 +110,28 @@ class MarketParserTest {
         assertEquals(81009.0, points.last().usd, 0.0)
     }
 
+    @Test fun historyMaxReadsWholeTextAndThinsEvenly() {
+        // Neueste zuerst, 10 000 Punkte über etwa 14 Jahre; der älteste Punkt steht am Ende und muss erhalten bleiben.
+        val newest = 1_792_335_600L
+        val sb = StringBuilder("""{"prices":[""")
+        for (i in 0 until 10_000) {
+            if (i > 0) sb.append(',')
+            sb.append("""{"time":${newest - i * 50_000L},"EUR":${100 + i},"USD":${110 + i}}""")
+        }
+        sb.append("]}")
+        val points = MarketParser.parseHistoryMax(sb.toString(), maxPoints = 400)
+        assertTrue(points.size in 390..401)
+        assertEquals(newest - 9_999 * 50_000L, points.first().timeSec)
+        assertEquals(newest, points.last().timeSec)
+        assertTrue(points.zipWithNext().all { (a, b) -> a.timeSec < b.timeSec })
+    }
+
+    @Test fun historyMaxKeepsShortSeriesUnchanged() {
+        val text = """{"prices":[{"time":1700003600,"EUR":2,"USD":3},{"time":1700000000,"EUR":1,"USD":2}]}"""
+        val points = MarketParser.parseHistoryMax(text)
+        assertEquals(listOf(1700000000L, 1700003600L), points.map { it.timeSec })
+    }
+
     @Test fun historyIgnoresOtherObjectsAndKeyOrder() {
         val text = """{"prices":[{"USD":81000,"time":1700000000,"EUR":72000}],"exchangeRates":{"USDEUR":0.89,"USDGBP":0.75}}"""
         val points = MarketParser.parseHistory(text)

@@ -181,9 +181,14 @@ internal fun dayDetail(context: Context, d: DayPoint, label: String, hours: List
     if (d.sunrise != null && d.sunset != null) {
         lines += context.getString(R.string.weather_detail_sun, d.sunrise.format(TimeFormat), d.sunset.format(TimeFormat))
     }
+    if (d.apparentMin != null && d.apparentMax != null) {
+        lines += context.getString(R.string.weather_detail_apparent, d.apparentMin.roundToInt().toString(), d.apparentMax.roundToInt().toString())
+    }
+    d.snowfallSum?.takeIf { it >= 0.1 }?.let { lines += context.getString(R.string.weather_detail_snowfall, oneDecimal(it)) }
     val stats = WeatherInsights.dayStats(hours, d)
     if (stats == null) {
         d.precipitationSum?.let { lines += context.getString(R.string.weather_detail_precip_total, oneDecimal(it)) }
+        d.precipitationHours?.takeIf { it > 0.0 }?.let { lines += context.getString(R.string.weather_detail_precip_hours, it.roundToInt().toString()) }
     }
     if (stats != null) {
         lines += context.getString(R.string.weather_detail_precip_sum, oneDecimal(d.precipitationSum ?: stats.precipSumMm), stats.wetHours.toString())

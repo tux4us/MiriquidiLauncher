@@ -350,7 +350,10 @@ private fun androidx.compose.foundation.lazy.LazyListScope.weatherSections(
     val uvWindow = WeatherInsights.uvWindow(report.forecast.hours, hourStart)
     val snow = WeatherInsights.snowOutlook(report.forecast.hours, hourStart)
 
+    val rainSoon = WeatherInsights.rainSoon(report.forecast.minutely, now)
+
     item { CurrentCard(report) }
+    if (rainSoon != null) item { RainSoonCard(rainSoon) }
     if (upcoming.size >= 2) item { SummaryCard(report, hourStart) }
     if (upcoming.size >= 2) item { HourlyCard(upcoming, onDetail) }
     if (upcoming.size >= 2) item { WindCard(upcoming) }
@@ -422,6 +425,7 @@ private fun CurrentCard(report: WeatherReport) {
         val cloud = c.cloudCover ?: hourNow?.cloudCover?.roundToInt()
         if (cloud != null) Text(stringResource(R.string.weather_cloud_value, cloud))
         hourNow?.visibility?.let { Text(stringResource(R.string.weather_visibility_value, kilometers(it))) }
+        hourNow?.soilTemperature?.let { Text(stringResource(R.string.weather_ground_value, it.roundToInt().toString())) }
         Text(stringResource(R.string.weather_pressure_value, c.pressure.roundToInt().toString()))
         Text(stringResource(R.string.weather_precip_value, oneDecimal(c.precipitation)))
         Text(stringResource(R.string.weather_uv_value, oneDecimal(c.uvIndex), uvLevels[WeatherMath.uvLevel(c.uvIndex)]))

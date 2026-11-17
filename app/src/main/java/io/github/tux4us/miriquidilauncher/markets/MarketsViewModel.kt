@@ -193,6 +193,8 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
     fun setRange(range: ChartRange) {
         _state.update { it.copy(range = range) }
         viewModelScope.launch { store.setRange(range) }
+        // Der Verlauf „Max“ wird erst beim Auswählen geladen (große Antwort, deshalb nicht bei jedem Abruf).
+        if (range == ChartRange.Max) startRefresh(manual = false)
     }
 
     fun setChartCurrency(currency: ChartCurrency) {
@@ -555,7 +557,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             refreshJob?.cancelAndJoin()
             store.setCustomBaseUrl(normalized)
-            val cleared = _state.value.snapshot.copy(fast = null, slow = null, history = null)
+            val cleared = _state.value.snapshot.copy(fast = null, slow = null, history = null, historyMax = null)
             store.clearBitcoinSnapshot(cleared)
             _state.update {
                 it.copy(
@@ -581,6 +583,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         val needFast = mempoolOpen && due(snap.fast?.atMillis, limits.fast)
         val needSlow = mempoolOpen && due(snap.slow?.atMillis, limits.slow)
         val needHistory = mempoolOpen && due(snap.history?.atMillis, limits.history)
+        val needHistoryMax = mempoolOpen && s.range == ChartRange.Max && due(snap.historyMax?.atMillis, limits.historyMax)
         val yahooOpen = s.yahooEnabled && !sourceBlocked(SOURCE_YAHOO, now)
         val stooqKey = s.stooqKey.takeIf { s.stooqActive && !sourceBlocked(SOURCE_STOOQ, now) }
         val needQuotes = (yahooOpen || stooqKey != null) && due(snap.quotes?.atMillis, limits.quotes)
@@ -596,7 +599,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         }.filter { it != "EUR" && FxLogic.isSupported(it) }.toSet()
         val needFx = neededCurrencies.isNotEmpty() && !sourceBlocked(SOURCE_FX, now) &&
             (due(snap.fx?.atMillis, limits.fx) || neededCurrencies.any { snap.fx?.perEur?.containsKey(it) != true })
-        if (!needFast && !needSlow && !needHistory && !needQuotes && !needCrypto && !needSecurities && !needFx) return
+        if (!needFast && !needSlow && !needHistory && !needHistoryMax && !needQuotes && !needCrypto && !needSecurities && !needFx) return
 
         val repository = MarketRepository(s.baseUrl)
         refreshJob = viewModelScope.launch {
@@ -628,11 +631,13 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
                 null
             }
             try {
-                if (needFast || needSlow || needHistory) {
+                if (needFast || needSlow || needHistory || needHistoryMax) {
                     try {
                         if (needFast) snapshot = snapshot.copy(fast = repository.fetchFast().filledFrom(snapshot.fast))
                         if (needSlow) snapshot = snapshot.copy(slow = repository.fetchSlow().filledFrom(snapshot.slow))
                         if (needHistory) snapshot = snapshot.copy(history = repository.fetchHistory())
+                        // Zuletzt: Scheitert die große Antwort, bleiben die übrigen Bitcoin-Werte erhalten.
+                        if (needHistoryMax) snapshot = snapshot.copy(historyMax = repository.fetchHistoryMax())
                     } catch (e: RateLimitException) {
                         bitcoinError = MarketError.RATE_LIMIT
                         blockedFor = maxOf(blockedFor, e.retryAfterSeconds.coerceAtLeast(MIN_BLOCK_SECONDS))
@@ -679,7 +684,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
                     it.copy(
                         snapshot = finished,
                         loading = false,
-                        bitcoinError = if (needFast || needSlow || needHistory) bitcoinError else it.bitcoinError,
+                        bitcoinError = if (needFast || needSlow || needHistory || needHistoryMax) bitcoinError else it.bitcoinError,
                         quotesError = if (needQuotes) quotesError else it.quotesError,
                         cryptoError = if (needCrypto) cryptoError else it.cryptoError,
                         securitiesError = if (needSecurities) securitiesError else it.securitiesError,
@@ -695,6 +700,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         val fast: Long,
         val slow: Long,
         val history: Long,
+        val historyMax: Long,
         val quotes: Long,
         val crypto: Long,
         val securities: Long,
@@ -712,7 +718,7 @@ class MarketsViewModel(application: Application) : AndroidViewModel(application)
         const val SOURCE_YAHOO = "yahoo"
         const val SOURCE_COINGECKO = "coingecko"
         const val SOURCE_FX = "fx"
-        val AUTO_AGES = Ages(fast = 120_000L, slow = 600_000L, history = 900_000L, quotes = 900_000L, crypto = 120_000L, securities = 300_000L, fx = 3_600_000L)
-        val MANUAL_AGES = Ages(fast = 0L, slow = 120_000L, history = 300_000L, quotes = 120_000L, crypto = 60_000L, securities = 60_000L, fx = 600_000L)
+        val AUTO_AGES = Ages(fast = 120_000L, slow = 600_000L, history = 900_000L, historyMax = 24L * 3_600_000L, quotes = 900_000L, crypto = 120_000L, securities = 300_000L, fx = 3_600_000L)
+        val MANUAL_AGES = Ages(fast = 0L, slow = 120_000L, history = 300_000L, historyMax = 6L * 3_600_000L, quotes = 120_000L, crypto = 60_000L, securities = 60_000L, fx = 600_000L)
     }
 }

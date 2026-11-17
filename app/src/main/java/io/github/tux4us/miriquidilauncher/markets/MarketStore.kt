@@ -129,7 +129,7 @@ class MarketStore(context: Context) {
 
     suspend fun clearBitcoinSnapshot(snapshot: MarketSnapshot) {
         // Beim Wechsel der Datenquelle gelten die alten Bitcoin-Werte nicht mehr; die übrigen Kurse bleiben.
-        store.edit { it[SNAPSHOT] = MarketCodec.encode(snapshot.copy(fast = null, slow = null, history = null)) }
+        store.edit { it[SNAPSHOT] = MarketCodec.encode(snapshot.copy(fast = null, slow = null, history = null, historyMax = null)) }
     }
 
     suspend fun setCustomBaseUrl(url: String?) {

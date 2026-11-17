@@ -52,6 +52,14 @@ object MarketCodec {
             }
             sb.append("]}")
         }
+        snapshot.historyMax?.let { h ->
+            sb.append(",\"histmax\":{\"at\":").append(h.atMillis).append(",\"p\":[")
+            h.points.forEachIndexed { i, p ->
+                if (i > 0) sb.append(',')
+                sb.append('[').append(p.timeSec).append(',').append(num(p.usd)).append(',').append(num(p.eur)).append(']')
+            }
+            sb.append("]}")
+        }
         snapshot.quotes?.let { q ->
             sb.append(",\"quotes\":{\"at\":").append(q.atMillis).append(",\"q\":[")
             q.quotes.forEachIndexed { i, x ->
@@ -106,6 +114,7 @@ object MarketCodec {
                 fast = root["fast"].asObject()?.let(::decodeFast),
                 slow = root["slow"].asObject()?.let(::decodeSlow),
                 history = root["hist"].asObject()?.let(::decodeHistory),
+                historyMax = root["histmax"].asObject()?.let(::decodeHistory)?.let { BitcoinHistoryMax(it.points, it.atMillis) },
                 quotes = root["quotes"].asObject()?.let(::decodeQuotes),
                 crypto = root["crypto"].asObject()?.let(::decodeCrypto),
                 securities = root["sec"].asObject()?.let(::decodeSecurities),

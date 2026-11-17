@@ -331,6 +331,53 @@ class WeatherInsightsTest {
         assertNull(WeatherInsights.hourAt(hours, t0.plusDays(3)))
     }
 
+    private fun steps(now: LocalDateTime, vararg mm: Double) =
+        mm.mapIndexed { i, v -> MinutePoint(now.plusMinutes(15L * (i + 1)), v) }
+
+    @Test fun rainSoonDry() {
+        val now = t0.plusHours(10).plusMinutes(7)
+        val r = WeatherInsights.rainSoon(steps(now, 0.0, 0.0, 0.0, 0.0, 0.0), now)!!
+        assertEquals(WeatherInsights.SoonState.DRY, r.state)
+        assertEquals(4, r.steps.size)
+    }
+
+    @Test fun rainSoonStartsLaterWithEnd() {
+        val now = t0.plusHours(10)
+        val r = WeatherInsights.rainSoon(steps(now, 0.0, 0.0, 0.4, 0.0), now)!!
+        assertEquals(WeatherInsights.SoonState.STARTS_LATER, r.state)
+        assertEquals(30, r.minutesToStart)
+        assertEquals(45, r.minutesToEnd)
+        assertEquals(0.4, r.totalMm, 1e-9)
+    }
+
+    @Test fun rainSoonRainingNowEndsWithinHour() {
+        val now = t0.plusHours(10)
+        val r = WeatherInsights.rainSoon(steps(now, 0.5, 0.3, 0.0, 0.0), now)!!
+        assertEquals(WeatherInsights.SoonState.RAINING_NOW, r.state)
+        assertEquals(30, r.minutesToEnd)
+    }
+
+    @Test fun rainSoonOngoingToEndOfHour() {
+        val now = t0.plusHours(10)
+        val r = WeatherInsights.rainSoon(steps(now, 0.5, 0.5, 0.5, 0.5), now)!!
+        assertEquals(WeatherInsights.SoonState.RAINING_NOW, r.state)
+        assertNull(r.minutesToEnd)
+    }
+
+    @Test fun rainSoonSingleDryStepDoesNotSplit() {
+        val now = t0.plusHours(10)
+        val r = WeatherInsights.rainSoon(steps(now, 0.4, 0.0, 0.4, 0.0), now)!!
+        assertEquals(45, r.minutesToEnd)
+    }
+
+    @Test fun rainSoonNeedsFourStepsInWindow() {
+        val now = t0.plusHours(10)
+        assertNull(WeatherInsights.rainSoon(emptyList(), now))
+        assertNull(WeatherInsights.rainSoon(steps(now, 0.0, 0.0, 0.0), now))
+        // veraltete Daten: alle Schritte liegen vor „jetzt“
+        assertNull(WeatherInsights.rainSoon(steps(now.minusHours(3), 0.0, 0.0, 0.0, 0.0), now))
+    }
+
     @Test fun eaqiLevels() {
         assertEquals(0, WeatherMath.eaqiLevel(19.9))
         assertEquals(1, WeatherMath.eaqiLevel(20.0))

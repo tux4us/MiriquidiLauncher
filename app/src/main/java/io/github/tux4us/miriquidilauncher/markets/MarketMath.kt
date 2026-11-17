@@ -112,7 +112,11 @@ object PriceSeries {
      * (jeder n-te Punkt; der letzte bleibt erhalten).
      */
     fun window(points: List<PricePoint>, range: ChartRange, nowSec: Long, maxPoints: Int = 160): List<PricePoint> {
-        val inRange = points.filter { it.timeSec >= nowSec - range.seconds && it.timeSec <= nowSec + MAX_GAP_SECONDS }
+        val inRange = if (range == ChartRange.Max) {
+            points.filter { it.timeSec <= nowSec + MAX_GAP_SECONDS }
+        } else {
+            points.filter { it.timeSec >= nowSec - range.seconds && it.timeSec <= nowSec + MAX_GAP_SECONDS }
+        }
         if (inRange.size <= maxPoints || maxPoints < 2) return inRange
         val stride = (inRange.size + maxPoints - 1) / maxPoints
         val thinned = inRange.filterIndexed { index, _ -> index % stride == 0 }.toMutableList()

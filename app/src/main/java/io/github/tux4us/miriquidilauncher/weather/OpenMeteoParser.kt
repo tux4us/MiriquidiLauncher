@@ -28,7 +28,22 @@ object OpenMeteoParser {
             isDay = (cur["is_day"].asDouble() ?: 1.0) >= 1.0,
             cloudCover = cur["cloud_cover"].asDouble()?.toInt()?.coerceIn(0, 100),
         )
-        return ForecastData(offset, current, parseHours(root["hourly"].asObject()), parseDays(root["daily"].asObject()))
+        return ForecastData(
+            offset, current, parseHours(root["hourly"].asObject()), parseDays(root["daily"].asObject()),
+            parseMinutes(root["minutely_15"].asObject()),
+        )
+    }
+
+    private fun parseMinutes(minutely: Map<String, Any?>?): List<MinutePoint> {
+        minutely ?: return emptyList()
+        val times = minutely["time"].asArray() ?: return emptyList()
+        val precip = minutely["precipitation"].asArray() ?: return emptyList()
+        val out = ArrayList<MinutePoint>(times.size)
+        for (i in times.indices) {
+            val time = parseDateTime(times.stringAt(i)) ?: continue
+            out += MinutePoint(time, precip.doubleAt(i)?.coerceAtLeast(0.0) ?: continue)
+        }
+        return out
     }
 
     private fun parseHours(hourly: Map<String, Any?>?): List<HourPoint> {
@@ -52,6 +67,7 @@ object OpenMeteoParser {
         val snowfall = hourly["snowfall"].asArray()
         val snowDepth = hourly["snow_depth"].asArray()
         val freezing = hourly["freezing_level_height"].asArray()
+        val soil = hourly["soil_temperature_0cm"].asArray()
         val out = ArrayList<HourPoint>(times.size)
         for (i in times.indices) {
             val time = parseDateTime(times.stringAt(i)) ?: continue
@@ -76,6 +92,7 @@ object OpenMeteoParser {
                 snowfall = snowfall.doubleAt(i),
                 snowDepth = snowDepth.doubleAt(i),
                 freezingLevel = freezing.doubleAt(i),
+                soilTemperature = soil.doubleAt(i),
             )
         }
         return out
@@ -95,6 +112,10 @@ object OpenMeteoParser {
         val rise = daily["sunrise"].asArray()
         val set = daily["sunset"].asArray()
         val precipSum = daily["precipitation_sum"].asArray()
+        val apparentMin = daily["apparent_temperature_min"].asArray()
+        val apparentMax = daily["apparent_temperature_max"].asArray()
+        val precipHours = daily["precipitation_hours"].asArray()
+        val snowSum = daily["snowfall_sum"].asArray()
         val out = ArrayList<DayPoint>(times.size)
         for (i in times.indices) {
             val date = try {
@@ -115,6 +136,10 @@ object OpenMeteoParser {
                 sunrise = parseDateTime(rise.stringAt(i)),
                 sunset = parseDateTime(set.stringAt(i)),
                 precipitationSum = precipSum.doubleAt(i),
+                apparentMin = apparentMin.doubleAt(i),
+                apparentMax = apparentMax.doubleAt(i),
+                precipitationHours = precipHours.doubleAt(i),
+                snowfallSum = snowSum.doubleAt(i),
             )
         }
         return out

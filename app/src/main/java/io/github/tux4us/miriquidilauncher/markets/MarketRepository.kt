@@ -79,6 +79,18 @@ class MarketRepository(baseUrl: String = MarketUrl.DEFAULT) {
         return BitcoinHistory(points, System.currentTimeMillis())
     }
 
+    /**
+     * Gesamter Kursverlauf seit Beginn der Aufzeichnung für den Zeitraum „Max“. Die Antwort wird vollständig gelesen
+     * (höchstens [HISTORY_MAX_BYTES]; ist sie größer, bricht der Abruf ab, statt den ältesten Teil abzuschneiden) und
+     * auf [MarketParser.MAX_HISTORY_MAX_POINTS] Punkte ausgedünnt. Gleiche Quelle wie [fetchHistory], keine zusätzliche Adresse.
+     */
+    suspend fun fetchHistoryMax(): BitcoinHistoryMax {
+        val text = get("$base/api/v1/historical-price?currency=EUR", maxBytes = HISTORY_MAX_BYTES)
+        val points = MarketParser.parseHistoryMax(text)
+        if (points.size < 2) throw IOException("Kein Kursverlauf")
+        return BitcoinHistoryMax(points, System.currentTimeMillis())
+    }
+
     /** Ergebnis eines Abrufs der Indizes und Rohstoffe. */
     data class QuotesResult(
         val data: QuotesData,
@@ -320,6 +332,7 @@ class MarketRepository(baseUrl: String = MarketUrl.DEFAULT) {
 
     companion object {
         const val HISTORY_BYTES = 96 * 1024
+        const val HISTORY_MAX_BYTES = 24 * 1024 * 1024
         const val KEEP_HISTORY_SECONDS = 31L * 24L * 3600L
         const val MAX_RETRY_AFTER_SECONDS = 900L
         private const val QUOTES_PARALLEL = 3

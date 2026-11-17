@@ -100,6 +100,15 @@ class MarketMathTest {
         assertTrue(PriceSeries.window(emptyList(), ChartRange.Week, 5L).isEmpty())
     }
 
+    @Test fun windowMaxKeepsWholeSeries() {
+        val points = hourly(24 * 400)
+        val now = points.last().timeSec
+        val all = PriceSeries.window(points, ChartRange.Max, now, maxPoints = 10_000)
+        assertEquals(points.size, all.size)
+        assertEquals(points.first().timeSec, all.first().timeSec)
+        assertEquals(ChartRange.Max, ChartRange.fromKey("max"))
+    }
+
     @Test fun metals() {
         assertEquals(133.94, MetalMath.perGram(4166.1), 0.01)
         assertEquals(3709.4, MetalMath.usdToEur(4166.1, 1.1231), 0.1)

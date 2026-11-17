@@ -58,6 +58,7 @@ import io.github.tux4us.miriquidilauncher.markets.BitcoinMath
 import io.github.tux4us.miriquidilauncher.markets.BitcoinPrice
 import io.github.tux4us.miriquidilauncher.markets.ChartCurrency
 import io.github.tux4us.miriquidilauncher.markets.ChartRange
+import io.github.tux4us.miriquidilauncher.markets.MarketParser
 import io.github.tux4us.miriquidilauncher.markets.DifficultyInfo
 import io.github.tux4us.miriquidilauncher.markets.MarketError
 import io.github.tux4us.miriquidilauncher.markets.MarketFormat
@@ -394,14 +395,17 @@ private fun ChartCard(
     onRange: (ChartRange) -> Unit,
     onCurrency: (ChartCurrency) -> Unit,
 ) {
-    val history = snapshot.history?.points.orEmpty()
+    val history = (if (range == ChartRange.Max) snapshot.historyMax?.points else snapshot.history?.points).orEmpty()
     val nowSec = if (price.timeSec > 0L) price.timeSec else history.lastOrNull()?.timeSec ?: 0L
-    val points = remember(history, range, nowSec) { PriceSeries.window(history, range, nowSec) }
+    val points = remember(history, range, nowSec) {
+        PriceSeries.window(history, range, nowSec, maxPoints = if (range == ChartRange.Max) MarketParser.MAX_HISTORY_MAX_POINTS + 1 else 160)
+    }
     GlassCard(stringResource(R.string.markets_chart)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             SegmentChip(stringResource(R.string.markets_change_24h), range == ChartRange.Day) { onRange(ChartRange.Day) }
             SegmentChip(stringResource(R.string.markets_change_7d), range == ChartRange.Week) { onRange(ChartRange.Week) }
             SegmentChip(stringResource(R.string.markets_change_30d), range == ChartRange.Month) { onRange(ChartRange.Month) }
+            SegmentChip(stringResource(R.string.markets_change_max), range == ChartRange.Max) { onRange(ChartRange.Max) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             SegmentChip("EUR", currency == ChartCurrency.Eur) { onCurrency(ChartCurrency.Eur) }
@@ -424,7 +428,7 @@ private fun ChartCard(
             )
         } else {
             Text(
-                stringResource(R.string.markets_chart_empty),
+                stringResource(if (range == ChartRange.Max) R.string.markets_chart_max_empty else R.string.markets_chart_empty),
                 style = MaterialTheme.typography.bodyMedium,
                 color = WeatherTextMuted,
             )
@@ -731,7 +735,12 @@ private fun formatTime(millis: Long, locale: Locale): String =
 
 /** Zeitbeschriftung der Diagrammachse: bei 24 Stunden die Uhrzeit, sonst das Datum. */
 private fun formatChartTime(millis: Long, range: ChartRange, locale: Locale): String =
-    if (range == ChartRange.Day) formatTime(millis, locale) else formatDate(millis, locale)
+    when (range) {
+        ChartRange.Day -> formatTime(millis, locale)
+        // Beim gesamten Verlauf genügt das kurze Datum.
+        ChartRange.Max -> DateFormat.getDateInstance(DateFormat.SHORT, locale).format(Date(millis))
+        else -> formatDate(millis, locale)
+    }
 
 private fun relativeTime(millis: Long): String =
     DateUtils.getRelativeTimeSpanString(millis, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString()

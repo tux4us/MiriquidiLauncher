@@ -383,6 +383,18 @@ Abends: %3$s – %4$s</string>
     <string name="weather_sum_uv">UV-Index ab 3 (Sonnenschutz empfohlen) von %1$s bis %2$s, Maximum %3$s um %4$s.</string>
     <string name="weather_sum_note">Ausgewertet aus den Stundenwerten von Open-Meteo. Richtwerte: nasse Stunde ab 0,1 mm, starke Böen ab 50 km/h, Winddrehung ab 45°, Nebel bei Sichtweite unter 1 km.</string>
     <string name="weather_dewpoint_value">Taupunkt: %1$s °C</string>
+    <string name="weather_ground_value">Bodenoberfläche: %1$s °C</string>
+    <string name="weather_section_rain_soon">Regen in der nächsten Stunde</string>
+    <string name="weather_soon_dry">Trocken: kein Niederschlag in der nächsten Stunde erwartet.</string>
+    <string name="weather_soon_now_until">Es regnet, voraussichtlich noch etwa %1$d Minuten (%2$s mm in der nächsten Stunde).</string>
+    <string name="weather_soon_now_ongoing">Es regnet und der Niederschlag hält voraussichtlich die ganze nächste Stunde an (%1$s mm).</string>
+    <string name="weather_soon_starts">Niederschlag beginnt in etwa %1$d Minuten und dauert etwa %2$d Minuten (%3$s mm in der nächsten Stunde).</string>
+    <string name="weather_soon_starts_ongoing">Niederschlag beginnt in etwa %1$d Minuten und hält bis zum Ende der Stunde an (%2$s mm).</string>
+    <string name="weather_soon_chart">Niederschlag je 15 Minuten (mm)</string>
+    <string name="weather_soon_note">Modellvorhersage in 15-Minuten-Schritten, keine Radarmessung. Sie ist in Mitteleuropa und Nordamerika direkt berechnet, sonst aus Stundenwerten abgeleitet.</string>
+    <string name="weather_detail_apparent">Gefühlt: %1$s° bis %2$s°</string>
+    <string name="weather_detail_snowfall">Neuschnee: %1$s cm</string>
+    <string name="weather_detail_precip_hours">Stunden mit Niederschlag: %1$s</string>
     <string name="weather_section_pressure">Luftdruck (nächste 24 Stunden)</string>
     <string name="weather_pressure_chart">Luftdruck in hPa</string>
     <string name="weather_pressure_trend_rising">Steigend: %1$s hPa in 24 Stunden.</string>
@@ -415,7 +427,6 @@ Abends: %3$s – %4$s</string>
     <string name="weather_detail_dewpoint">Taupunkt: %1$s°</string>
     <string name="weather_detail_cloud">Bewölkung: %1$s %%</string>
     <string name="weather_detail_visibility">Sichtweite: %1$s km</string>
-    <string name="weather_detail_snowfall">Neuschnee: %1$s cm</string>
     <string name="weather_detail_precip_total">Niederschlag: %1$s mm</string>
     <string name="weather_section_snow">Schnee und Nullgradgrenze (nächste 24 Stunden)</string>
     <string name="weather_snow_fall">Neuschnee: %1$s cm</string>

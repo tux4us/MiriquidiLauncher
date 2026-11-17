@@ -55,7 +55,15 @@ data class HourPoint(
     val snowDepth: Double? = null,
     /** Höhe der Nullgradgrenze in Metern. */
     val freezingLevel: Double? = null,
+    /** Temperatur der Bodenoberfläche in °C. */
+    val soilTemperature: Double? = null,
 )
+
+/**
+ * Niederschlag in mm in einem 15-Minuten-Schritt. [time] ist das Ende des Schritts (Summe der vorangegangenen
+ * 15 Minuten), Ortszeit des Standorts.
+ */
+data class MinutePoint(val time: LocalDateTime, val precipitation: Double)
 
 data class DayPoint(
     val date: LocalDate,
@@ -71,6 +79,13 @@ data class DayPoint(
     val sunset: LocalDateTime?,
     /** Niederschlagssumme des Tages in mm laut Quelle; `null`, wenn nicht geliefert. */
     val precipitationSum: Double? = null,
+    /** Niedrigste gefühlte Temperatur des Tages in °C; `null`, wenn nicht geliefert (alle folgenden Felder ebenso). */
+    val apparentMin: Double? = null,
+    val apparentMax: Double? = null,
+    /** Stunden mit Niederschlag laut Quelle. */
+    val precipitationHours: Double? = null,
+    /** Neuschneesumme des Tages in cm. */
+    val snowfallSum: Double? = null,
 )
 
 enum class PollenType(val apiKey: String) {
@@ -104,6 +119,8 @@ data class ForecastData(
     val current: CurrentWeather,
     val hours: List<HourPoint>,
     val days: List<DayPoint>,
+    /** Niederschlag in 15-Minuten-Schritten für die nächsten ein bis zwei Stunden; leer, wenn die Quelle ihn nicht liefert. */
+    val minutely: List<MinutePoint> = emptyList(),
 ) {
     /** Aktuelle Ortszeit des Standorts. */
     fun localNow(): LocalDateTime = LocalDateTime.now(ZoneOffset.ofTotalSeconds(utcOffsetSeconds))

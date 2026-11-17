@@ -26,6 +26,10 @@ class MarketCodecTest {
             listOf(PricePoint(1_792_328_400L, 81_872.0, 72_892.0), PricePoint(1_792_332_000L, 81_438.5, 72_501.25)),
             1_792_302_900_000L,
         ),
+        historyMax = BitcoinHistoryMax(
+            listOf(PricePoint(1_300_000_000L, 0.9, 0.7), PricePoint(1_792_332_000L, 81_438.5, 72_501.25)),
+            1_792_302_950_000L,
+        ),
         quotes = QuotesData(
             listOf(
                 Quote("dax", 24250.75, 24100.5, "EUR", listOf(24000.0, 24100.5, 24250.75), QuoteSource.YAHOO),

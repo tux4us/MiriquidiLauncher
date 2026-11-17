@@ -72,11 +72,15 @@ data class BitcoinSlow(
 /** Stündlicher Kursverlauf, aufsteigend nach Zeit. */
 data class BitcoinHistory(val points: List<PricePoint>, val atMillis: Long)
 
+/** Kursverlauf seit dem Beginn der Aufzeichnung (Zeitraum „Max“), zeitlich auf wenige hundert Punkte ausgedünnt, aufsteigend nach Zeit. */
+data class BitcoinHistoryMax(val points: List<PricePoint>, val atMillis: Long)
+
 /** Gesamter zwischengespeicherter Stand der Scope „Kurse“. */
 data class MarketSnapshot(
     val fast: BitcoinFast? = null,
     val slow: BitcoinSlow? = null,
     val history: BitcoinHistory? = null,
+    val historyMax: BitcoinHistoryMax? = null,
     val quotes: QuotesData? = null,
     val crypto: CryptoData? = null,
     val securities: SecuritiesData? = null,
@@ -102,6 +106,9 @@ enum class ChartRange(val seconds: Long, val key: String) {
     Day(24L * 3600L, "24h"),
     Week(7L * 24L * 3600L, "7d"),
     Month(30L * 24L * 3600L, "30d"),
+
+    /** Gesamter Verlauf seit Beginn der Aufzeichnung; [seconds] ist hier ohne Bedeutung. */
+    Max(0L, "max"),
     ;
 
     companion object {

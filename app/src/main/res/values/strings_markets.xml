@@ -18,6 +18,7 @@
     <string name="markets_change_24h">24 h</string>
     <string name="markets_change_7d">7 days</string>
     <string name="markets_change_30d">30 days</string>
+    <string name="markets_change_max">Max</string>
     <string name="markets_sats_per_usd">Satoshis per dollar</string>
     <string name="markets_sats_per_eur">Satoshis per euro</string>
     <string name="markets_market_cap">Market capitalization (theoretical)</string>
@@ -26,6 +27,7 @@
 
     <string name="markets_chart">Price history</string>
     <string name="markets_chart_empty">No price history available.</string>
+    <string name="markets_chart_max_empty">The full price history is loading or unavailable. The first load may transfer a larger amount of data.</string>
     <string name="markets_chart_description">Price history in %1$s from %2$s to %3$s</string>
 
     <string name="markets_network">Network</string>

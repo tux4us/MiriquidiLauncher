@@ -18,6 +18,9 @@ object MarketParser {
     /** Höchstzahl der Kurspunkte aus dem Verlauf (stündlich, entspricht etwa 83 Tagen). */
     const val MAX_HISTORY_POINTS = 2000
 
+    /** Anzahl der Punkte des Verlaufs „Max“ nach dem Ausdünnen. */
+    const val MAX_HISTORY_MAX_POINTS = 400
+
     fun parsePrices(text: String): BitcoinPrice {
         val o = obj(text)
         val usd = o["USD"].asDouble()
@@ -120,6 +123,47 @@ object MarketParser {
         }
         val sorted = byTime.values.sortedBy { it.timeSec }
         return if (sorted.size > MAX_HISTORY_POINTS) sorted.takeLast(MAX_HISTORY_POINTS) else sorted
+    }
+
+    /**
+     * Liest den gesamten Kursverlauf aus `/api/v1/historical-price` und dünnt ihn zeitlich gleichmäßig auf höchstens
+     * [maxPoints] + 1 Punkte aus (je Zeitabschnitt der letzte Punkt; erster und letzter Punkt bleiben erhalten).
+     * Das Ergebnis ist aufsteigend nach Zeit sortiert und ohne doppelte Zeitpunkte. Anders als [parseHistory] wird
+     * der Text vollständig gelesen, weil der älteste Teil am Ende der Antwort steht.
+     */
+    fun parseHistoryMax(text: String, maxPoints: Int = MAX_HISTORY_MAX_POINTS): List<PricePoint> {
+        val byTime = HashMap<Long, PricePoint>()
+        for (match in HISTORY_OBJECT.findAll(text)) {
+            val chunk = match.value
+            val time = HISTORY_TIME.find(chunk)?.groupValues?.get(1)?.toLongOrNull() ?: continue
+            val usd = HISTORY_USD.find(chunk)?.groupValues?.get(1)?.toDoubleOrNull() ?: continue
+            val eur = HISTORY_EUR.find(chunk)?.groupValues?.get(1)?.toDoubleOrNull() ?: continue
+            if (!valid(usd) || !valid(eur)) continue
+            byTime[time] = PricePoint(time, usd, eur)
+        }
+        return thinByTime(byTime.values.sortedBy { it.timeSec }, maxPoints)
+    }
+
+    /** Dünnt [sorted] (aufsteigend nach Zeit) auf höchstens [maxPoints] + 1 Punkte in gleich langen Zeitabschnitten aus. */
+    internal fun thinByTime(sorted: List<PricePoint>, maxPoints: Int): List<PricePoint> {
+        if (maxPoints < 2 || sorted.size <= maxPoints) return sorted
+        val first = sorted.first().timeSec
+        val span = (sorted.last().timeSec - first).coerceAtLeast(1L)
+        val result = ArrayList<PricePoint>(maxPoints)
+        result += sorted.first()
+        var lastBucket = 0
+        var candidate: PricePoint? = null
+        for (i in 1 until sorted.size) {
+            val p = sorted[i]
+            val bucket = (((p.timeSec - first).toDouble() / span) * (maxPoints - 1)).toInt().coerceIn(0, maxPoints - 1)
+            if (bucket != lastBucket) {
+                candidate?.let { result += it }
+                lastBucket = bucket
+            }
+            candidate = p
+        }
+        candidate?.let { if (result.last() != it) result += it }
+        return result
     }
 
     /** Kurs von 1 Euro in US-Dollar und Datum aus `https://api.frankfurter.dev/v2/rate/eur/usd`. */

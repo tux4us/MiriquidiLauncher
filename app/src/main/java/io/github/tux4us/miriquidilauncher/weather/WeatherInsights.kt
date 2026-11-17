@@ -114,6 +114,68 @@ object WeatherInsights {
         )
     }
 
+    // --- Regen in der nächsten Stunde (15-Minuten-Schritte) ---------------------------------------
+
+    /** Ab diesem Niederschlag (mm) in 15 Minuten gilt ein Schritt als nass (Richtwert, Auflösung der Quelle 0,1 mm). */
+    const val WET_STEP_MM = 0.1
+
+    /** Zeitraum (Minuten), für den die Kurzfristvorhersage ausgewertet wird. */
+    const val SOON_MINUTES = 60L
+
+    /** Dauer eines Schritts der Kurzfristvorhersage in Minuten. */
+    const val STEP_MINUTES = 15L
+
+    enum class SoonState { DRY, RAINING_NOW, STARTS_LATER }
+
+    /**
+     * Niederschlag in der nächsten Stunde. [minutesToStart] ist bei [SoonState.STARTS_LATER] die Wartezeit bis zum
+     * Beginn, [minutesToEnd] die Zeit bis zum Ende des ersten Niederschlags (`null`, wenn er bis zum Ende der Stunde
+     * anhält), [steps] die Werte der ausgewerteten Schritte, [totalMm] ihre Summe.
+     */
+    data class RainSoon(
+        val state: SoonState,
+        val minutesToStart: Int?,
+        val minutesToEnd: Int?,
+        val totalMm: Double,
+        val steps: List<Double>,
+    )
+
+    /**
+     * Wertet die Schritte aus, die in der Stunde ab [now] enden (Zeit eines Schritts = Ende der 15 Minuten, für die
+     * die Summe gilt). `null`, wenn weniger als vier Schritte vorliegen, z. B. bei veralteten oder fehlenden Daten.
+     */
+    fun rainSoon(minutes: List<MinutePoint>, now: LocalDateTime): RainSoon? {
+        val end = now.plusMinutes(SOON_MINUTES)
+        val window = minutes.filter { it.time.isAfter(now) && !it.time.isAfter(end) }.sortedBy { it.time }
+        if (window.size < (SOON_MINUTES / STEP_MINUTES).toInt()) return null
+        val wet = window.map { it.precipitation >= WET_STEP_MM }
+        val total = window.sumOf { it.precipitation }
+        val steps = window.map { it.precipitation }
+        val firstWet = wet.indexOf(true)
+        if (firstWet < 0) return RainSoon(SoonState.DRY, null, null, total, steps)
+        var lastWet = firstWet
+        // Eine einzelne trockene Lücke trennt nicht, analog zu den Stundenfenstern.
+        var j = firstWet + 1
+        while (j < wet.size) {
+            if (wet[j]) {
+                lastWet = j
+                j++
+            } else if (j + 1 < wet.size && wet[j + 1]) {
+                j++
+            } else {
+                break
+            }
+        }
+        fun minutesFromNow(t: LocalDateTime) = java.time.Duration.between(now, t).toMinutes().toInt().coerceAtLeast(0)
+        val startTime = window[firstWet].time.minusMinutes(STEP_MINUTES)
+        val untilEnd = if (lastWet == window.lastIndex) null else minutesFromNow(window[lastWet].time)
+        return if (!startTime.isAfter(now)) {
+            RainSoon(SoonState.RAINING_NOW, null, untilEnd, total, steps)
+        } else {
+            RainSoon(SoonState.STARTS_LATER, minutesFromNow(startTime), untilEnd, total, steps)
+        }
+    }
+
     // --- Temperatur und Wind --------------------------------------------------------------------
 
     data class Extremes(val max: HourPoint, val min: HourPoint)

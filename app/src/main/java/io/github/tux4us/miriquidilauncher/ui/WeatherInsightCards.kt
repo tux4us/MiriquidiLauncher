@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +39,37 @@ internal fun timeLabel(time: LocalDateTime, today: LocalDate): String =
     } else {
         time.format(DateTimeFormatter.ofPattern("EEE HH:mm", Locale.getDefault()))
     }
+
+/** Regen in der nächsten Stunde nach der 15-Minuten-Vorhersage: Aussage in einem Satz und Niederschlag je 15 Minuten. */
+@Composable
+internal fun RainSoonCard(soon: WeatherInsights.RainSoon) {
+    val total = oneDecimal(soon.totalMm)
+    val headline = when (soon.state) {
+        WeatherInsights.SoonState.DRY -> stringResource(R.string.weather_soon_dry)
+        WeatherInsights.SoonState.RAINING_NOW ->
+            soon.minutesToEnd?.let { stringResource(R.string.weather_soon_now_until, it, total) }
+                ?: stringResource(R.string.weather_soon_now_ongoing, total)
+        WeatherInsights.SoonState.STARTS_LATER ->
+            soon.minutesToEnd?.let { end -> stringResource(R.string.weather_soon_starts, soon.minutesToStart ?: 0, (end - (soon.minutesToStart ?: 0)).coerceAtLeast(1), total) }
+                ?: stringResource(R.string.weather_soon_starts_ongoing, soon.minutesToStart ?: 0, total)
+    }
+    SectionCard(stringResource(R.string.weather_section_rain_soon)) {
+        Text(headline)
+        if (soon.state != WeatherInsights.SoonState.DRY) {
+            Text(stringResource(R.string.weather_soon_chart), style = MaterialTheme.typography.labelMedium)
+            PrecipitationChart(
+                values = soon.steps,
+                description = stringResource(R.string.weather_soon_chart) + ": " + total + " mm",
+                minScale = 0.5,
+            )
+        }
+        Text(
+            stringResource(R.string.weather_soon_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = WeatherTextMuted,
+        )
+    }
+}
 
 /** Zusammenfassung der nächsten 24 Stunden in wenigen Sätzen: Niederschlag, Temperatur, Böen, Wind, UV. */
 @Composable
@@ -135,6 +167,7 @@ internal fun PressureCard(outlook: WeatherInsights.PressureOutlook) {
             labels = labels,
             description = title + ": " + outlook.values.min().roundToInt() + " – " + outlook.values.max().roundToInt(),
             unit = "",
+            lineColor = Color(0xFFA5D6A7),
         )
         val change = signed(outlook.changeAhead)
         Text(

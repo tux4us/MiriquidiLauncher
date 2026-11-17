@@ -29,6 +29,34 @@ class OpenMeteoParserStageBTest {
     }
     """
 
+    @Test fun minutelyAndDailyExtrasAreParsed() {
+        val f = OpenMeteoParser.parseForecast(
+            forecast(
+                extraHourly = ""","soil_temperature_0cm": [2.5, 3.0, 4.5]""",
+                extraDaily = """, "apparent_temperature_max": [4.0], "apparent_temperature_min": [-2.0],
+                    "precipitation_hours": [5.0], "snowfall_sum": [1.4]""",
+            ).replace(
+                "\"daily\"",
+                """"minutely_15": {"time": ["2026-11-12T10:15", "2026-11-12T10:30", "bad"], "precipitation": [0.0, 0.3, 0.1]}, "daily"""",
+            ),
+        )
+        assertEquals(2, f.minutely.size)
+        assertEquals(0.3, f.minutely[1].precipitation, 0.0)
+        assertEquals(4.5, f.hours[2].soilTemperature!!, 0.0)
+        val d = f.days[0]
+        assertEquals(-2.0, d.apparentMin!!, 0.0)
+        assertEquals(4.0, d.apparentMax!!, 0.0)
+        assertEquals(5.0, d.precipitationHours!!, 0.0)
+        assertEquals(1.4, d.snowfallSum!!, 0.0)
+    }
+
+    @Test fun responseWithoutMinutelyHasEmptyList() {
+        val f = OpenMeteoParser.parseForecast(forecast())
+        assertTrue(f.minutely.isEmpty())
+        assertNull(f.hours[0].soilTemperature)
+        assertNull(f.days[0].apparentMax)
+    }
+
     @Test fun oldResponseWithoutNewFieldsParsesWithNulls() {
         val f = OpenMeteoParser.parseForecast(forecast())
         assertNull(f.current.cloudCover)

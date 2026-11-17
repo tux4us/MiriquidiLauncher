@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -21,8 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 
+/** Gelb für Temperatur und Sonnenschein, Blau für Niederschlag; auf dem dunklen Kartenhintergrund gut lesbar. */
+internal val ChartYellow = Color(0xFFFFD54F)
+internal val ChartBlue = Color(0xFF42A5F5)
+
 /**
- * Liniendiagramm der Temperatur. [labels] enthält pro Wert eine Beschriftung der x-Achse (leer = keine);
+ * Liniendiagramm der Temperatur mit farbiger Fläche unter der Linie. [labels] enthält pro Wert eine Beschriftung der x-Achse (leer = keine);
  * [description] ist der Text für Screenreader, [unit] die Einheit der Achsenbeschriftung.
  */
 @Composable
@@ -32,10 +37,11 @@ fun TemperatureChart(
     description: String,
     modifier: Modifier = Modifier,
     unit: String = "°",
+    lineColor: Color = ChartYellow,
 ) {
     if (values.size < 2) return
     val measurer = rememberTextMeasurer()
-    val line = WeatherText
+    val line = lineColor
     val grid = Color(0x33FFFFFF)
     val textColor = WeatherTextMuted
     val labelStyle = TextStyle(color = textColor, fontSize = 11.sp)
@@ -66,7 +72,21 @@ fun TemperatureChart(
         values.forEachIndexed { i, v ->
             if (i == 0) path.moveTo(x(i), y(v)) else path.lineTo(x(i), y(v))
         }
-        drawPath(path, line, style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round))
+        val area = Path().apply {
+            addPath(path)
+            lineTo(x(values.lastIndex), bottom)
+            lineTo(x(0), bottom)
+            close()
+        }
+        drawPath(
+            area,
+            Brush.verticalGradient(listOf(line.copy(alpha = 0.45f), line.copy(alpha = 0.05f)), startY = top, endY = bottom),
+        )
+        drawPath(path, line, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
+        val maxIndex = values.indexOf(max)
+        val minIndex = values.indexOf(min)
+        drawCircle(line, radius = 3.5.dp.toPx(), center = Offset(x(maxIndex), y(max)))
+        if (minIndex != maxIndex) drawCircle(line, radius = 3.5.dp.toPx(), center = Offset(x(minIndex), y(min)))
         labels.forEachIndexed { i, text ->
             if (text.isNotEmpty() && i < values.size) {
                 val m = measurer.measure(text, labelStyle)
@@ -77,15 +97,18 @@ fun TemperatureChart(
     }
 }
 
-/** Säulendiagramm für Niederschlag in mm je Stunde; die Skala reicht mindestens bis 1 mm. */
+/** Säulendiagramm für Niederschlag in mm je Stunde; die Skala reicht mindestens bis 1 mm und ist links beschriftet. */
 @Composable
 fun PrecipitationChart(
     values: List<Double>,
     description: String,
     modifier: Modifier = Modifier,
-    barColor: Color = Color(0xCCFFFFFF),
+    barColor: Color = ChartBlue,
+    minScale: Double = 1.0,
 ) {
     if (values.isEmpty()) return
+    val measurer = rememberTextMeasurer()
+    val labelStyle = TextStyle(color = WeatherTextMuted, fontSize = 11.sp)
     val grid = Color(0x33FFFFFF)
     Canvas(
         modifier = modifier
@@ -97,12 +120,15 @@ fun PrecipitationChart(
         val right = size.width - 8.dp.toPx()
         val bottom = size.height - 2.dp.toPx()
         val top = 2.dp.toPx()
-        val max = values.max().coerceAtLeast(1.0)
+        val max = values.max().coerceAtLeast(minScale)
         val slot = (right - left) / values.size
         drawLine(grid, Offset(left, bottom), Offset(right, bottom), 1.dp.toPx())
+        drawLine(grid, Offset(left, top), Offset(right, top), 1.dp.toPx())
+        val maxText = measurer.measure(oneDecimalText(max), labelStyle)
+        drawText(maxText, topLeft = Offset(0f, top))
         values.forEachIndexed { i, v ->
             if (v > 0.0) {
-                val h = ((bottom - top) * (v / max)).toFloat().coerceAtLeast(1.5.dp.toPx())
+                val h = ((bottom - top) * (v / max)).toFloat().coerceAtLeast(2.dp.toPx())
                 drawRect(
                     color = barColor,
                     topLeft = Offset(left + slot * i + slot * 0.15f, bottom - h),
@@ -112,6 +138,10 @@ fun PrecipitationChart(
         }
     }
 }
+
+/** Skalenbeschriftung in mm, eine Nachkommastelle bei Werten unter 10. */
+private fun oneDecimalText(value: Double): String =
+    if (value >= 10.0) value.roundToInt().toString() else String.format(java.util.Locale.getDefault(), "%.1f", value)
 
 /** Säulen für die Sonnenscheindauer je Tag in Stunden (Skala bis 16 h), Beschriftung mit Tag und Stundenzahl. */
 @Composable
@@ -141,7 +171,7 @@ fun SunshineChart(
             val barW = (slot * 0.5f).coerceAtMost(28.dp.toPx())
             val cx = slot * i + slot / 2f
             drawRect(
-                color = Color(0xCCFFFFFF),
+                color = ChartYellow,
                 topLeft = Offset(cx - barW / 2f, valueH + barArea - barH),
                 size = Size(barW, barH),
             )

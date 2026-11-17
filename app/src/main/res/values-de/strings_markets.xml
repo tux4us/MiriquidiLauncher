@@ -18,6 +18,7 @@
     <string name="markets_change_24h">24 Std.</string>
     <string name="markets_change_7d">7 Tage</string>
     <string name="markets_change_30d">30 Tage</string>
+    <string name="markets_change_max">Max</string>
     <string name="markets_sats_per_usd">Satoshi je Dollar</string>
     <string name="markets_sats_per_eur">Satoshi je Euro</string>
     <string name="markets_market_cap">Marktkapitalisierung (theoretisch)</string>
@@ -26,6 +27,7 @@
 
     <string name="markets_chart">Kursverlauf</string>
     <string name="markets_chart_empty">Kein Kursverlauf verfügbar.</string>
+    <string name="markets_chart_max_empty">Der gesamte Kursverlauf wird geladen oder ist nicht verfügbar. Beim ersten Laden kann eine größere Datenmenge übertragen werden.</string>
     <string name="markets_chart_description">Kursverlauf in %1$s von %2$s bis %3$s</string>
 
     <string name="markets_network">Netzwerk</string>
