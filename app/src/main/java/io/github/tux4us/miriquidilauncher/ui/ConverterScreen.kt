@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -149,7 +150,11 @@ private fun CategoryPicker(selectedId: String, onSelect: (String) -> Unit, modif
             )
             Text("▾", color = WeatherTextMuted, style = MaterialTheme.typography.titleMedium)
         }
-        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+        DropdownMenu(
+            expanded = open,
+            onDismissRequest = { open = false },
+            modifier = Modifier.heightIn(max = 320.dp),
+        ) {
             ConverterCatalog.ids.forEach { id ->
                 DropdownMenuItem(
                     text = { Text(stringResource(categoryName(id)), fontWeight = if (id == selectedId) FontWeight.Bold else FontWeight.Normal) },
