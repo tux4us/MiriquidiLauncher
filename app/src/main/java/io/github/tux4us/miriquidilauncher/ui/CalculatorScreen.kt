@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -256,6 +257,10 @@ private fun CalcDisplay(session: CalcSession, separator: Char, onCopy: (String) 
     val expressionDescription = stringResource(R.string.calc_expression)
     val resultDescription = stringResource(if (session.evaluated) R.string.calc_result else R.string.calc_result_preview)
     val copyHint = stringResource(R.string.calc_copy_result)
+    val scrollState = rememberScrollState()
+    LaunchedEffect(text, session.editor.cursor) {
+        scrollState.scrollTo(scrollState.maxValue)
+    }
 
     Box(modifier.glass(RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 12.dp)) {
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.End) {
@@ -267,7 +272,7 @@ private fun CalcDisplay(session: CalcSession, separator: Char, onCopy: (String) 
                 modifier = Modifier
                     .weight(1f, fill = false)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState(), reverseScrolling = true)
+                    .verticalScroll(scrollState)
                     .semantics { contentDescription = "$expressionDescription: $text" },
             )
             val errorText = (outcome as? CalcOutcome.Error)?.let { errorMessage(it.error) }
