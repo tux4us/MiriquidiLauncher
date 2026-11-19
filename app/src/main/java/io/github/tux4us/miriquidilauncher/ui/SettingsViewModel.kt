@@ -17,6 +17,7 @@ import io.github.tux4us.miriquidilauncher.backup.BackupQr
 import io.github.tux4us.miriquidilauncher.backup.ImportSummary
 import io.github.tux4us.miriquidilauncher.scopes.ScopeVisibility
 import io.github.tux4us.miriquidilauncher.scopes.ScopeVisibilityStore
+import io.github.tux4us.miriquidilauncher.support.SupportStore
 
 /** Rückmeldung zu einem Export oder Import; [Text] wird in der Oberfläche übersetzt. */
 sealed interface BackupMessage {
@@ -55,8 +56,26 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     /** Namen aller Scopes in der eingestellten Reihenfolge (einschließlich der ausgeblendeten). */
     val scopeOrder: StateFlow<List<String>> = _scopeOrder.asStateFlow()
 
+    private val supportStore = SupportStore(application)
+    private val _showSupportPrompt = MutableStateFlow(false)
+
+    /** `true`, solange der einmalige Spendenhinweis nach einem Update angezeigt werden soll. */
+    val showSupportPrompt: StateFlow<Boolean> = _showSupportPrompt.asStateFlow()
+
     init {
         reloadScopes()
+        checkSupportPrompt()
+    }
+
+    /** Fragt ab, ob nach einem Update der Spendenhinweis erscheint; die Version wird dabei festgehalten. */
+    private fun checkSupportPrompt() {
+        viewModelScope.launch {
+            if (supportStore.consumePrompt()) _showSupportPrompt.value = true
+        }
+    }
+
+    fun dismissSupportPrompt() {
+        _showSupportPrompt.value = false
     }
 
     /** Liest Sichtbarkeit und Reihenfolge der Scopes neu aus dem Speicher; beim Start und nach einem Backup-Import. */

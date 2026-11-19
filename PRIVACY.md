@@ -1,12 +1,13 @@
 # Privacy Policy – MiriquidiLauncher
 
-Last updated: 1 November 2026 · applies to MiriquidiLauncher 0.6.8 and later · [Deutsche Fassung](DATENSCHUTZ.md) (the German version is authoritative)
+Last updated: 19 November 2026 · applies to MiriquidiLauncher 0.6.8 and later · [Deutsche Fassung](DATENSCHUTZ.md) (the German version is authoritative)
 
 ## 1. Summary
 
 - The developer operates **no server** for the launcher. There is **no user account, no advertising, no usage analytics, no crash reporting and no Google services**. The developer receives no data from the app.
 - Personal data (favourites, notes, dog profiles, holdings on the markets page, podcast subscriptions, radio stations and playlists, calculator history, etc.) is stored **on the device only**.
 - Some pages (weather, markets, feed reader, notes with Nextcloud, podcasts) fetch data **directly from your device from third parties** and only when you use the page. These pages (weather, feed reader, podcasts, markets) are **hidden** after installation and after resetting the app; the launcher makes no connection for them until you show them in the settings ("Scopes" card) and agree in the notice dialog. An imported backup cannot show them without this consent. Connections use HTTPS; the only exception are radio streams when you switch on "Allow http streams" (off by default) in the Music scope. The Music scope itself is not a network scope: local music works without any network access; the station directory search is active only after a separate consent inside the scope. The recipients see at least your IP address (section 5).
+- The launcher contains a **donation link** (Buy Me a Coffee). It is opened in the browser only when you tap it; the app sends no data in doing so, and the payment takes place outside the app (section 5).
 - Permissions are requested **on first use** of the respective feature and can be revoked at any time (section 6).
 
 ## 2. Controller and contact
@@ -45,6 +46,7 @@ For network requests (section 5), **your device** sends the request directly to 
 | Notes | Markdown files in the app-specific documents folder (`Android/data/<package>/files/Documents/MiriquidiNotes`), favourites, sorting, optionally Nextcloud credentials (password encrypted) | App storage |
 | Calculator | Angle mode, memory, last result, history (limited) | App-internal storage |
 | System | Battery statistics of up to the last 7 days (recorded by the launcher), the app's own network traffic (system counters) | App-internal storage |
+| Donation notice | Number of the app version for which the one-time notice after an update was last checked (not part of the backup) | Internal app storage |
 | Camera | Photos and videos in the `MiriquidiLauncher` folder of the media library; settings | Shared storage (media library) |
 | Gallery | Photos and videos are shown, moved, copied, renamed, deleted or shared only on your command; Android confirms trash, delete, rename and move with a system dialog each time; the media library's trash keeps deleted items for 30 days. Favourites and hidden albums are stored locally by the app | Shared storage (media library), app storage |
 
@@ -80,6 +82,10 @@ All connections use HTTPS (plain HTTP is blocked). The only exception: radio str
 | Links, web search | The browser you choose or its search engine; without a browser with web search, DuckDuckGo | Search term or address | Tapping a link or "Search the web" |
 
 The recipients are controllers in their own right. What else they process and where (also outside the EU/EEA, e.g. Yahoo, Apple or CoinGecko) is governed by their privacy policies. The launcher has no influence on this; the transmission originates from your device at your initiative. For servers you enter yourself (Nextcloud, weather server, mempool instance, feeds, podcasts), the respective operator determines the processing. Open-Meteo weather data is licensed under CC BY 4.0; see `THIRD_PARTY_NOTICES.md`.
+
+### Donation link
+
+In the settings ("Support the developer" card) and once after an update, the launcher shows a notice with a link to `https://buymeacoffee.com/tux4us`. The page is opened only when you tap the donate button, in your device's browser, not in the app. The app itself makes no connection to buymeacoffee.com and transmits no data there. The operator of Buy Me a Coffee is responsible for processing on that site (including IP address and payment data). Donations are voluntary and unlock no features.
 
 ## 6. Permissions
 

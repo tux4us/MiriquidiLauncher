@@ -12,8 +12,8 @@ android {
         applicationId = "io.github.tux4us.miriquidilauncher"
         minSdk = 26
         targetSdk = 36
-        versionCode = 43
-        versionName = "0.8.9"
+        versionCode = 44
+        versionName = "0.9.0"
     }
 
     buildTypes {

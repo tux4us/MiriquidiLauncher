@@ -384,6 +384,11 @@ fun SettingsScreen(
                 }
             }
             item {
+                SectionCard(stringResource(R.string.settings_section_support)) {
+                    SupportSection()
+                }
+            }
+            item {
                 SectionCard(stringResource(R.string.settings_section_language)) {
                     Text(stringResource(R.string.settings_language_text))
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

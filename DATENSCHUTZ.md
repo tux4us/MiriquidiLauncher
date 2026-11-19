@@ -1,12 +1,13 @@
 # Datenschutzerklärung MiriquidiLauncher
 
-Stand: 1. November 2026 · gilt für MiriquidiLauncher ab Version 0.6.8 · [English version](PRIVACY.md)
+Stand: 19. November 2026 · gilt für MiriquidiLauncher ab Version 0.6.8 · [English version](PRIVACY.md)
 
 ## 1. Kurzfassung
 
 - Der Entwickler betreibt **keinen Server** für den Launcher. Es gibt **kein Benutzerkonto, keine Werbung, keine Nutzungsanalyse, keine Absturzberichte und keine Google-Dienste**. Der Entwickler erhält keine Daten aus der App.
 - Persönliche Daten (Favoriten, Notizen, Hundeprofile, Kurse-Bestand, Podcast-Abos, Radiosender und Wiedergabelisten, Rechner-Verlauf u. a.) werden **nur auf dem Gerät** gespeichert.
 - Einige Seiten (Wetter, Kurse, FeedReader, Notizen mit Nextcloud, Podcasts) rufen Daten **direkt vom Gerät aus bei Drittanbietern** ab, und zwar erst, wenn du die Seite benutzt. Diese Seiten (Wetter, FeedReader, Podcasts, Kurse) sind nach der Installation und nach dem Zurücksetzen der App **ausgeblendet**; der Launcher stellt für sie keine Verbindung her, bis du sie in den Einstellungen (Karte „Scopes“) einblendest und im Hinweisdialog zustimmst. Ein eingespieltes Backup kann sie nicht ohne diese Zustimmung einblenden. Die Verbindungen sind per HTTPS; einzige Ausnahme sind Radiostreams, wenn du in der Scope „Musik“ den Schalter „http-Streams erlauben“ (standardmäßig aus) einschaltest. Die Scope „Musik“ selbst ist keine Netzwerk-Scope: Lokale Musik funktioniert ohne Netzwerk; die Sendersuche im Verzeichnis ist erst nach einer eigenen Zustimmung in der Scope aktiv. Die Empfänger sehen dabei mindestens deine IP-Adresse (Abschnitt 5).
+- Der Launcher enthält einen **Spendenlink** (Buy Me a Coffee). Er wird nur auf dein Tippen im Browser geöffnet; die App sendet dabei keine Daten, die Zahlung läuft außerhalb der App (Abschnitt 5).
 - Berechtigungen werden **erst bei der ersten Nutzung** der jeweiligen Funktion angefragt und sind widerrufbar (Abschnitt 6).
 
 ## 2. Verantwortlicher und Kontakt
@@ -49,6 +50,7 @@ Soweit die App auf Informationen im Endgerät zugreift oder dort speichert, gesc
 | Notizen | Markdown-Dateien im app-eigenen Dokumentenordner (`Android/data/<Paket>/files/Documents/MiriquidiNotes`), Favoriten, Sortierung, optional Nextcloud-Zugang (Passwort verschlüsselt) | App-Speicher |
 | Rechner | Winkelmodus, Speicherwert, letztes Ergebnis, Verlauf (begrenzt) | Interner App-Speicher |
 | System | Akku-Statistik der letzten bis zu 7 Tage (vom Launcher aufgezeichnet), eigener Netzwerkverkehr der App (Zähler des Systems) | Interner App-Speicher |
+| Spendenhinweis | Nummer der App-Version, bei der zuletzt auf den einmaligen Hinweis nach einem Update geprüft wurde (nicht im Backup) | Interner App-Speicher |
 | Kamera | Fotos und Videos im Ordner `MiriquidiLauncher` der Mediathek; Einstellungen | Gemeinsamer Speicher (Mediathek) |
 | Galerie | Fotos und Videos werden nur auf deinen Befehl angezeigt, verschoben, kopiert, umbenannt, gelöscht oder geteilt; Papierkorb, Löschen, Umbenennen und Verschieben bestätigt Android jeweils mit einem Systemdialog; der Papierkorb der Mediathek hält gelöschte Medien 30 Tage vor. Favoriten und ausgeblendete Alben speichert die App lokal | Gemeinsamer Speicher (Mediathek), App-Speicher |
 
@@ -86,6 +88,10 @@ Alle Verbindungen laufen verschlüsselt über HTTPS (unverschlüsseltes HTTP ist
 Die genannten Empfänger sind eigene Verantwortliche. Welche Daten sie darüber hinaus verarbeiten und wo (auch außerhalb der EU/des EWR, etwa bei Yahoo, Apple oder CoinGecko), richtet sich nach deren Datenschutzerklärungen. Darauf hat der Launcher keinen Einfluss; die Übermittlung geht von deinem Gerät auf deine Veranlassung aus. Bei Servern, die du selbst einträgst (Nextcloud, Wetterserver, Mempool-Instanz, Feeds, Podcasts), bestimmt der jeweilige Betreiber die Verarbeitung.
 
 Die Wetterdaten von Open-Meteo stehen unter CC BY 4.0; Näheres in `THIRD_PARTY_NOTICES.md`.
+
+### Spendenlink
+
+In den Einstellungen (Karte „Entwickler unterstützen“) und einmalig nach einem Update zeigt der Launcher einen Hinweis mit einem Link zu `https://buymeacoffee.com/tux4us`. Die Seite wird erst geöffnet, wenn du die Spenden-Schaltfläche tippst, und zwar im Browser deines Geräts, nicht in der App. Die App stellt selbst keine Verbindung zu buymeacoffee.com her und überträgt keine Daten dorthin. Für die Verarbeitung auf der Seite (u. a. IP-Adresse, Zahlungsdaten) ist der Betreiber von Buy Me a Coffee verantwortlich. Spenden sind freiwillig und schalten keine Funktionen frei.
 
 ## 6. Berechtigungen
 

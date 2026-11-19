@@ -93,7 +93,7 @@ private fun LicensesDialog(onDismiss: () -> Unit) {
 }
 
 /** Versionsname und -nummer der installierten App; bei einem Fehler ein Strich. */
-private fun appVersion(context: Context): Pair<String, Long> =
+internal fun appVersion(context: Context): Pair<String, Long> =
     try {
         val info = context.packageManager.getPackageInfo(context.packageName, 0)
         val code = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {

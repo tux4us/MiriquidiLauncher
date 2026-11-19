@@ -190,6 +190,8 @@ fun LauncherScreen(
     val dogState by dogViewModel.state.collectAsStateWithLifecycle()
     val recentsState by recentsViewModel.state.collectAsStateWithLifecycle()
     var recentsOpen by remember { mutableStateOf(false) }
+    val showSupportPrompt by settingsViewModel.showSupportPrompt.collectAsStateWithLifecycle()
+    if (showSupportPrompt) SupportPromptDialog(onDismiss = settingsViewModel::dismissSupportPrompt)
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
     // Die Karte „Hunde“ erscheint nur bei eingeblendeter Hunde-Scope.
     val dogsShown = Scope.Dogs.name !in hiddenScopes
