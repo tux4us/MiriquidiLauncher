@@ -85,8 +85,10 @@ class MarketRepository(baseUrl: String = MarketUrl.DEFAULT) {
      * auf [MarketParser.MAX_HISTORY_MAX_POINTS] Punkte ausgedünnt. Gleiche Quelle wie [fetchHistory], keine zusätzliche Adresse.
      */
     suspend fun fetchHistoryMax(): BitcoinHistoryMax {
-        val text = get("$base/api/v1/historical-price?currency=EUR", maxBytes = HISTORY_MAX_BYTES)
-        val points = MarketParser.parseHistoryMax(text)
+        // Lesen und Zerlegen als Datenstrom im Hintergrund; der Text wird nie vollständig im Speicher gehalten.
+        val points = request("$base/api/v1/historical-price?currency=EUR", USER_AGENT) { input ->
+            MarketParser.parseHistoryMax(input.reader(Charsets.UTF_8).buffered(), HISTORY_MAX_BYTES.toLong())
+        }
         if (points.size < 2) throw IOException("Kein Kursverlauf")
         return BitcoinHistoryMax(points, System.currentTimeMillis())
     }
@@ -297,6 +299,23 @@ class MarketRepository(baseUrl: String = MarketUrl.DEFAULT) {
     }
 
     private suspend fun get(url: String, maxBytes: Int = MAX_BYTES, truncate: Boolean = false, userAgent: String = USER_AGENT): String =
+        request(url, userAgent) { input ->
+            val out = ByteArrayOutputStream()
+            val buffer = ByteArray(8192)
+            while (true) {
+                val n = input.read(buffer)
+                if (n < 0) break
+                out.write(buffer, 0, n)
+                if (out.size() > maxBytes) {
+                    if (truncate) break
+                    throw IOException("Antwort zu groß")
+                }
+            }
+            out.toString(Charsets.UTF_8.name())
+        }
+
+    /** HTTPS-Abruf auf dem IO-Thread; [read] verarbeitet den Antwortstrom ebenfalls dort. */
+    private suspend fun <T> request(url: String, userAgent: String, read: (java.io.InputStream) -> T): T =
         withContext(Dispatchers.IO) {
             if (!url.startsWith("https://")) throw IOException("Nur HTTPS")
             val connection = URL(url).openConnection() as HttpURLConnection
@@ -311,20 +330,7 @@ class MarketRepository(baseUrl: String = MarketUrl.DEFAULT) {
                     throw RateLimitException(wait.coerceIn(0L, MAX_RETRY_AFTER_SECONDS))
                 }
                 if (code !in 200..299) throw IOException("HTTP $code")
-                connection.inputStream.use { input ->
-                    val out = ByteArrayOutputStream()
-                    val buffer = ByteArray(8192)
-                    while (true) {
-                        val n = input.read(buffer)
-                        if (n < 0) break
-                        out.write(buffer, 0, n)
-                        if (out.size() > maxBytes) {
-                            if (truncate) break
-                            throw IOException("Antwort zu groß")
-                        }
-                    }
-                    out.toString(Charsets.UTF_8.name())
-                }
+                connection.inputStream.use(read)
             } finally {
                 connection.disconnect()
             }

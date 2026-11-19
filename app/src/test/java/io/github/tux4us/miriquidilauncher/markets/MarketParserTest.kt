@@ -132,6 +132,19 @@ class MarketParserTest {
         assertEquals(listOf(1700000000L, 1700003600L), points.map { it.timeSec })
     }
 
+    @Test fun historyMaxStreamRejectsTooLargeResponse() {
+        val text = """{"prices":[{"time":1700003600,"EUR":2,"USD":3},{"time":1700000000,"EUR":1,"USD":2}]}"""
+        val result = runCatching { MarketParser.parseHistoryMax(java.io.StringReader(text), maxChars = 20L) }
+        assertTrue(result.exceptionOrNull() is java.io.IOException)
+    }
+
+    @Test fun historyMaxStreamIgnoresOversizedObjectAndOtherObjects() {
+        val long = "x".repeat(2000)
+        val text = """{"prices":[{"time":1700003600,"EUR":2,"USD":3,"pad":"$long"},{"time":1700000000,"EUR":1,"USD":2}],"exchangeRates":{"USDEUR":0.9}}"""
+        val points = MarketParser.parseHistoryMax(java.io.StringReader(text), maxChars = Long.MAX_VALUE)
+        assertEquals(listOf(1700000000L), points.map { it.timeSec })
+    }
+
     @Test fun historyIgnoresOtherObjectsAndKeyOrder() {
         val text = """{"prices":[{"USD":81000,"time":1700000000,"EUR":72000}],"exchangeRates":{"USDEUR":0.89,"USDGBP":0.75}}"""
         val points = MarketParser.parseHistory(text)

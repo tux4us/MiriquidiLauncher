@@ -21,6 +21,8 @@ object MarketParser {
     /** Anzahl der Punkte des Verlaufs „Max“ nach dem Ausdünnen. */
     const val MAX_HISTORY_MAX_POINTS = 400
 
+    private const val MAX_HISTORY_OBJECT_CHARS = 512
+
     fun parsePrices(text: String): BitcoinPrice {
         val o = obj(text)
         val usd = o["USD"].asDouble()
@@ -131,17 +133,53 @@ object MarketParser {
      * Das Ergebnis ist aufsteigend nach Zeit sortiert und ohne doppelte Zeitpunkte. Anders als [parseHistory] wird
      * der Text vollständig gelesen, weil der älteste Teil am Ende der Antwort steht.
      */
-    fun parseHistoryMax(text: String, maxPoints: Int = MAX_HISTORY_MAX_POINTS): List<PricePoint> {
+    fun parseHistoryMax(text: String, maxPoints: Int = MAX_HISTORY_MAX_POINTS): List<PricePoint> =
+        parseHistoryMax(java.io.StringReader(text), Long.MAX_VALUE, maxPoints)
+
+    /**
+     * Wie [parseHistoryMax], liest aber zeichenweise aus [reader], ohne die Antwort als ganzen Text zu halten.
+     * Mehr als [maxChars] Zeichen führen zu einer [java.io.IOException] (statt den ältesten Teil abzuschneiden).
+     * Gelesen wird Objekt für Objekt (`{...}` ohne weitere Klammern), ein Objekt über [MAX_HISTORY_OBJECT_CHARS]
+     * Zeichen wird verworfen. Gehört auf einen Hintergrund-Thread.
+     */
+    fun parseHistoryMax(reader: java.io.Reader, maxChars: Long, maxPoints: Int = MAX_HISTORY_MAX_POINTS): List<PricePoint> {
         val byTime = HashMap<Long, PricePoint>()
-        for (match in HISTORY_OBJECT.findAll(text)) {
-            val chunk = match.value
-            val time = HISTORY_TIME.find(chunk)?.groupValues?.get(1)?.toLongOrNull() ?: continue
-            val usd = HISTORY_USD.find(chunk)?.groupValues?.get(1)?.toDoubleOrNull() ?: continue
-            val eur = HISTORY_EUR.find(chunk)?.groupValues?.get(1)?.toDoubleOrNull() ?: continue
-            if (!valid(usd) || !valid(eur)) continue
-            byTime[time] = PricePoint(time, usd, eur)
+        val chunk = StringBuilder()
+        var inObject = false
+        var total = 0L
+        val buffer = CharArray(8192)
+        while (true) {
+            val n = reader.read(buffer)
+            if (n < 0) break
+            total += n
+            if (total > maxChars) throw java.io.IOException("Antwort zu groß")
+            for (i in 0 until n) {
+                val c = buffer[i]
+                when {
+                    c == '{' -> {
+                        chunk.setLength(0)
+                        inObject = true
+                    }
+                    c == '}' -> {
+                        if (inObject) addHistoryObject(chunk, byTime)
+                        inObject = false
+                    }
+                    inObject -> {
+                        chunk.append(c)
+                        if (chunk.length > MAX_HISTORY_OBJECT_CHARS) inObject = false
+                    }
+                }
+            }
         }
         return thinByTime(byTime.values.sortedBy { it.timeSec }, maxPoints)
+    }
+
+    private fun addHistoryObject(chunk: CharSequence, into: MutableMap<Long, PricePoint>) {
+        val time = HISTORY_TIME.find(chunk)?.groupValues?.get(1)?.toLongOrNull() ?: return
+        val usd = HISTORY_USD.find(chunk)?.groupValues?.get(1)?.toDoubleOrNull() ?: return
+        val eur = HISTORY_EUR.find(chunk)?.groupValues?.get(1)?.toDoubleOrNull() ?: return
+        if (!valid(usd) || !valid(eur)) return
+        into[time] = PricePoint(time, usd, eur)
     }
 
     /** Dünnt [sorted] (aufsteigend nach Zeit) auf höchstens [maxPoints] + 1 Punkte in gleich langen Zeitabschnitten aus. */
