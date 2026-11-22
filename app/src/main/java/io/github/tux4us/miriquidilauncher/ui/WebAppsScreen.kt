@@ -197,7 +197,7 @@ private fun CellBody(label: String, modifier: Modifier = Modifier, icon: @Compos
 
 /** Eigenes Symbol der Webapp oder, ohne Symbol, eine Kachel mit dem Anfangsbuchstaben. */
 @Composable
-private fun WebAppIcon(app: WebApp, revision: Int, viewModel: WebAppsViewModel, size: Dp, modifier: Modifier = Modifier) {
+internal fun WebAppIcon(app: WebApp, revision: Int, viewModel: WebAppsViewModel, size: Dp, modifier: Modifier = Modifier) {
     val bitmap by produceState<Bitmap?>(initialValue = null, app.id, app.hasIcon, revision) {
         value = if (app.hasIcon) viewModel.loadIcon(app.id) else null
     }

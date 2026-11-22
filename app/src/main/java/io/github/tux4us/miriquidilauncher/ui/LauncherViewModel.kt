@@ -41,6 +41,8 @@ import io.github.tux4us.miriquidilauncher.search.ContactSearchProvider
 import io.github.tux4us.miriquidilauncher.search.SearchEngine
 import io.github.tux4us.miriquidilauncher.search.SearchResult
 import io.github.tux4us.miriquidilauncher.search.SettingsSearchProvider
+import io.github.tux4us.miriquidilauncher.search.WebAppSearchProvider
+import io.github.tux4us.miriquidilauncher.webapps.WebAppStore
 
 /** Ergebnis einer Suche zusammen mit der Anfrage, zu der es gehört. */
 data class SearchState(val query: String, val results: List<SearchResult>)
@@ -54,12 +56,14 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     private val contactPhotos = ContactPhotos(application)
     private val groupsStore = AppGroupsStore(application)
     private val contactWaysRepository = ContactWaysRepository(application)
+    private val webAppStore = WebAppStore(application)
     private val searchEngine = SearchEngine(
         listOf(
             AppSearchProvider { repository.apps.value },
             ContactSearchProvider(application),
             SettingsSearchProvider(application),
             ActionSearchProvider(application),
+            WebAppSearchProvider { webAppStore.current() },
         ),
     )
 
@@ -92,7 +96,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     private val searchRefresh = MutableStateFlow(0)
 
     val searchState: StateFlow<SearchState> =
-        combine(_query.debounce(SEARCH_DEBOUNCE_MS), repository.apps, searchRefresh) { query, _, _ -> query }
+        combine(_query.debounce(SEARCH_DEBOUNCE_MS), repository.apps, searchRefresh, webAppStore.apps) { query, _, _, _ -> query }
             .mapLatest { query -> SearchState(query, searchEngine.search(query)) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), SearchState("", emptyList()))
 

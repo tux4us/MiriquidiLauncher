@@ -86,6 +86,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import io.github.tux4us.miriquidilauncher.R
@@ -128,6 +129,8 @@ import io.github.tux4us.miriquidilauncher.camera.CameraViewModel
 import io.github.tux4us.miriquidilauncher.system.SystemViewModel
 import io.github.tux4us.miriquidilauncher.search.AppResult
 import io.github.tux4us.miriquidilauncher.search.ContactResult
+import io.github.tux4us.miriquidilauncher.search.WebAppResult
+import io.github.tux4us.miriquidilauncher.webapps.WebAppOpener
 import io.github.tux4us.miriquidilauncher.search.ResultAction
 import io.github.tux4us.miriquidilauncher.search.SearchResult
 import java.util.Date
@@ -295,6 +298,12 @@ fun LauncherScreen(
             } catch (ignored: ActivityNotFoundException) {
                 reportFailure()
             } catch (ignored: SecurityException) {
+                reportFailure()
+            }
+            is WebAppResult -> if (WebAppOpener.open(context, result.app)) {
+                focusManager.clearFocus()
+                viewModel.setQuery("")
+            } else {
                 reportFailure()
             }
             is ActionResult -> {
@@ -852,6 +861,7 @@ private fun SearchResultsContent(
                     onLaunch = { onLaunch(result.entry) },
                 )
                 is ContactResult -> ContactRow(result, viewModel) { onOpenResult(result) }
+                is WebAppResult -> WebAppRow(result) { onOpenResult(result) }
                 is ActionResult -> ActionRow(result) { onOpenResult(result) }
                 else -> Unit
             }
@@ -1104,6 +1114,30 @@ private fun ActionRow(result: ActionResult, onClick: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun WebAppRow(result: WebAppResult, onClick: () -> Unit) {
+    // Dieselbe Instanz wie in MainActivity (Speicher der Activity), daher dieselben Symbole und derselbe Zähler.
+    val webAppsViewModel: WebAppsViewModel = viewModel()
+    val revision by webAppsViewModel.iconRevision.collectAsStateWithLifecycle()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        WebAppIcon(result.app, revision, webAppsViewModel, 48.dp)
+        Spacer(Modifier.width(16.dp))
+        Text(
+            text = result.title,
+            color = TextPrimary,
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
