@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_chat">Messenger</string>
+    <string name="chat_intro">Chat mit Nextcloud Talk: Gespräche lesen und Nachrichten senden. Neue Nachrichten erscheinen, solange diese Seite geöffnet ist; im Hintergrund gibt es keine Verbindung und keine Benachrichtigungen. Anrufe sind nicht enthalten.</string>
+    <string name="chat_connect">Mit Nextcloud verbinden</string>
+    <string name="chat_login_hint">Nextcloud-Adresse, Benutzername und ein App-Passwort (Nextcloud: Einstellungen → Sicherheit). Die Talk-App muss auf dem Server installiert sein. Nur HTTPS. Empfehlung: ein eigenes App-Passwort nur für den Launcher anlegen, denn es gibt Zugriff auf das ganze Konto und lässt sich dort einzeln widerrufen.</string>
+    <string name="chat_login_server">Server (https://…)</string>
+    <string name="chat_login_user">Benutzername</string>
+    <string name="chat_login_password">App-Passwort</string>
+    <string name="chat_login_action">Anmelden</string>
+    <string name="chat_login_from_feed">Zugang vom FeedReader übernehmen</string>
+    <string name="chat_login_from_notes">Zugang von den Notizen übernehmen</string>
+    <string name="chat_cancel">Abbrechen</string>
+    <string name="chat_account">Nextcloud-Konto</string>
+    <string name="chat_account_hint">Beim Abmelden werden Zugangsdaten, Schlüssel und der verschlüsselte Zwischenspeicher mit den Nachrichten auf diesem Gerät gelöscht. Auf dem Server bleibt alles erhalten.</string>
+    <string name="chat_logout">Abmelden</string>
+    <string name="chat_close">Schließen</string>
+    <string name="chat_refresh">Aktualisieren</string>
+    <string name="chat_search_hint">Gespräche suchen</string>
+    <string name="chat_empty">Keine Gespräche vorhanden.</string>
+    <string name="chat_empty_search">Keine Treffer.</string>
+    <string name="chat_back">‹ Zurück</string>
+    <string name="chat_message_hint">Nachricht</string>
+    <string name="chat_send">Senden</string>
+    <string name="chat_reply">Antworten</string>
+    <string name="chat_replying_to">Antwort an %1$s</string>
+    <string name="chat_reply_cancel">Abbrechen</string>
+    <string name="chat_sending">Wird gesendet …</string>
+    <string name="chat_failed">Senden fehlgeschlagen</string>
+    <string name="chat_retry">Erneut senden</string>
+    <string name="chat_discard">Verwerfen</string>
+    <string name="chat_deleted">Nachricht gelöscht</string>
+    <string name="chat_file">Datei: %1$s</string>
+    <string name="chat_offline">Keine Verbindung zum Server. Angezeigt wird der gespeicherte Stand.</string>
+    <string name="chat_read_only_room">In diesem Gespräch kannst du nicht schreiben.</string>
+    <string name="chat_loading_older">Ältere Nachrichten werden geladen …</string>
+    <string name="chat_notice_dismiss">OK</string>
+    <string name="chat_notice_login_invalid_url">Die Serveradresse ist ungültig.</string>
+    <string name="chat_notice_login_not_https">Nur HTTPS-Adressen sind erlaubt.</string>
+    <string name="chat_notice_login_auth">Benutzername oder App-Passwort wurde abgelehnt.</string>
+    <string name="chat_notice_login_not_found">Die Talk-App wurde auf dem Server nicht gefunden.</string>
+    <string name="chat_notice_login_network">Der Server ist nicht erreichbar.</string>
+    <string name="chat_notice_login_keystore">Das Passwort lässt sich auf diesem Gerät nicht sicher speichern.</string>
+    <string name="chat_notice_feed_missing">Im FeedReader ist kein Nextcloud-Zugang gespeichert.</string>
+    <string name="chat_notice_notes_missing">In den Notizen ist kein Nextcloud-Zugang gespeichert.</string>
+    <string name="chat_notice_auth_lost">Der Server hat die Zugangsdaten abgelehnt. Melde dich unter „Nextcloud-Konto“ neu an.</string>
+    <string name="chat_notice_room_gone">Das Gespräch ist nicht mehr verfügbar.</string>
+    <string name="chat_notice_load_failed">Die Nachrichten konnten nicht geladen werden.</string>
+    <string name="chat_notice_send_too_long">Die Nachricht ist zu lang.</string>
+    <string name="chat_notice_send_empty">Die Nachricht ist leer.</string>
+    <string name="chat_notice_read_only">In diesem Gespräch darfst du nicht schreiben.</string>
+    <string name="chat_you">Du</string>
+    <string name="chat_attach">Datei anhängen</string>
+    <string name="chat_notice_attach_too_large">Die Datei ist zu groß (Grenze 100 MB, der Server erlaubt eventuell weniger).</string>
+    <string name="chat_notice_attach_failed">Die Datei konnte nicht gesendet werden. Prüfe die Verbindung und die Berechtigungen in deiner Nextcloud.</string>
+</resources>

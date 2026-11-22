@@ -132,7 +132,8 @@ fun SettingsScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(stringResource(networkConsentDetail(target)))
-                    Text(stringResource(R.string.settings_network_consent_common))
+                    // Der Messenger sendet Zugangsdaten und Nachrichten an die eigene Nextcloud: eigener Schlusstext.
+                    Text(stringResource(if (target == Scope.Chat) R.string.settings_network_consent_common_account else R.string.settings_network_consent_common))
                 }
             },
             confirmButton = {
@@ -497,5 +498,6 @@ private fun networkConsentDetail(scope: Scope): Int = when (scope) {
     Scope.Weather -> R.string.settings_network_consent_weather
     Scope.Feed -> R.string.settings_network_consent_feed
     Scope.Podcasts -> R.string.settings_network_consent_podcasts
+    Scope.Chat -> R.string.settings_network_consent_chat
     else -> R.string.settings_network_consent_markets
 }

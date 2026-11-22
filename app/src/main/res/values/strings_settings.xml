@@ -64,6 +64,8 @@
     <string name="settings_network_consent_feed">FeedReader: Only the feeds and article pages you added yourself are fetched. The respective server sees your IP address.</string>
     <string name="settings_network_consent_podcasts">Podcasts: The podcast directory, feeds and episodes are fetched; when playing or downloading, the device connects to the podcast’s own server.</string>
     <string name="settings_network_consent_markets">Markets: To get prices, the values you chose are requested from the configured price sources.</string>
+    <string name="settings_network_consent_chat">Messenger: User name, app password, messages and the texts you send go only to the Nextcloud you enter. That server’s operator sees your IP address. The cache on the device is encrypted.</string>
+    <string name="settings_network_consent_common_account">There are no ads and no tracking, and nothing goes to the developer. Without your consent the launcher makes no connections for this scope. You can hide it again at any time.</string>
     <string name="settings_section_support">Support the developer</string>
     <string name="settings_support_text">MiriquidiLauncher is free, ad-free and works without an account or tracking. If the launcher is useful to you in daily use, you can support its further development with a voluntary donation.</string>
     <string name="settings_support_note">All features are available with or without a donation. The button opens buymeacoffee.com in your browser; the payment is handled there, not in the app.</string>

@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import io.github.tux4us.miriquidilauncher.calendar.AgendaViewModel
 import io.github.tux4us.miriquidilauncher.calendar.CalendarViewModel
 import io.github.tux4us.miriquidilauncher.camera.CameraViewModel
+import io.github.tux4us.miriquidilauncher.chat.ChatViewModel
 import io.github.tux4us.miriquidilauncher.feed.FeedViewModel
 import io.github.tux4us.miriquidilauncher.markets.MarketsViewModel
 import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
@@ -47,6 +48,7 @@ class MainActivity : ComponentActivity() {
     private val musicViewModel: MusicViewModel by viewModels()
     private val galleryViewModel: GalleryViewModel by viewModels()
     private val notesViewModel: NotesViewModel by viewModels()
+    private val chatViewModel: ChatViewModel by viewModels()
     private val systemViewModel: SystemViewModel by viewModels()
     private val calculatorViewModel: CalculatorViewModel by viewModels()
     private val converterViewModel: ConverterViewModel by viewModels()
@@ -83,6 +85,7 @@ class MainActivity : ComponentActivity() {
                     musicViewModel = musicViewModel,
                     galleryViewModel = galleryViewModel,
                     notesViewModel = notesViewModel,
+                    chatViewModel = chatViewModel,
                     systemViewModel = systemViewModel,
                     calculatorViewModel = calculatorViewModel,
                     converterViewModel = converterViewModel,
