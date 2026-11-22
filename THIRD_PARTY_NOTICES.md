@@ -11,6 +11,7 @@ MiriquidiLauncher steht unter der GNU General Public License, Version 3 oder sp�
 | kotlinx.coroutines (JetBrains) | Nebenläufigkeit |
 | AndroidX CameraX (Core, Camera2, Lifecycle, View, Video, Extensions) | Kamera des QR-Scanners und Scope „Kamera“ (Foto, Video, Hersteller-Erweiterungen); die Erweiterungen nutzen die Herstellerbibliotheken des Geräts, keine Google-Dienste |
 | AndroidX Media3 (ExoPlayer, HLS, Session; Apache-2.0) | Podcast- und Musikwiedergabe (lokal und Radiostreams, auch HLS) mit Vordergrunddienst und Mediensitzung, keine Google-Dienste |
+| AndroidX Browser (Custom Tabs; Apache-2.0) | Scope „Webapps“: Öffnen einer gespeicherten Adresse in einem Custom Tab, wenn der Nutzer das wählt; es wird nur der Intent erzeugt, der Launcher lädt die Seite nicht selbst |
 | ZXing core (Copyright ZXing authors) | Erkennung von QR-Codes, vollständig auf dem Gerät |
 
 Nur für Tests: JUnit 4 (EPL-1.0), kotlinx-coroutines-test (Apache-2.0). Beides ist nicht im APK enthalten.

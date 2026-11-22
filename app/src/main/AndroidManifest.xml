@@ -131,6 +131,20 @@
             </intent-filter>
         </activity>
 
+        <!-- Scope "Webapps": nimmt "Zum Startbildschirm hinzufügen" von Browsern entgegen. Das System sendet die Anfrage
+             nur an den Standard-Launcher; ohne gültige Anfrage beendet sich die Activity sofort. Ohne Oberfläche außer
+             dem Bestätigungsdialog, nicht in der App-Übersicht. -->
+        <activity
+            android:name=".webapps.PinShortcutActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.content.pm.action.CONFIRM_PIN_SHORTCUT" />
+            </intent-filter>
+        </activity>
+
         <!-- Podcast-Wiedergabe (Media3). exported="true" mit dem Media3-Intent-Filter ist nötig, damit Systemoberfläche,
              Bluetooth und Kopfhörertasten die Mediensitzung steuern können. -->
         <service

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_webapps">Webapps</string>
+    <string name="webapps_empty">Noch keine Webapps. Über „Webapp hinzufügen“ Name, https-Adresse und Symbol speichern; Antippen öffnet die Adresse im Browser.</string>
+    <string name="webapp_add">Webapp hinzufügen</string>
+    <string name="webapp_new_title">Neue Webapp</string>
+    <string name="webapp_edit_title">Webapp bearbeiten</string>
+    <string name="webapp_name_hint">Name</string>
+    <string name="webapp_url_hint">Webadresse (https)</string>
+    <string name="webapp_url_not_https">Nur Adressen mit https:// werden angenommen.</string>
+    <string name="webapp_url_invalid">Diese Adresse ist ungültig.</string>
+    <string name="webapp_custom_tab">In einem Custom Tab statt im Browser öffnen</string>
+    <string name="webapp_icon_choose">Symbolbild wählen</string>
+    <string name="webapp_icon_remove">Symbol entfernen</string>
+    <string name="webapp_icon_failed">Das Bild konnte nicht gelesen werden.</string>
+    <string name="webapp_save">Speichern</string>
+    <string name="webapp_edit">Bearbeiten</string>
+    <string name="webapp_delete">Löschen</string>
+    <string name="webapp_delete_title">„%1$s“ löschen?</string>
+    <string name="webapp_open_failed">Keine App gefunden, die diese Adresse öffnen kann.</string>
+    <string name="webapp_save_failed">Die Webapp konnte nicht gespeichert werden.</string>
+    <string name="webapp_pin_title">Zu „Webapps“ hinzufügen?</string>
+    <string name="webapp_pin_message">„%1$s“ aus %2$s. Beim Antippen wird die Verknüpfung über das System gestartet. Der Launcher sieht die Adresse nicht.</string>
+    <string name="webapp_pin_add">Hinzufügen</string>
+    <string name="webapp_pin_added">Zu „Webapps“ hinzugefügt.</string>
+    <string name="webapp_pin_full">Die Webapp-Liste ist voll.</string>
+    <string name="webapp_pin_failed">Die Verknüpfung konnte nicht hinzugefügt werden.</string>
+    <string name="webapp_pin_info">Verknüpfung aus dem Browser: Die Adresse ist für den Launcher nicht sichtbar und nicht änderbar. Bearbeitbar sind nur Name und Symbol.</string>
+    <string name="webapp_pin_open_failed">Die Verknüpfung konnte nicht gestartet werden. Sie funktioniert nur, solange dieser Launcher der Standard-Launcher ist und die App die Verknüpfung noch anbietet.</string>
+</resources>

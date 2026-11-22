@@ -30,6 +30,7 @@ enum class Scope(@StringRes val label: Int, @DrawableRes val icon: Int, val canH
     Gallery(R.string.scope_gallery, R.drawable.ic_gallery),
     Notes(R.string.scope_notes, R.drawable.ic_notes),
     Chat(R.string.scope_chat, R.drawable.ic_message, network = true),
+    WebApps(R.string.scope_webapps, R.drawable.ic_web),
     Settings(R.string.scope_settings, R.drawable.ic_settings, canHide = false),
     Camera(R.string.scope_camera, R.drawable.ic_camera),
 }

@@ -12,8 +12,8 @@ android {
         applicationId = "io.github.tux4us.miriquidilauncher"
         minSdk = 26
         targetSdk = 36
-        versionCode = 46
-        versionName = "1.0.0"
+        versionCode = 47
+        versionName = "1.1.0"
     }
 
     buildTypes {
@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.video)
     implementation(libs.androidx.camera.extensions)
+    implementation(libs.androidx.browser)
     implementation(libs.zxing.core)
 
     testImplementation(libs.junit)

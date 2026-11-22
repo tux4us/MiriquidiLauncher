@@ -11,6 +11,7 @@ Apache License 2.0 (Volltext unten / full text below):
 - kotlinx.coroutines, Copyright JetBrains s.r.o. and contributors
 - AndroidX CameraX (Kamera des QR-Scanners und Scope "Kamera": Foto, Video, Hersteller-Erweiterungen), Copyright The Android Open Source Project
 - AndroidX Media3 (ExoPlayer, Session: Podcast-Wiedergabe), Copyright The Android Open Source Project
+- AndroidX Browser (Custom Tabs der Scope "Webapps"), Copyright The Android Open Source Project
 - ZXing ("Zebra Crossing") core, Copyright ZXing authors (QR-Code-Erkennung, läuft vollständig auf dem Gerät)
 - Material Icons (Symbole der Oberfläche), Copyright Google LLC
 

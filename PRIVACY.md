@@ -44,6 +44,7 @@ For network requests (section 5), **your device** sends the request directly to 
 | Music | Saved radio stations (import and export as a .json file only on request via the system dialog), playlists and favourites (as media library ids), equalizer settings, switches for station search, http and station logos; the music files themselves are only read | App-internal storage |
 | Feed reader | Nextcloud address and user name, app password (encrypted), local feeds, read marks, cached articles | App-internal storage |
 | Messenger | Nextcloud address, user name and user id, app password (encrypted), conversation list and the last 100 messages per conversation as a cache (encrypted with a key in the Android Keystore); a file to be sent is kept as a copy in the app cache until it is sent or discarded | App-internal storage, not in the backup |
+| Web apps | Name, https address and opening mode per web app, optionally an icon image you picked (128 × 128 pixels, copy in private app storage); for shortcuts from the browser instead name, icon, package name of the browser app, shortcut id and user profile number (the launcher does not know the address). The launcher does not fetch the addresses; when you tap one it hands the address to your browser or a Custom Tab, and the site then sees your connection (at least the IP address) as with any browser visit | App-internal storage, icons not in the backup |
 | Notes | Markdown files in the app-specific documents folder (`Android/data/<package>/files/Documents/MiriquidiNotes`), favourites, sorting, optionally Nextcloud credentials (password encrypted) | App storage |
 | Calculator | Angle mode, memory, last result, history (limited) | App-internal storage |
 | System | Battery statistics of up to the last 7 days (recorded by the launcher), the app's own network traffic (system counters) | App-internal storage |
@@ -55,7 +56,7 @@ Android cloud backup and device-to-device transfer are **disabled** for the app 
 
 ### Backup and export
 
-On request, the backup function in the settings creates a JSON file (`Downloads/MiriquidiLauncher`). It may contain favourites (optionally without phone numbers), weather places, notes, dog profiles with due dates, podcast and markets data, feed subscriptions and settings, but **not** passwords, keys or caches. The file is **not encrypted**; other apps with access to shared storage can read it. Store it securely and delete it when no longer needed. A backup QR code contains only favourites, app groups, weather places and the scope order, **never** dog, note or markets data.
+On request, the backup function in the settings creates a JSON file (`Downloads/MiriquidiLauncher`). It may contain favourites (optionally without phone numbers), weather places, notes, dog profiles with due dates, podcast and markets data, feed subscriptions, web apps (name and address, without icons and without browser shortcuts) and settings, but **not** passwords, keys or caches. The file is **not encrypted**; other apps with access to shared storage can read it. Store it securely and delete it when no longer needed. A backup QR code contains only favourites, app groups, weather places and the scope order, **never** dog, note or markets data.
 
 ### Emergency card (dogs)
 

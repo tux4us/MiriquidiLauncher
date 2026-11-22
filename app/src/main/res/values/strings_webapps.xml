@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="scope_webapps">Web apps</string>
+    <string name="webapps_empty">No web apps yet. Use “Add web app” to save a name, an https address and an icon. Tapping opens the address in your browser.</string>
+    <string name="webapp_add">Add web app</string>
+    <string name="webapp_new_title">New web app</string>
+    <string name="webapp_edit_title">Edit web app</string>
+    <string name="webapp_name_hint">Name</string>
+    <string name="webapp_url_hint">Web address (https)</string>
+    <string name="webapp_url_not_https">Only addresses with https:// are accepted.</string>
+    <string name="webapp_url_invalid">This address is not valid.</string>
+    <string name="webapp_custom_tab">Open in a Custom Tab instead of the browser</string>
+    <string name="webapp_icon_choose">Choose icon image</string>
+    <string name="webapp_icon_remove">Remove icon</string>
+    <string name="webapp_icon_failed">The image could not be read.</string>
+    <string name="webapp_save">Save</string>
+    <string name="webapp_edit">Edit</string>
+    <string name="webapp_delete">Delete</string>
+    <string name="webapp_delete_title">Delete “%1$s”?</string>
+    <string name="webapp_open_failed">No app found to open this address.</string>
+    <string name="webapp_save_failed">Could not save the web app.</string>
+    <string name="webapp_pin_title">Add to “Web apps”?</string>
+    <string name="webapp_pin_message">“%1$s” from %2$s. When tapped, the shortcut is started through the system. The launcher cannot see the address.</string>
+    <string name="webapp_pin_add">Add</string>
+    <string name="webapp_pin_added">Added to “Web apps”.</string>
+    <string name="webapp_pin_full">The web app list is full.</string>
+    <string name="webapp_pin_failed">The shortcut could not be added.</string>
+    <string name="webapp_pin_info">Shortcut from the browser: the address is not visible to the launcher and cannot be changed. Only name and icon can be edited.</string>
+    <string name="webapp_pin_open_failed">The shortcut could not be started. It works only while this launcher is the default launcher and the app still offers the shortcut.</string>
+</resources>

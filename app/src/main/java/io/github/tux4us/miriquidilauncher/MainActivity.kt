@@ -20,6 +20,7 @@ import io.github.tux4us.miriquidilauncher.calendar.AgendaViewModel
 import io.github.tux4us.miriquidilauncher.calendar.CalendarViewModel
 import io.github.tux4us.miriquidilauncher.camera.CameraViewModel
 import io.github.tux4us.miriquidilauncher.chat.ChatViewModel
+import io.github.tux4us.miriquidilauncher.webapps.WebAppsViewModel
 import io.github.tux4us.miriquidilauncher.feed.FeedViewModel
 import io.github.tux4us.miriquidilauncher.markets.MarketsViewModel
 import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
@@ -49,6 +50,7 @@ class MainActivity : ComponentActivity() {
     private val galleryViewModel: GalleryViewModel by viewModels()
     private val notesViewModel: NotesViewModel by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
+    private val webAppsViewModel: WebAppsViewModel by viewModels()
     private val systemViewModel: SystemViewModel by viewModels()
     private val calculatorViewModel: CalculatorViewModel by viewModels()
     private val converterViewModel: ConverterViewModel by viewModels()
@@ -86,6 +88,7 @@ class MainActivity : ComponentActivity() {
                     galleryViewModel = galleryViewModel,
                     notesViewModel = notesViewModel,
                     chatViewModel = chatViewModel,
+                    webAppsViewModel = webAppsViewModel,
                     systemViewModel = systemViewModel,
                     calculatorViewModel = calculatorViewModel,
                     converterViewModel = converterViewModel,

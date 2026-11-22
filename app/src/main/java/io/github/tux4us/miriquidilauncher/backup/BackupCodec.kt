@@ -41,6 +41,8 @@ import io.github.tux4us.miriquidilauncher.weather.asArray
 import io.github.tux4us.miriquidilauncher.weather.asDouble
 import io.github.tux4us.miriquidilauncher.weather.asObject
 import io.github.tux4us.miriquidilauncher.weather.asString
+import io.github.tux4us.miriquidilauncher.webapps.WebApp
+import io.github.tux4us.miriquidilauncher.webapps.WebAppLogic
 
 /** Lesbares JSON-Format für Backups. Frei von Android-Klassen, damit es auf der JVM testbar ist. */
 object BackupCodec {
@@ -146,6 +148,13 @@ object BackupCodec {
         data.agendaEnabled?.let { sb.append(",\n  \"agendaEnabled\": ").append(it) }
         data.dogs?.let { sb.append(",\n  \"dogs\": ").append(DogCodec.encode(it)) }
         data.music?.let { sb.append(",\n  \"music\": ").append(MusicCodec.encodeBackup(it)) }
+        data.webApps?.let { apps ->
+            sb.append(",\n  \"webApps\": [")
+            sb.append(apps.joinToString(", ") { a ->
+                "{\"id\": ${str(a.id)}, \"name\": ${str(a.name)}, \"url\": ${str(a.url)}, \"customTab\": ${a.customTab}}"
+            })
+            sb.append("]")
+        }
     }
 
     fun decode(text: String, maxBytes: Int = MAX_BYTES): BackupData {
@@ -230,6 +239,7 @@ object BackupCodec {
             agendaEnabled = root["agendaEnabled"] as? Boolean,
             dogs = root["dogs"].asObject()?.let { DogCodec.fromMap(it) },
             music = root["music"].asObject()?.let { MusicCodec.decodeBackup(it) },
+            webApps = root["webApps"].asArray()?.let { array -> parseWebApps(array) },
         )
     }
 
@@ -316,6 +326,23 @@ object BackupCodec {
         val settings = CameraSettingsCodec.decode(text).copy(cameraId = null, lastUri = null, lastIsVideo = false)
         val app = o["buttonApp"].asString()?.takeIf { it.length <= 255 && PACKAGE_NAME.matches(it) }
         return BackupCamera(settings, app)
+    }
+
+    /** Symbole stehen nicht im Backup; ungültige Kennungen, Namen und Adressen (kein HTTPS) werden von [WebAppLogic.sanitize] verworfen. */
+    private fun parseWebApps(array: List<Any?>): List<WebApp> {
+        if (array.size > MAX_ENTRIES) throw BackupException("Zu viele Webapps")
+        return WebAppLogic.sanitize(
+            array.mapNotNull { entry ->
+                val o = entry.asObject() ?: return@mapNotNull null
+                WebApp(
+                    id = o["id"].asString() ?: return@mapNotNull null,
+                    name = o["name"].asString() ?: return@mapNotNull null,
+                    url = o["url"].asString() ?: return@mapNotNull null,
+                    customTab = o["customTab"] as? Boolean ?: false,
+                    hasIcon = false,
+                )
+            },
+        )
     }
 
     private fun parseNotesSettings(o: Map<String, Any?>) = BackupNotesSettings(

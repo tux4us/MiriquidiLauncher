@@ -99,6 +99,7 @@ import io.github.tux4us.miriquidilauncher.markets.MarketsViewModel
 import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
 import io.github.tux4us.miriquidilauncher.notes.NotesViewModel
 import io.github.tux4us.miriquidilauncher.chat.ChatViewModel
+import io.github.tux4us.miriquidilauncher.webapps.WebAppsViewModel
 import io.github.tux4us.miriquidilauncher.music.MusicViewModel
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
 import io.github.tux4us.miriquidilauncher.weather.WeatherViewModel
@@ -165,6 +166,7 @@ fun LauncherScreen(
     galleryViewModel: GalleryViewModel,
     notesViewModel: NotesViewModel,
     chatViewModel: ChatViewModel,
+    webAppsViewModel: WebAppsViewModel,
     systemViewModel: SystemViewModel,
     calculatorViewModel: CalculatorViewModel,
     converterViewModel: ConverterViewModel,
@@ -527,6 +529,9 @@ fun LauncherScreen(
                     Scope.Chat -> ChatScreen(
                         viewModel = chatViewModel,
                         active = currentScope == Scope.Chat,
+                    )
+                    Scope.WebApps -> WebAppsScreen(
+                        viewModel = webAppsViewModel,
                     )
                     Scope.Markets -> MarketsScreen(
                         viewModel = marketsViewModel,

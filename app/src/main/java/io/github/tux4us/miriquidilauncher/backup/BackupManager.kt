@@ -39,6 +39,9 @@ import io.github.tux4us.miriquidilauncher.ui.PinnedScopeNames
 import io.github.tux4us.miriquidilauncher.ui.ScopeNames
 import io.github.tux4us.miriquidilauncher.weather.WeatherServer
 import io.github.tux4us.miriquidilauncher.weather.WeatherStore
+import io.github.tux4us.miriquidilauncher.webapps.WebAppIcons
+import io.github.tux4us.miriquidilauncher.webapps.WebAppLogic
+import io.github.tux4us.miriquidilauncher.webapps.WebAppStore
 import java.security.GeneralSecurityException
 import kotlinx.coroutines.flow.first
 
@@ -82,6 +85,8 @@ class BackupManager(context: Context) {
     private val agendaStore = AgendaStore(appContext)
     private val dogStore = DogStore(appContext)
     private val musicStore = MusicStore(appContext)
+    private val webAppStore = WebAppStore(appContext)
+    private val webAppIcons = WebAppIcons(appContext)
 
     /** Aktueller Bestand als Backup-JSON. */
     private suspend fun snapshot(includeContacts: Boolean, includeFileOnlyData: Boolean): String {
@@ -108,6 +113,8 @@ class BackupManager(context: Context) {
             agendaEnabled = if (includeFileOnlyData) agendaStore.enabled.first() else null,
             dogs = if (includeFileOnlyData) dogStore.load() else null,
             music = if (includeFileOnlyData) musicStore.load() else null,
+            // Verknüpfungen aus dem Browser sind an Gerät, Benutzerprofil und Standard-Launcher gebunden und stehen nicht im Backup.
+            webApps = if (includeFileOnlyData) webAppStore.current().filter { it.pin == null } else null,
         )
         return BackupCodec.encode(data, Instant.now().toString())
     }
@@ -252,6 +259,15 @@ class BackupManager(context: Context) {
         data.notesSettings?.let { notesStore.saveSort(it.sort, it.ascending) }
         data.agendaEnabled?.let { agendaStore.setEnabled(it) }
         data.dogs?.let { dogStore.save(it) }
+        data.webApps?.let { imported ->
+            // Symbole liegen nur auf dem Gerät: Einträge mit gleicher Kennung behalten ihr Symbol, übrige Symbole entfallen.
+            // Verknüpfungen aus dem Browser gehören zum Gerät und bleiben erhalten.
+            val withIcons = webAppIcons.existing()
+            val keptPins = webAppStore.current().filter { it.pin != null }
+            val restored = imported.map { it.copy(hasIcon = it.id in withIcons) } + keptPins
+            webAppStore.replaceAll(restored)
+            webAppIcons.retain(WebAppLogic.sanitize(restored).map { it.id }.toSet())
+        }
         data.music?.let { restored ->
             // Zustimmung zur Sendersuche und http-Schalter gehören zum Gerät und kommen nie aus dem Backup.
             val current = musicStore.load()

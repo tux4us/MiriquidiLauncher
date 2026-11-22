@@ -27,6 +27,7 @@ import io.github.tux4us.miriquidilauncher.podcasts.PodcastData
 import io.github.tux4us.miriquidilauncher.podcasts.SearchProvider
 import io.github.tux4us.miriquidilauncher.weather.GeoPlace
 import io.github.tux4us.miriquidilauncher.weather.ShadowHeights
+import io.github.tux4us.miriquidilauncher.webapps.WebApp
 import io.github.tux4us.miriquidilauncher.music.MusicData
 import io.github.tux4us.miriquidilauncher.music.Playlist
 import io.github.tux4us.miriquidilauncher.music.Station
@@ -411,6 +412,28 @@ class BackupCodecTest {
         assertEquals(false, decoded.radioEnabled)
         assertEquals(false, decoded.allowHttp)
         assertNull(file(full).music)
+    }
+
+    @Test fun webAppsRoundTripWithoutIcons() {
+        val apps = listOf(
+            WebApp("a-1", "Mail \"privat\"", "https://mail.example.org/", customTab = true, hasIcon = true),
+            WebApp("b2", "Notizen", "https://example.org:8443/n?x=1"),
+        )
+        val decoded = file(full.copy(webApps = apps)).webApps!!
+        // Symbole stehen nicht im Backup.
+        assertEquals(apps.map { it.copy(hasIcon = false) }, decoded)
+        assertNull(file(full).webApps)
+    }
+
+    @Test fun webAppsDropUnsafeEntriesOnImport() {
+        val text = BackupCodec.encode(full, "2026-11-22T10:00:00Z").trimEnd().removeSuffix("}") +
+            ",\n  \"webApps\": [" +
+            "{\"id\": \"../x\", \"name\": \"Pfad\", \"url\": \"https://example.org\"}, " +
+            "{\"id\": \"h1\", \"name\": \"Unsicher\", \"url\": \"http://example.org\"}, " +
+            "{\"id\": \"j1\", \"name\": \"Skript\", \"url\": \"javascript:alert(1)\"}, " +
+            "{\"id\": \"ok1\", \"name\": \"Gut\", \"url\": \"example.org/app\", \"customTab\": true}" +
+            "]\n}\n"
+        assertEquals(listOf(WebApp("ok1", "Gut", "https://example.org/app", customTab = true)), BackupCodec.decode(text).webApps)
     }
 
     // endregion

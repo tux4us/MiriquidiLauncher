@@ -16,6 +16,7 @@ import io.github.tux4us.miriquidilauncher.notes.NoteSort
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastData
 import io.github.tux4us.miriquidilauncher.weather.GeoPlace
 import io.github.tux4us.miriquidilauncher.weather.ShadowHeights
+import io.github.tux4us.miriquidilauncher.webapps.WebApp
 
 /**
  * Inhalt eines Backups. `null` bedeutet "nicht im Backup enthalten"; beim Einspielen bleibt der
@@ -59,6 +60,8 @@ data class BackupData(
     val dogs: DogData? = null,
     /** Radiosender, Wiedergabelisten, Favoriten und Equalizer der Musik-Scope; Zustimmung und http-Schalter gehören zum Gerät. Nur in der Backup-Datei. */
     val music: MusicData? = null,
+    /** Webapps (Name, Adresse, Öffnungsart; ohne Symbole); `null` = nicht im Backup und beim Einspielen unverändert. Nur in der Backup-Datei. */
+    val webApps: List<WebApp>? = null,
 )
 
 /** Ausgeblendete Scopes und die Reihenfolge aller Scopes (Namen). Unbekannte Namen werden beim Einspielen verworfen. */
