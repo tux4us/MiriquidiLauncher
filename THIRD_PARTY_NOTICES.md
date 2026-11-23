@@ -6,7 +6,7 @@ MiriquidiLauncher steht unter der GNU General Public License, Version 3 oder sp�
 
 | Komponente | Verwendung |
 |---|---|
-| AndroidX (Core, Activity, Lifecycle, DataStore, Compose UI/Foundation/Material3/Animation/Runtime, Startup, Tracing, Emoji2, ProfileInstaller) | Oberfläche, Lebenszyklus, Einstellungen |
+| AndroidX (Core, Activity, Lifecycle, DataStore, WorkManager, Compose UI/Foundation/Material3/Animation/Runtime, Startup, Tracing, Emoji2, ProfileInstaller) | Oberfläche, Lebenszyklus, Einstellungen, Hintergrundabfrage der Chat-Benachrichtigungen |
 | Kotlin Standard Library (JetBrains) | Sprache |
 | kotlinx.coroutines (JetBrains) | Nebenläufigkeit |
 | AndroidX CameraX (Core, Camera2, Lifecycle, View, Video, Extensions) | Kamera des QR-Scanners und Scope „Kamera“ (Foto, Video, Hersteller-Erweiterungen); die Erweiterungen nutzen die Herstellerbibliotheken des Geräts, keine Google-Dienste |

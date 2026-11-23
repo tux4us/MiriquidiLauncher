@@ -224,6 +224,13 @@ fun LauncherScreen(
         if (target != null && target != sidePagerState.currentPage) sidePagerState.scrollToPage(target)
     }
     fun pageOf(target: Scope): Int? = pages.pageOf(target.name)
+    // Tipp auf eine Chat-Benachrichtigung: zur Messenger-Seite wechseln; ist sie ausgeblendet, wird die Anfrage verworfen.
+    val chatOpenRequest by chatViewModel.openRequest.collectAsStateWithLifecycle()
+    LaunchedEffect(chatOpenRequest, pages) {
+        if (chatOpenRequest == null) return@LaunchedEffect
+        val page = pageOf(Scope.Chat)
+        if (page == null) chatViewModel.clearOpenRequest() else sidePagerState.scrollToPage(page)
+    }
     var scannerOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current

@@ -46,6 +46,7 @@ enum class ChatNoticeKind {
     READ_ONLY,
     ATTACH_TOO_LARGE,
     ATTACH_FAILED,
+    NOTIFY_DENIED,
 }
 
 data class ChatNotice(val kind: ChatNoticeKind)
@@ -73,6 +74,10 @@ data class ChatUiState(
     /** Die letzte Anfrage ist gescheitert; die Anzeige stammt (teilweise) aus dem Zwischenspeicher. */
     val offline: Boolean = false,
     val notice: ChatNotice? = null,
+    /** Hintergrundabfrage für Benachrichtigungen eingeschaltet. */
+    val notifyEnabled: Boolean = false,
+    /** Absender und Text in der Benachrichtigung zeigen (sonst nur „Neue Nachricht“). */
+    val notifyShowText: Boolean = true,
 )
 
 /**
@@ -102,6 +107,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun setActive(value: Boolean) {
         if (active == value) return
         active = value
+        ChatForeground.active = value
         if (value) authBroken = false
         if (value && !loaded) loadAccount() else restartLoop()
     }
@@ -117,14 +123,18 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             credentials = saved
             remote = saved?.let { ChatRemote(it.baseUrl, it.user, it.password) }
             val rooms = if (saved != null) ChatLogic.sortRooms(store.loadRooms()) else emptyList()
+            val notify = if (saved != null) store.loadNotify() else ChatNotifySettings(false, true)
             _state.update {
                 it.copy(
                     ready = true,
+                    notifyEnabled = notify.enabled,
+                    notifyShowText = notify.showText,
                     account = saved?.let { c -> ChatAccount(c.baseUrl, c.user) },
                     ownId = saved?.userId.orEmpty(),
                     rooms = rooms,
                 )
             }
+            tryOpenPending(final = false)
             restartLoop()
         }
     }
@@ -162,6 +172,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 store.saveRooms(fresh)
                 store.prune(fresh.map { it.token }.toSet())
             }
+            ChatNotifyLogic.roomsToClear(fresh).forEach { ChatNotifier.cancel(getApplication(), it) }
+            tryOpenPending(final = true)
             true
         } catch (e: CancellationException) {
             throw e
@@ -289,6 +301,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     fun openRoom(token: String) {
         val room = _state.value.rooms.firstOrNull { it.token == token } ?: return
+        ChatNotifier.cancel(getApplication(), token)
         _state.update {
             it.copy(openRoom = room, messages = emptyList(), outbox = emptyList(), replyTo = null, hasOlder = true, loadingOlder = false)
         }
@@ -597,6 +610,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun logout() {
         loopJob?.cancel()
         loopJob = null
+        ChatNotifyScheduler.apply(getApplication(), false)
+        ChatNotifier.cancelAll(getApplication())
+        _openRequest.value = null
         viewModelScope.launch {
             store.clear()
             credentials = null
@@ -604,6 +620,79 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             _state.value = ChatUiState(ready = true)
         }
     }
+
+    // region Benachrichtigungen ---------------------------------------------------------------------
+
+    /**
+     * Schaltet die Hintergrundabfrage ein oder aus. Beim Einschalten wird der aktuelle Stand als Grundlinie gemerkt, damit
+     * bereits vorhandene ungelesene Nachrichten nicht gemeldet werden. Die Benachrichtigungsberechtigung klärt die Oberfläche.
+     */
+    fun setNotifications(enabled: Boolean) {
+        val r = remote ?: return
+        viewModelScope.launch {
+            if (enabled) {
+                try {
+                    val rooms = r.rooms()
+                    store.saveNotifyEnabled(true, ChatNotifyLogic.initialBaseline(rooms))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: ChatHttpException) {
+                    if (e.code == 401 || e.code == 403) authLost() else notice(ChatNoticeKind.LOAD_FAILED)
+                    return@launch
+                } catch (e: IOException) {
+                    notice(ChatNoticeKind.LOAD_FAILED)
+                    return@launch
+                }
+                ChatNotifier.ensureChannel(getApplication())
+                ChatNotifyScheduler.apply(getApplication(), true)
+            } else {
+                store.saveNotifyEnabled(false)
+                ChatNotifyScheduler.apply(getApplication(), false)
+                ChatNotifier.cancelAll(getApplication())
+            }
+            _state.update { it.copy(notifyEnabled = enabled) }
+        }
+    }
+
+    fun setNotifyShowText(value: Boolean) {
+        _state.update { it.copy(notifyShowText = value) }
+        viewModelScope.launch { store.saveNotifyShowText(value) }
+    }
+
+    fun notifyPermissionDenied() = notice(ChatNoticeKind.NOTIFY_DENIED)
+
+    private val _openRequest = MutableStateFlow<String?>(null)
+
+    /** Token eines Gesprächs, das auf Wunsch einer Benachrichtigung geöffnet werden soll, bis es geöffnet oder verworfen ist. */
+    val openRequest: StateFlow<String?> = _openRequest.asStateFlow()
+
+    fun requestOpen(token: String) {
+        if (!ChatApi.isSafeToken(token)) return
+        _openRequest.value = token
+        tryOpenPending(final = false)
+    }
+
+    fun clearOpenRequest() {
+        _openRequest.value = null
+    }
+
+    /** Öffnet das gewünschte Gespräch, sobald es in der Raumliste steht; mit [final] wird eine unbekannte Anfrage verworfen. */
+    private fun tryOpenPending(final: Boolean) {
+        val token = _openRequest.value ?: return
+        if (_state.value.rooms.any { it.token == token }) {
+            _openRequest.value = null
+            openRoom(token)
+        } else if (final) {
+            _openRequest.value = null
+        }
+    }
+
+    override fun onCleared() {
+        ChatForeground.active = false
+        super.onCleared()
+    }
+
+    // endregion
 
     private fun authLost() {
         authBroken = true

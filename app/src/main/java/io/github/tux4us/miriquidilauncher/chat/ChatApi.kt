@@ -181,6 +181,8 @@ object ChatApi {
             lastPreview = preview,
             favorite = o["isFavorite"] as? Boolean ?: false,
             readOnly = (o["readOnly"].asDouble()?.toInt() ?: 0) == 1,
+            lastMessageId = last?.id ?: 0L,
+            notificationLevel = o["notificationLevel"].asDouble()?.toInt() ?: 0,
         )
     }
 

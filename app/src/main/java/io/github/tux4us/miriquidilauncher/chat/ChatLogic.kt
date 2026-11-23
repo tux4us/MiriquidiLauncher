@@ -132,7 +132,7 @@ object ChatCacheCodec {
         val items = rooms.take(ChatLogic.CACHE_ROOMS).joinToString(",") {
             "{\"token\":${NotesJson.str(it.token)},\"type\":${it.type},\"name\":${NotesJson.str(it.name)}," +
                 "\"unread\":${it.unread},\"mention\":${it.unreadMention},\"activity\":${it.lastActivity}," +
-                "\"preview\":${NotesJson.str(it.lastPreview)},\"fav\":${it.favorite},\"ro\":${it.readOnly}}"
+                "\"preview\":${NotesJson.str(it.lastPreview)},\"fav\":${it.favorite},\"ro\":${it.readOnly},\"lm\":${it.lastMessageId},\"nl\":${it.notificationLevel}}"
         }
         return "{\"v\":$VERSION,\"rooms\":[$items]}"
     }
@@ -152,6 +152,8 @@ object ChatCacheCodec {
                 lastPreview = o["preview"].asString().orEmpty(),
                 favorite = o["fav"] as? Boolean ?: false,
                 readOnly = o["ro"] as? Boolean ?: false,
+                lastMessageId = o["lm"].asDouble()?.toLong() ?: 0L,
+                notificationLevel = o["nl"].asDouble()?.toInt() ?: 0,
             )
         }.orEmpty()
     }

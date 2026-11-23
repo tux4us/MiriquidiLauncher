@@ -6,7 +6,7 @@ Volltext / Full text: https://www.gnu.org/licenses/gpl-3.0.html
 DRITTKOMPONENTEN / THIRD-PARTY COMPONENTS
 
 Apache License 2.0 (Volltext unten / full text below):
-- AndroidX: Core, Activity, Lifecycle, DataStore, Compose (UI, Foundation, Material3, Animation, Runtime), Startup, Tracing, Emoji2, ProfileInstaller u. a. Copyright The Android Open Source Project
+- AndroidX: Core, Activity, Lifecycle, DataStore, WorkManager, Compose (UI, Foundation, Material3, Animation, Runtime), Startup, Tracing, Emoji2, ProfileInstaller u. a. Copyright The Android Open Source Project
 - Kotlin Standard Library, Copyright JetBrains s.r.o. and Kotlin Programming Language contributors
 - kotlinx.coroutines, Copyright JetBrains s.r.o. and contributors
 - AndroidX CameraX (Kamera des QR-Scanners und Scope "Kamera": Foto, Video, Hersteller-Erweiterungen), Copyright The Android Open Source Project

@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.ui
 
+import android.Manifest
 import android.content.ActivityNotFoundException
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +45,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -55,10 +61,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -73,6 +81,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -83,6 +92,7 @@ import io.github.tux4us.miriquidilauncher.chat.ChatLogic
 import io.github.tux4us.miriquidilauncher.chat.ChatMessage
 import io.github.tux4us.miriquidilauncher.chat.ChatMessageKind
 import io.github.tux4us.miriquidilauncher.chat.ChatNoticeKind
+import io.github.tux4us.miriquidilauncher.chat.ChatNotifier
 import io.github.tux4us.miriquidilauncher.chat.ChatRoom
 import io.github.tux4us.miriquidilauncher.chat.ChatUiState
 import io.github.tux4us.miriquidilauncher.chat.ChatViewModel
@@ -571,6 +581,32 @@ private fun noticeText(kind: ChatNoticeKind): Int = when (kind) {
     ChatNoticeKind.READ_ONLY -> R.string.chat_notice_read_only
     ChatNoticeKind.ATTACH_TOO_LARGE -> R.string.chat_notice_attach_too_large
     ChatNoticeKind.ATTACH_FAILED -> R.string.chat_notice_attach_failed
+    ChatNoticeKind.NOTIFY_DENIED -> R.string.chat_notice_notify_denied
+}
+
+@Composable
+private fun NotifySwitch(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .toggleable(value = checked, role = Role.Switch, onValueChange = onChange)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(label, color = WeatherText, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        Switch(
+            checked = checked,
+            onCheckedChange = null,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = ChatDialogColor,
+                checkedTrackColor = WeatherText,
+                uncheckedThumbColor = WeatherText,
+                uncheckedTrackColor = Color(0x33FFFFFF),
+                uncheckedBorderColor = Color(0x99FFFFFF),
+            ),
+        )
+    }
 }
 
 @Composable
@@ -615,6 +651,19 @@ private fun LoginDialog(viewModel: ChatViewModel, onDismiss: () -> Unit) {
 @Composable
 private fun AccountDialog(state: ChatUiState, viewModel: ChatViewModel, onDismiss: () -> Unit) {
     val account = state.account
+    val context = LocalContext.current
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) viewModel.setNotifications(true) else viewModel.notifyPermissionDenied()
+    }
+    fun toggleNotifications(on: Boolean) {
+        val missing = Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        when {
+            !on -> viewModel.setNotifications(false)
+            missing -> permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            else -> viewModel.setNotifications(true)
+        }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ChatDialogColor,
@@ -626,6 +675,14 @@ private fun AccountDialog(state: ChatUiState, viewModel: ChatViewModel, onDismis
                 if (account != null) {
                     Text(account.server, color = WeatherText)
                     Text(account.user, color = WeatherText)
+                    NotifySwitch(stringResource(R.string.chat_notify_enable), state.notifyEnabled, ::toggleNotifications)
+                    if (state.notifyEnabled) {
+                        NotifySwitch(stringResource(R.string.chat_notify_show_text), state.notifyShowText, viewModel::setNotifyShowText)
+                        if (!ChatNotifier.canNotify(context)) {
+                            Text(stringResource(R.string.chat_notify_blocked), color = ChatError, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    Text(stringResource(R.string.chat_notify_hint), style = MaterialTheme.typography.bodySmall)
                 }
                 Text(stringResource(R.string.chat_account_hint), style = MaterialTheme.typography.bodySmall)
             }

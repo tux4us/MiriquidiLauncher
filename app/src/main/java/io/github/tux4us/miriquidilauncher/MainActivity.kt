@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import io.github.tux4us.miriquidilauncher.calendar.AgendaViewModel
 import io.github.tux4us.miriquidilauncher.calendar.CalendarViewModel
 import io.github.tux4us.miriquidilauncher.camera.CameraViewModel
+import io.github.tux4us.miriquidilauncher.chat.ChatNotifier
 import io.github.tux4us.miriquidilauncher.chat.ChatViewModel
 import io.github.tux4us.miriquidilauncher.webapps.WebAppsViewModel
 import io.github.tux4us.miriquidilauncher.feed.FeedViewModel
@@ -75,6 +76,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
         )
         contactsGranted = hasContactsPermission()
+        if (savedInstanceState == null) handleChatIntent(intent)
         setContent {
             LauncherTheme {
                 LauncherScreen(
@@ -121,9 +123,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        handleChatIntent(intent)
         if (intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_HOME)) {
             viewModel.onHomePressed()
         }
+    }
+
+    /** Tipp auf eine Chat-Benachrichtigung: das Gespräch im Messenger öffnen. */
+    private fun handleChatIntent(intent: Intent) {
+        val token = intent.getStringExtra(ChatNotifier.EXTRA_TOKEN) ?: return
+        intent.removeExtra(ChatNotifier.EXTRA_TOKEN)
+        chatViewModel.requestOpen(token)
     }
 
     private fun hasContactsPermission(): Boolean =

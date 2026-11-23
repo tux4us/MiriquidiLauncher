@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <string name="scope_chat">Messenger</string>
-    <string name="chat_intro">Chat with Nextcloud Talk: read conversations and send messages. New messages appear while this page is open; there is no background connection and there are no notifications. Calls are not included.</string>
+    <string name="chat_intro">Chat with Nextcloud Talk: read conversations and send messages. New messages appear while this page is open. Optional background notifications can be turned on in the account dialog (about every 15 minutes). Calls are not included.</string>
     <string name="chat_connect">Connect to Nextcloud</string>
     <string name="chat_login_hint">Nextcloud address, user name and an app password (Nextcloud: Settings → Security). The Talk app must be installed on the server. HTTPS only. Recommendation: create a separate app password just for the launcher, because it gives access to the whole account and can be revoked individually there.</string>
     <string name="chat_login_server">Server (https://…)</string>
@@ -54,4 +54,15 @@
     <string name="chat_attach">Attach file</string>
     <string name="chat_notice_attach_too_large">The file is too large (limit 100 MB, the server may allow less).</string>
     <string name="chat_notice_attach_failed">The file could not be sent. Check the connection and the permissions in your Nextcloud.</string>
+    <string name="chat_notice_notify_denied">Notification permission was not granted. Notifications stay off.</string>
+    <string name="chat_notify_enable">Notifications</string>
+    <string name="chat_notify_show_text">Show sender and text</string>
+    <string name="chat_notify_hint">When on, the launcher asks your Nextcloud for new messages in the background about every 15 minutes (only with a network connection; the system may delay it in power-saving modes). Without the option “Show sender and text” only “New message” is shown. Conversations set to “never” in Talk stay silent. The lock screen never shows the text.</string>
+    <string name="chat_notify_blocked">Notifications for this app are turned off in the system settings.</string>
+    <string name="chat_notify_channel">Chat messages</string>
+    <string name="chat_notify_channel_desc">New messages from Nextcloud Talk</string>
+    <plurals name="chat_notify_new">
+        <item quantity="one">%d new message</item>
+        <item quantity="other">%d new messages</item>
+    </plurals>
 </resources>

@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <string name="scope_chat">Messenger</string>
-    <string name="chat_intro">Chat mit Nextcloud Talk: Gespräche lesen und Nachrichten senden. Neue Nachrichten erscheinen, solange diese Seite geöffnet ist; im Hintergrund gibt es keine Verbindung und keine Benachrichtigungen. Anrufe sind nicht enthalten.</string>
+    <string name="chat_intro">Chat mit Nextcloud Talk: Gespräche lesen und Nachrichten senden. Neue Nachrichten erscheinen, solange diese Seite geöffnet ist. Optionale Benachrichtigungen im Hintergrund lassen sich im Konto-Dialog einschalten (etwa alle 15 Minuten). Anrufe sind nicht enthalten.</string>
     <string name="chat_connect">Mit Nextcloud verbinden</string>
     <string name="chat_login_hint">Nextcloud-Adresse, Benutzername und ein App-Passwort (Nextcloud: Einstellungen → Sicherheit). Die Talk-App muss auf dem Server installiert sein. Nur HTTPS. Empfehlung: ein eigenes App-Passwort nur für den Launcher anlegen, denn es gibt Zugriff auf das ganze Konto und lässt sich dort einzeln widerrufen.</string>
     <string name="chat_login_server">Server (https://…)</string>
@@ -54,4 +54,15 @@
     <string name="chat_attach">Datei anhängen</string>
     <string name="chat_notice_attach_too_large">Die Datei ist zu groß (Grenze 100 MB, der Server erlaubt eventuell weniger).</string>
     <string name="chat_notice_attach_failed">Die Datei konnte nicht gesendet werden. Prüfe die Verbindung und die Berechtigungen in deiner Nextcloud.</string>
+    <string name="chat_notice_notify_denied">Die Berechtigung für Benachrichtigungen wurde nicht erteilt. Benachrichtigungen bleiben aus.</string>
+    <string name="chat_notify_enable">Benachrichtigungen</string>
+    <string name="chat_notify_show_text">Absender und Text anzeigen</string>
+    <string name="chat_notify_hint">Eingeschaltet fragt der Launcher etwa alle 15 Minuten im Hintergrund bei deiner Nextcloud nach neuen Nachrichten (nur mit Netzverbindung; Energiesparmodi können die Abfrage verzögern). Ohne die Option „Absender und Text anzeigen“ erscheint nur „Neue Nachricht“. In Talk auf „nie“ gestellte Gespräche bleiben still. Auf dem Sperrbildschirm erscheint nie der Text.</string>
+    <string name="chat_notify_blocked">Benachrichtigungen für diese App sind in den Systemeinstellungen ausgeschaltet.</string>
+    <string name="chat_notify_channel">Chat-Nachrichten</string>
+    <string name="chat_notify_channel_desc">Neue Nachrichten aus Nextcloud Talk</string>
+    <plurals name="chat_notify_new">
+        <item quantity="one">%d neue Nachricht</item>
+        <item quantity="other">%d neue Nachrichten</item>
+    </plurals>
 </resources>

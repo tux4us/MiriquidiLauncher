@@ -23,6 +23,10 @@ data class ChatRoom(
     val lastPreview: String,
     val favorite: Boolean,
     val readOnly: Boolean,
+    /** Id der letzten Nachricht, 0 ohne Nachricht. */
+    val lastMessageId: Long = 0L,
+    /** Benachrichtigungsstufe des Gesprächs in Talk: 0 Standard, 1 immer, 2 nur Erwähnungen, 3 nie. */
+    val notificationLevel: Int = 0,
 ) {
     /** Bei Einzelgesprächen steht kein Absendername in den Nachrichten. */
     val isGroup: Boolean get() = type != ChatRoomType.ONE_TO_ONE && type != ChatRoomType.NOTE_TO_SELF

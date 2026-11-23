@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -22,6 +23,9 @@ private val Context.chatDataStore: DataStore<Preferences> by preferencesDataStor
     name = "chat",
     corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
 )
+
+/** Einstellungen der Chat-Benachrichtigungen. */
+data class ChatNotifySettings(val enabled: Boolean, val showText: Boolean)
 
 /**
  * Lokaler Zustand des Messenger-Scopes: Zugangsdaten (Passwort über den Keystore verschlüsselt) und der Zwischenspeicher
@@ -56,9 +60,37 @@ class ChatStore(context: Context) {
         }
     }
 
+    /** Einstellungen der Benachrichtigungen; standardmäßig aus, mit Absender und Text. */
+    suspend fun loadNotify(): ChatNotifySettings {
+        val p = prefs()
+        return ChatNotifySettings(p[NOTIFY_ENABLED] ?: false, p[NOTIFY_TEXT] ?: true)
+    }
+
+    suspend fun saveNotifyShowText(showText: Boolean) {
+        store.edit { it[NOTIFY_TEXT] = showText }
+    }
+
+    /** Schaltet ein und legt die Grundlinie fest, oder schaltet aus und verwirft sie. */
+    suspend fun saveNotifyEnabled(enabled: Boolean, baseline: Map<String, Long> = emptyMap()) {
+        store.edit {
+            it[NOTIFY_ENABLED] = enabled
+            if (enabled) it[NOTIFIED] = ChatNotifyLogic.encodeBaseline(baseline) else it.remove(NOTIFIED)
+        }
+    }
+
+    /** `null`, wenn noch keine Grundlinie gespeichert ist. */
+    suspend fun loadBaseline(): Map<String, Long>? = prefs()[NOTIFIED]?.let(ChatNotifyLogic::decodeBaseline)
+
+    suspend fun saveBaseline(baseline: Map<String, Long>) {
+        store.edit { it[NOTIFIED] = ChatNotifyLogic.encodeBaseline(baseline) }
+    }
+
     /** Entfernt Zugangsdaten, Schlüssel und den gesamten Zwischenspeicher. */
     suspend fun clear() {
         store.edit {
+            it.remove(NOTIFY_ENABLED)
+            it.remove(NOTIFY_TEXT)
+            it.remove(NOTIFIED)
             it.remove(SERVER)
             it.remove(USER)
             it.remove(UID)
@@ -127,5 +159,8 @@ class ChatStore(context: Context) {
         val USER = stringPreferencesKey("user")
         val UID = stringPreferencesKey("uid")
         val SECRET = stringPreferencesKey("secret")
+        val NOTIFY_ENABLED = booleanPreferencesKey("notify_enabled")
+        val NOTIFY_TEXT = booleanPreferencesKey("notify_text")
+        val NOTIFIED = stringPreferencesKey("notified")
     }
 }
