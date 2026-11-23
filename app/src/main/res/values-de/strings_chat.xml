@@ -65,4 +65,12 @@
         <item quantity="one">%d neue Nachricht</item>
         <item quantity="other">%d neue Nachrichten</item>
     </plurals>
+    <string name="chat_yes">ja</string>
+    <string name="chat_no">nein</string>
+    <string name="chat_notify_check">Jetzt prüfen</string>
+    <string name="chat_notify_check_running">Prüfe …</string>
+    <string name="chat_notify_check_result">Gespräche: %1$d, mit ungelesenen Nachrichten: %2$d, Benachrichtigungen gezeigt: %3$d. Berechtigung erteilt: %4$s, erster Lauf (nur Grundlinie): %5$s, eingeschaltet: %6$s.</string>
+    <string name="chat_notify_check_error">Prüfung fehlgeschlagen: %1$s</string>
+    <string name="chat_notify_check_room">%1$s: ungelesen %2$d, letzte Nachrichten-Id %3$d, Grundlinie %4$d, Stufe %5$d</string>
+    <string name="chat_notify_check_fetched">  abgerufen %1$d Nachrichten, davon %2$d neu und von anderen</string>
 </resources>

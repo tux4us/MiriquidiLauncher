@@ -678,6 +678,8 @@ private fun AccountDialog(state: ChatUiState, viewModel: ChatViewModel, onDismis
                     NotifySwitch(stringResource(R.string.chat_notify_enable), state.notifyEnabled, ::toggleNotifications)
                     if (state.notifyEnabled) {
                         NotifySwitch(stringResource(R.string.chat_notify_show_text), state.notifyShowText, viewModel::setNotifyShowText)
+                        DialogButton(stringResource(R.string.chat_notify_check), viewModel::checkNotificationsNow)
+                        state.notifyCheck?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = WeatherText) }
                         if (!ChatNotifier.canNotify(context)) {
                             Text(stringResource(R.string.chat_notify_blocked), color = ChatError, style = MaterialTheme.typography.bodySmall)
                         }

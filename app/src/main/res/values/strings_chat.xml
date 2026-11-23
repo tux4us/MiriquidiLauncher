@@ -65,4 +65,12 @@
         <item quantity="one">%d new message</item>
         <item quantity="other">%d new messages</item>
     </plurals>
+    <string name="chat_yes">yes</string>
+    <string name="chat_no">no</string>
+    <string name="chat_notify_check">Check now</string>
+    <string name="chat_notify_check_running">Checking…</string>
+    <string name="chat_notify_check_result">Conversations: %1$d, with unread messages: %2$d, notifications shown: %3$d. Permission granted: %4$s, first run (baseline only): %5$s, switched on: %6$s.</string>
+    <string name="chat_notify_check_error">Check failed: %1$s</string>
+    <string name="chat_notify_check_room">%1$s: unread %2$d, last message id %3$d, baseline %4$d, level %5$d</string>
+    <string name="chat_notify_check_fetched">  retrieved %1$d messages, %2$d of them new and from others</string>
 </resources>

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.tux4us.miriquidilauncher.R
 import io.github.tux4us.miriquidilauncher.feed.FeedStore
 import io.github.tux4us.miriquidilauncher.feed.NewsApi
 import io.github.tux4us.miriquidilauncher.feed.ServerUrl
@@ -78,6 +79,8 @@ data class ChatUiState(
     val notifyEnabled: Boolean = false,
     /** Absender und Text in der Benachrichtigung zeigen (sonst nur „Neue Nachricht“). */
     val notifyShowText: Boolean = true,
+    /** Ergebnis der manuellen Prüfung („Jetzt prüfen“), `null` ohne Prüfung. */
+    val notifyCheck: String? = null,
 )
 
 /**
@@ -660,6 +663,73 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun notifyPermissionDenied() = notice(ChatNoticeKind.NOTIFY_DENIED)
+
+    /**
+     * Führt einen Lauf der Hintergrundabfrage sofort aus (derselbe Ablauf wie im Worker, ohne Wartezeit und ohne
+     * Rücksicht auf die Sichtbarkeit) und zeigt das Ergebnis im Konto-Dialog. Zum Prüfen der Einrichtung.
+     */
+    fun checkNotificationsNow() {
+        val r = remote ?: return
+        val app = getApplication<Application>()
+        _state.update { it.copy(notifyCheck = app.getString(R.string.chat_notify_check_running)) }
+        viewModelScope.launch {
+            var rooms = 0
+            var unread = 0
+            var shown = 0
+            val details = mutableListOf<String>()
+            val result = try {
+                val settings = store.loadNotify()
+                val baseline = store.loadBaseline()
+                val source = object : ChatNotifySource {
+                    override suspend fun rooms(): List<ChatRoom> = r.rooms().also { list ->
+                        rooms = list.size
+                        unread = list.count { it.unread > 0 }
+                        list.filter { it.unread > 0 }.take(5).forEach { room ->
+                            details += app.getString(
+                                R.string.chat_notify_check_room,
+                                room.name, room.unread, room.lastMessageId, baseline?.get(room.token) ?: 0L, room.notificationLevel,
+                            )
+                        }
+                    }
+
+                    override suspend fun messages(token: String, limit: Int): List<ChatMessage> {
+                        val list = r.messages(token, false, 0L, limit)
+                        val fresh = ChatNotifyLogic.newMessages(list, baseline?.get(token) ?: 0L, _state.value.ownId)
+                        details += app.getString(R.string.chat_notify_check_fetched, list.size, fresh.size)
+                        return list
+                    }
+                }
+                val notifier = ChatNotifier(app, settings.showText)
+                val sink = object : ChatNotifySink {
+                    override fun show(room: ChatRoom, lines: List<String>, count: Int) {
+                        shown++
+                        notifier.show(room, lines, count)
+                    }
+
+                    override fun clear(token: String) = notifier.clear(token)
+                }
+                ChatNotifyRunner.run(source, sink, baseline, _state.value.ownId, ChatNotifier.canNotify(app))
+                // Die Grundlinie bleibt unverändert: die Prüfung verbraucht keine Meldungen des echten Laufs.
+                val summary = app.getString(
+                    R.string.chat_notify_check_result,
+                    rooms,
+                    unread,
+                    shown,
+                    app.getString(if (ChatNotifier.canNotify(app)) R.string.chat_yes else R.string.chat_no),
+                    app.getString(if (baseline == null) R.string.chat_yes else R.string.chat_no),
+                    if (settings.enabled) app.getString(R.string.chat_yes) else app.getString(R.string.chat_no),
+                )
+                (details + summary).joinToString("\n")
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ChatHttpException) {
+                app.getString(R.string.chat_notify_check_error, "HTTP ${e.code}")
+            } catch (e: IOException) {
+                app.getString(R.string.chat_notify_check_error, e.javaClass.simpleName)
+            }
+            _state.update { it.copy(notifyCheck = result) }
+        }
+    }
 
     private val _openRequest = MutableStateFlow<String?>(null)
 
