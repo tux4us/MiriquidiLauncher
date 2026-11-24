@@ -19,6 +19,8 @@ import androidx.core.content.ContextCompat
 import io.github.tux4us.miriquidilauncher.calendar.AgendaViewModel
 import io.github.tux4us.miriquidilauncher.calendar.CalendarViewModel
 import io.github.tux4us.miriquidilauncher.camera.CameraViewModel
+import io.github.tux4us.miriquidilauncher.chat.ChatForeground
+import io.github.tux4us.miriquidilauncher.home.HomeCardsViewModel
 import io.github.tux4us.miriquidilauncher.chat.ChatNotifier
 import io.github.tux4us.miriquidilauncher.chat.ChatViewModel
 import io.github.tux4us.miriquidilauncher.webapps.WebAppsViewModel
@@ -57,6 +59,7 @@ class MainActivity : ComponentActivity() {
     private val converterViewModel: ConverterViewModel by viewModels()
     private val cameraViewModel: CameraViewModel by viewModels()
     private val agendaViewModel: AgendaViewModel by viewModels()
+    private val homeCardsViewModel: HomeCardsViewModel by viewModels()
     private val dogViewModel: DogViewModel by viewModels()
     private val recentsViewModel: RecentsViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
@@ -96,6 +99,7 @@ class MainActivity : ComponentActivity() {
                     converterViewModel = converterViewModel,
                     cameraViewModel = cameraViewModel,
                     agendaViewModel = agendaViewModel,
+                    homeCardsViewModel = homeCardsViewModel,
                     dogViewModel = dogViewModel,
                     recentsViewModel = recentsViewModel,
                     settingsViewModel = settingsViewModel,
@@ -108,8 +112,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onPause() {
+        ChatForeground.visible = false
+        super.onPause()
+    }
+
     override fun onResume() {
         super.onResume()
+        ChatForeground.visible = true
         // Termine der Startseite neu lesen (Kalender oder Berechtigung können sich geändert haben).
         agendaViewModel.refresh()
         // Die Berechtigung kann in den Systemeinstellungen geändert worden sein.

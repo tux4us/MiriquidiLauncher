@@ -55,6 +55,10 @@ data class ChatMessage(
     val reply: ChatReply? = null,
     val attachments: List<ChatAttachment> = emptyList(),
     val referenceId: String = "",
+    /** Reaktionen (Emoji mit Anzahl); leer ohne Reaktionen. */
+    val reactions: Map<String, Int> = emptyMap(),
+    /** Die Emojis, mit denen das eigene Konto reagiert hat. */
+    val reactionsSelf: Set<String> = emptySet(),
 ) {
     /** `true`, wenn die Nachricht von dem Konto mit der Benutzer-Id [ownId] stammt. */
     fun isOwn(ownId: String): Boolean = ownId.isNotEmpty() && actorType == "users" && actorId == ownId

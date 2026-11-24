@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.ui
 
+import io.github.tux4us.miriquidilauncher.home.HomeCardsViewModel
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -37,6 +38,10 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
+import kotlin.math.roundToInt
+import io.github.tux4us.miriquidilauncher.home.HomeCardsSettings
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Slider
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -79,6 +84,7 @@ fun SettingsScreen(
     launcherViewModel: LauncherViewModel,
     settingsViewModel: SettingsViewModel,
     agendaViewModel: AgendaViewModel,
+    homeCardsViewModel: HomeCardsViewModel,
     onRestored: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -87,6 +93,7 @@ fun SettingsScreen(
     val contacts by launcherViewModel.favoriteContacts.collectAsStateWithLifecycle()
     val state by settingsViewModel.state.collectAsStateWithLifecycle()
     val agenda by agendaViewModel.state.collectAsStateWithLifecycle()
+    val homeCards by homeCardsViewModel.settings.collectAsStateWithLifecycle()
     val hiddenScopes by settingsViewModel.hiddenScopes.collectAsStateWithLifecycle()
     val scopeOrder by settingsViewModel.scopeOrder.collectAsStateWithLifecycle()
     val consentedScopes by settingsViewModel.consentedScopes.collectAsStateWithLifecycle()
@@ -276,6 +283,66 @@ fun SettingsScreen(
                             )
                         }
                     }
+                    HomeCheckRow(
+                        title = stringResource(R.string.settings_home_tomorrow_title),
+                        text = stringResource(R.string.settings_home_tomorrow_text),
+                        checked = homeCards.tomorrow,
+                        onChange = homeCardsViewModel::setTomorrow,
+                    )
+                    HomeCheckRow(
+                        title = stringResource(R.string.settings_home_weather_title),
+                        text = stringResource(R.string.settings_home_weather_text),
+                        checked = homeCards.weather,
+                        onChange = homeCardsViewModel::setWeather,
+                    )
+                    HomeCheckRow(
+                        title = stringResource(R.string.settings_home_messages_title),
+                        text = stringResource(R.string.settings_home_messages_text),
+                        checked = homeCards.messages,
+                        onChange = homeCardsViewModel::setMessages,
+                    )
+                    if (homeCards.messages) {
+                        HomeCheckRow(
+                            title = stringResource(R.string.settings_home_messages_preview_title),
+                            text = stringResource(R.string.settings_home_messages_preview_text),
+                            checked = homeCards.messagesText,
+                            onChange = homeCardsViewModel::setMessagesText,
+                        )
+                    }
+                }
+            }
+            item {
+                SectionCard(stringResource(R.string.settings_section_appearance)) {
+                    Row(Modifier.fillMaxWidth()) {
+                        Text(
+                            stringResource(R.string.settings_menu_opacity_title),
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            "${(homeCards.menuOpacity * 100).roundToInt()} %",
+                            color = WeatherTextMuted,
+                        )
+                    }
+                    Text(
+                        stringResource(R.string.settings_menu_opacity_text),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = WeatherTextMuted,
+                    )
+                    Slider(
+                        value = homeCards.menuOpacity,
+                        onValueChange = { homeCardsViewModel.setMenuOpacity((it * 20).roundToInt() / 20f) },
+                        valueRange = HomeCardsSettings.MIN_MENU_OPACITY..HomeCardsSettings.MAX_MENU_OPACITY,
+                        colors = SliderDefaults.colors(
+                            thumbColor = WeatherText,
+                            activeTrackColor = WeatherText,
+                            inactiveTrackColor = Color(0x33FFFFFF),
+                        ),
+                    )
+                    OutlineAction(
+                        stringResource(R.string.settings_menu_opacity_reset),
+                        enabled = homeCards.menuOpacity != HomeCardsSettings.DEFAULT_MENU_OPACITY,
+                        onClick = { homeCardsViewModel.setMenuOpacity(HomeCardsSettings.DEFAULT_MENU_OPACITY) },
+                    )
                 }
             }
             item {
@@ -500,4 +567,29 @@ private fun networkConsentDetail(scope: Scope): Int = when (scope) {
     Scope.Podcasts -> R.string.settings_network_consent_podcasts
     Scope.Chat -> R.string.settings_network_consent_chat
     else -> R.string.settings_network_consent_markets
+}
+
+/** Zeile mit Häkchen für eine Option der Startseite; die ganze Zeile ist das Trefferfeld. */
+@Composable
+private fun HomeCheckRow(title: String, text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(role = Role.Checkbox) { onChange(!checked) },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = null,
+            colors = CheckboxDefaults.colors(
+                checkedColor = WeatherText,
+                checkmarkColor = Color(0xFF141A22),
+                uncheckedColor = WeatherText,
+            ),
+        )
+        Column(Modifier.weight(1f).padding(start = 8.dp)) {
+            Text(title)
+            Text(text, style = MaterialTheme.typography.bodySmall, color = WeatherTextMuted)
+        }
+    }
 }

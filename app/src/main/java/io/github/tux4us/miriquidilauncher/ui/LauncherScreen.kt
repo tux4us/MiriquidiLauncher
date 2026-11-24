@@ -33,6 +33,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -100,6 +102,10 @@ import io.github.tux4us.miriquidilauncher.markets.MarketsViewModel
 import io.github.tux4us.miriquidilauncher.gallery.GalleryViewModel
 import io.github.tux4us.miriquidilauncher.notes.NotesViewModel
 import io.github.tux4us.miriquidilauncher.chat.ChatViewModel
+import io.github.tux4us.miriquidilauncher.weather.WeatherReport
+import io.github.tux4us.miriquidilauncher.home.HomeCardsSettings
+import io.github.tux4us.miriquidilauncher.chat.ChatRoom
+import io.github.tux4us.miriquidilauncher.home.HomeCardsViewModel
 import io.github.tux4us.miriquidilauncher.webapps.WebAppsViewModel
 import io.github.tux4us.miriquidilauncher.music.MusicViewModel
 import io.github.tux4us.miriquidilauncher.podcasts.PodcastsViewModel
@@ -175,6 +181,7 @@ fun LauncherScreen(
     converterViewModel: ConverterViewModel,
     cameraViewModel: CameraViewModel,
     agendaViewModel: AgendaViewModel,
+    homeCardsViewModel: HomeCardsViewModel,
     dogViewModel: DogViewModel,
     recentsViewModel: RecentsViewModel,
     settingsViewModel: SettingsViewModel,
@@ -194,6 +201,9 @@ fun LauncherScreen(
     val podcastDetailOpen by podcastsViewModel.detailOpen.collectAsStateWithLifecycle()
     val cameraBusy by cameraViewModel.busy.collectAsStateWithLifecycle()
     val agendaState by agendaViewModel.state.collectAsStateWithLifecycle()
+    val homeSettings by homeCardsViewModel.settings.collectAsStateWithLifecycle()
+    val homeUnread by chatViewModel.homeUnread.collectAsStateWithLifecycle()
+    val weatherState by weatherViewModel.state.collectAsStateWithLifecycle()
     val dogState by dogViewModel.state.collectAsStateWithLifecycle()
     val recentsState by recentsViewModel.state.collectAsStateWithLifecycle()
     var recentsOpen by remember { mutableStateOf(false) }
@@ -447,6 +457,18 @@ fun LauncherScreen(
                             onOpenResult = ::openResult,
                             onRequestContacts = onRequestContacts,
                             agenda = agendaState,
+                            homeSettings = homeSettings,
+                            unreadRooms = homeUnread,
+                            weatherReport = weatherState.report,
+                            weatherAnimated = weatherState.backgroundAnimated,
+                            homeVisible = sidePagerState.currentPage == SIDE_PAGE_LAUNCHER && pagerState.currentPage == PAGE_HOME,
+                            onChatRefresh = chatViewModel::refreshHome,
+                            onOpenChat = { token ->
+                                // Das Gespräch wird sofort geöffnet, wenn es bekannt ist; die Seite muss in jedem Fall gewechselt werden.
+                                chatViewModel.requestOpen(token)
+                                pageOf(Scope.Chat)?.let { page -> scope.launch { sidePagerState.animateScrollToPage(page) } }
+                            },
+                            onWeatherRefresh = weatherViewModel::onScreenShown,
                             onAgendaRefresh = agendaViewModel::refresh,
                             dogDue = dogDue,
                             onAgendaOpen = { view ->
@@ -499,6 +521,7 @@ fun LauncherScreen(
                         launcherViewModel = viewModel,
                         settingsViewModel = settingsViewModel,
                         agendaViewModel = agendaViewModel,
+                        homeCardsViewModel = homeCardsViewModel,
                         onRestored = {
                             weatherViewModel.reloadFromStore()
                             podcastsViewModel.reloadFromStore()
@@ -654,6 +677,7 @@ fun LauncherScreen(
                 actionLabel = null,
                 onEvent = ::dispatchActiveMenuEvent,
                 onItemLongClick = null,
+                panelOpacity = homeSettings.menuOpacity,
             )
         }
     }
@@ -736,6 +760,14 @@ private fun HomePage(
     onOpenResult: (SearchResult) -> Unit,
     onRequestContacts: () -> Unit,
     agenda: AgendaUiState,
+    homeSettings: HomeCardsSettings,
+    unreadRooms: List<ChatRoom>,
+    weatherReport: WeatherReport?,
+    weatherAnimated: Boolean,
+    homeVisible: Boolean,
+    onChatRefresh: () -> Unit,
+    onOpenChat: (String) -> Unit,
+    onWeatherRefresh: () -> Unit,
     onAgendaRefresh: () -> Unit,
     dogDue: List<DueEntry>,
     onAgendaOpen: (AgendaView) -> Unit,
@@ -760,11 +792,32 @@ private fun HomePage(
                 .padding(horizontal = 8.dp),
         ) {
             if (query.isEmpty()) {
-                Column(Modifier.padding(top = 32.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                Column(
+                    Modifier.verticalScroll(rememberScrollState()).padding(top = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                ) {
                     ClockHeader()
+                    if (homeSettings.weather) {
+                        WeatherHomeCard(
+                            report = weatherReport,
+                            animated = weatherAnimated,
+                            visible = homeVisible,
+                            onRefresh = onWeatherRefresh,
+                            onOpen = { onOpenScope(Scope.Weather) },
+                        )
+                    }
                     val view = agenda.view
                     if (agenda.enabled && agenda.permissionGranted && view != null) {
-                        AgendaCard(view = view, onRefresh = onAgendaRefresh, onOpen = onAgendaOpen)
+                        AgendaCard(view = view, onRefresh = onAgendaRefresh, onOpen = onAgendaOpen, tomorrow = agenda.tomorrow)
+                    }
+                    if (homeSettings.messages) {
+                        ChatHomeCard(
+                            rooms = unreadRooms,
+                            showText = homeSettings.messagesText,
+                            visible = homeVisible,
+                            onRefresh = onChatRefresh,
+                            onOpen = onOpenChat,
+                        )
                     }
                     DogsHomeCard(entries = dogDue, onOpen = { onOpenScope(Scope.Dogs) })
                 }

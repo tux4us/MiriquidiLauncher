@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.backup
 
+import io.github.tux4us.miriquidilauncher.home.HomeCardsStore
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
@@ -83,6 +84,7 @@ class BackupManager(context: Context) {
     private val cameraSettingsStore = CameraSettingsStore(appContext)
     private val cameraAppStore = CameraStore(appContext)
     private val agendaStore = AgendaStore(appContext)
+    private val homeCardsStore = HomeCardsStore(appContext)
     private val dogStore = DogStore(appContext)
     private val musicStore = MusicStore(appContext)
     private val webAppStore = WebAppStore(appContext)
@@ -111,6 +113,7 @@ class BackupManager(context: Context) {
             camera = if (includeFileOnlyData) cameraForBackup() else null,
             notesSettings = if (includeFileOnlyData) notesStore.settings().let { BackupNotesSettings(it.sort, it.ascending) } else null,
             agendaEnabled = if (includeFileOnlyData) agendaStore.enabled.first() else null,
+            homeCards = if (includeFileOnlyData) homeCardsStore.load() else null,
             dogs = if (includeFileOnlyData) dogStore.load() else null,
             music = if (includeFileOnlyData) musicStore.load() else null,
             // Verknüpfungen aus dem Browser sind an Gerät, Benutzerprofil und Standard-Launcher gebunden und stehen nicht im Backup.
@@ -258,6 +261,7 @@ class BackupManager(context: Context) {
         }
         data.notesSettings?.let { notesStore.saveSort(it.sort, it.ascending) }
         data.agendaEnabled?.let { agendaStore.setEnabled(it) }
+        data.homeCards?.let { homeCardsStore.save(it) }
         data.dogs?.let { dogStore.save(it) }
         data.webApps?.let { imported ->
             // Symbole liegen nur auf dem Gerät: Einträge mit gleicher Kennung behalten ihr Symbol, übrige Symbole entfallen.

@@ -22,10 +22,19 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.cancellation.CancellationException
 
-/** `true`, solange der Messenger sichtbar ist und die App im Vordergrund steht; dann benachrichtigt der Worker nicht. */
+/**
+ * Der Worker benachrichtigt nicht, solange der Messenger sichtbar ist und die App im Vordergrund steht.
+ * [visible] setzt die Activity synchron in `onResume` und `onPause`; [active] kommt aus der Oberfläche und kann
+ * veralten, weil Compose bei angehaltener Activity nicht neu zeichnet. Maßgeblich ist daher nur [shown].
+ */
 object ChatForeground {
     @Volatile
     var active: Boolean = false
+
+    @Volatile
+    var visible: Boolean = false
+
+    val shown: Boolean get() = active && visible
 }
 
 /** Zeigt und entfernt die Benachrichtigungen. Der Inhalt bleibt auf dem Sperrbildschirm verborgen. */
@@ -123,7 +132,7 @@ class ChatNotifyWorker(context: Context, params: WorkerParameters) : CoroutineWo
         val store = ChatStore(applicationContext)
         val settings = store.loadNotify()
         if (!settings.enabled) return Result.success()
-        if (ChatForeground.active) return Result.success()
+        if (ChatForeground.shown) return Result.success()
         val credentials = store.loadCredentials() ?: return Result.success()
         val remote = ChatRemote(credentials.baseUrl, credentials.user, credentials.password)
         val source = object : ChatNotifySource {

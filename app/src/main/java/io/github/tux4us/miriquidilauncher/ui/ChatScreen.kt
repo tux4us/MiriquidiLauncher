@@ -9,6 +9,16 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
+import java.time.LocalDateTime
+import io.github.tux4us.miriquidilauncher.chat.ChatApi
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.horizontalScroll
+import android.widget.Toast
+import android.content.Context
+import android.content.ClipboardManager
+import android.content.ClipData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.toggleable
@@ -266,6 +276,8 @@ private fun ChatView(state: ChatUiState, room: ChatRoom, viewModel: ChatViewMode
     val newestFirst = remember(messages) { messages.asReversed() }
     val outbox = remember(state.outbox, room.token) { state.outbox.filter { it.token == room.token }.asReversed() }
     val listState = rememberLazyListState()
+    val context = LocalContext.current
+    var forwardOf by remember(room.token) { mutableStateOf<ChatMessage?>(null) }
     val newestId = messages.lastOrNull()?.id ?: 0L
     var scrolledOnce by remember(room.token) { mutableStateOf(false) }
     var seenOutbox by remember(room.token) { mutableStateOf(0) }
@@ -309,6 +321,10 @@ private fun ChatView(state: ChatUiState, room: ChatRoom, viewModel: ChatViewMode
                     canReply = !room.readOnly,
                     locale = locale,
                     onReply = { viewModel.setReply(message) },
+                    onCopy = { copyToClipboard(context, ChatLogic.forwardText(message)) },
+                    onForward = { forwardOf = message },
+                    onReminder = { pickReminderTime(context) { millis -> viewModel.createReminder(message, millis) } },
+                    onReact = { emoji -> viewModel.react(message, emoji) },
                 )
             }
             if (state.hasOlder && messages.isNotEmpty()) {
@@ -335,6 +351,80 @@ private fun ChatView(state: ChatUiState, room: ChatRoom, viewModel: ChatViewMode
             Composer(state, room, viewModel)
         }
     }
+    forwardOf?.let { message ->
+        ForwardDialog(
+            rooms = state.rooms,
+            onPick = { target ->
+                forwardOf = null
+                viewModel.forward(message, target.token)
+            },
+            onDismiss = { forwardOf = null },
+        )
+    }
+}
+
+/** Kopiert [text] in die Zwischenablage; ab Android 13 zeigt das System selbst eine Bestätigung. */
+private fun copyToClipboard(context: Context, text: String) {
+    if (text.isEmpty()) return
+    val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager ?: return
+    manager.setPrimaryClip(ClipData.newPlainText("", text))
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        Toast.makeText(context, R.string.chat_copied, Toast.LENGTH_SHORT).show()
+    }
+}
+
+/** Fragt Datum und Uhrzeit der Erinnerung mit den Standarddialogen des Systems ab (Vorgabe: morgen 9:00 Uhr). */
+private fun pickReminderTime(context: Context, onPicked: (Long) -> Unit) {
+    val zone = ZoneId.systemDefault()
+    val tomorrow = LocalDate.now(zone).plusDays(1)
+    val dialog = android.app.DatePickerDialog(
+        context,
+        { _, year, month, day ->
+            val is24 = android.text.format.DateFormat.is24HourFormat(context)
+            android.app.TimePickerDialog(
+                context,
+                { _, hour, minute ->
+                    onPicked(LocalDateTime.of(year, month + 1, day, hour, minute).atZone(zone).toInstant().toEpochMilli())
+                },
+                9, 0, is24,
+            ).show()
+        },
+        tomorrow.year, tomorrow.monthValue - 1, tomorrow.dayOfMonth,
+    )
+    dialog.datePicker.minDate = System.currentTimeMillis() - 1_000L
+    dialog.show()
+}
+
+@Composable
+private fun ForwardDialog(rooms: List<ChatRoom>, onPick: (ChatRoom) -> Unit, onDismiss: () -> Unit) {
+    val targets = remember(rooms) { rooms.filter { !it.readOnly } }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = ChatDialogColor,
+        titleContentColor = WeatherText,
+        textContentColor = WeatherTextMuted,
+        title = { Text(stringResource(R.string.chat_forward_title)) },
+        text = {
+            if (targets.isEmpty()) {
+                Text(stringResource(R.string.chat_empty))
+            } else {
+                LazyColumn(Modifier.heightIn(max = 360.dp)) {
+                    items(targets, key = { it.token }) { target ->
+                        Text(
+                            text = target.name.ifBlank { stringResource(R.string.scope_chat) },
+                            color = WeatherText,
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.fillMaxWidth().clickable { onPick(target) }.padding(vertical = 12.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { DialogButton(stringResource(R.string.chat_cancel), onDismiss) },
+    )
 }
 
 @Composable
@@ -388,12 +478,18 @@ private fun Composer(state: ChatUiState, room: ChatRoom, viewModel: ChatViewMode
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 colors = filesFieldColors(),
             )
-            PodcastButton(stringResource(R.string.chat_send), {
-                // Der Entwurf bleibt stehen, wenn der Text nicht gesendet werden kann (leer, zu lang).
-                val sendable = ChatLogic.check(ChatLogic.clean(draft)) == OutgoingCheck.OK
-                viewModel.send(draft)
-                if (sendable) draft = ""
-            })
+            // Kleine runde Schaltfläche mit Pfeil statt der Textschaltfläche; die Beschriftung bleibt für TalkBack.
+            IconButton(
+                onClick = {
+                    // Der Entwurf bleibt stehen, wenn der Text nicht gesendet werden kann (leer, zu lang).
+                    val sendable = ChatLogic.check(ChatLogic.clean(draft)) == OutgoingCheck.OK
+                    viewModel.send(draft)
+                    if (sendable) draft = ""
+                },
+                modifier = Modifier.size(48.dp).glass(CircleShape),
+            ) {
+                Icon(painterResource(R.drawable.ic_send), stringResource(R.string.chat_send), tint = WeatherText)
+            }
         }
         if (!keyboardOpen) Spacer(Modifier.height(ScopeBottomClearance))
     }
@@ -409,6 +505,10 @@ private fun MessageItem(
     canReply: Boolean,
     locale: Locale,
     onReply: () -> Unit,
+    onCopy: () -> Unit,
+    onForward: () -> Unit,
+    onReminder: () -> Unit,
+    onReact: (String) -> Unit,
 ) {
     Column(Modifier.fillMaxWidth()) {
         if (newDay) {
@@ -437,7 +537,7 @@ private fun MessageItem(
                     Modifier
                         .widthIn(max = 300.dp)
                         .then(if (own) Modifier.glass(ChatOwnShape, ChatOwnBubble) else Modifier.glass(ChatOtherShape))
-                        .combinedClickable(onClick = {}, onLongClick = { if (canReply && message.kind == ChatMessageKind.TEXT) menuOpen = true })
+                        .combinedClickable(onClick = {}, onLongClick = { if (message.kind == ChatMessageKind.TEXT) menuOpen = true })
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
@@ -466,10 +566,49 @@ private fun MessageItem(
                         if (message.text.isNotEmpty()) MessageText(message.text)
                         message.attachments.forEach { AttachmentRow(it) }
                     }
+                    if (message.reactions.isNotEmpty()) {
+                        Row(
+                            Modifier.horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            message.reactions.forEach { (emoji, count) ->
+                                val mine = emoji in message.reactionsSelf
+                                Text(
+                                    text = "$emoji $count",
+                                    color = WeatherText,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = if (mine) FontWeight.Bold else FontWeight.Normal,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .background(if (mine) Color(0x66FFFFFF) else Color(0x22FFFFFF))
+                                        .clickable(enabled = canReply) { onReact(emoji) }
+                                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                                )
+                            }
+                        }
+                    }
                     Text(formatChatClock(message.timestamp, locale), color = WeatherTextMuted, style = MaterialTheme.typography.labelSmall, modifier = Modifier.align(Alignment.End))
                 }
+                val hasContent = remember(message) { ChatLogic.forwardText(message).isNotEmpty() }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                    DropdownMenuItem(text = { Text(stringResource(R.string.chat_reply)) }, onClick = { menuOpen = false; onReply() })
+                    if (canReply) {
+                        Row(Modifier.padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                            ChatApi.QUICK_REACTIONS.forEach { emoji ->
+                                Text(
+                                    text = emoji,
+                                    fontSize = 22.sp,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .clickable(onClickLabel = emoji) { menuOpen = false; onReact(emoji) }
+                                        .padding(8.dp),
+                                )
+                            }
+                        }
+                        DropdownMenuItem(text = { Text(stringResource(R.string.chat_reply)) }, onClick = { menuOpen = false; onReply() })
+                    }
+                    DropdownMenuItem(text = { Text(stringResource(R.string.chat_copy)) }, enabled = hasContent, onClick = { menuOpen = false; onCopy() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.chat_forward)) }, enabled = hasContent, onClick = { menuOpen = false; onForward() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.chat_reminder)) }, enabled = hasContent, onClick = { menuOpen = false; onReminder() })
                 }
             }
         }
@@ -559,7 +698,8 @@ private fun NoticeBanner(kind: ChatNoticeKind, onDismiss: () -> Unit) {
         Modifier.fillMaxWidth().padding(bottom = 8.dp).glass(RoundedCornerShape(14.dp)).padding(start = 14.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(stringResource(noticeText(kind)), color = ChatError, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        val info = kind == ChatNoticeKind.FORWARDED || kind == ChatNoticeKind.REMINDER_CREATED
+        Text(stringResource(noticeText(kind)), color = if (info) WeatherText else ChatError, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
         PodcastTextButton(stringResource(R.string.chat_notice_dismiss), onDismiss)
     }
 }
@@ -582,6 +722,11 @@ private fun noticeText(kind: ChatNoticeKind): Int = when (kind) {
     ChatNoticeKind.ATTACH_TOO_LARGE -> R.string.chat_notice_attach_too_large
     ChatNoticeKind.ATTACH_FAILED -> R.string.chat_notice_attach_failed
     ChatNoticeKind.NOTIFY_DENIED -> R.string.chat_notice_notify_denied
+    ChatNoticeKind.FORWARDED -> R.string.chat_notice_forwarded
+    ChatNoticeKind.FORWARD_FAILED -> R.string.chat_notice_forward_failed
+    ChatNoticeKind.REACTION_FAILED -> R.string.chat_notice_reaction_failed
+    ChatNoticeKind.REMINDER_CREATED -> R.string.chat_notice_reminder_created
+    ChatNoticeKind.REMINDER_FAILED -> R.string.chat_notice_reminder_failed
 }
 
 @Composable

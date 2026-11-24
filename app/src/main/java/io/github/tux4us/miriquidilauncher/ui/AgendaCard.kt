@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,6 +43,9 @@ import kotlinx.coroutines.delay
 /** Höchstens so viele Termine stehen in der Card; weitere werden als "+n weitere" gezählt. */
 private const val MAX_LISTED = 4
 
+/** Der zusätzliche Abschnitt „Morgen“ bleibt kürzer. */
+private const val MAX_LISTED_TOMORROW = 3
+
 private val CardText = Color.White
 private val CardTextMuted = Color.White.copy(alpha = 0.72f)
 private val DefaultDot = Color(0xFF8AB4F8)
@@ -57,16 +61,13 @@ private val DetailIndent = 8.dp + 10.dp + TimeColumnWidth + 10.dp
  * aufgerufen, damit sie zur Umschaltzeit und um Mitternacht wechselt.
  */
 @Composable
-fun AgendaCard(view: AgendaView, onRefresh: () -> Unit, onOpen: (AgendaView) -> Unit, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val locale = remember { Locale.getDefault() }
-    val zone = remember { ZoneId.systemDefault() }
-    val timeFormat = remember(context) { DateFormat.getTimeFormat(context) }
-    val dateFormat = remember(locale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale) }
-    val allDayLabel = stringResource(R.string.calendar_all_day)
-    val ongoingLabel = stringResource(R.string.agenda_ongoing)
-    val untitled = stringResource(R.string.calendar_untitled)
-
+fun AgendaCard(
+    view: AgendaView,
+    onRefresh: () -> Unit,
+    onOpen: (AgendaView) -> Unit,
+    modifier: Modifier = Modifier,
+    tomorrow: AgendaView? = null,
+) {
     LaunchedEffect(Unit) {
         while (true) {
             delay(60_000L)
@@ -75,14 +76,36 @@ fun AgendaCard(view: AgendaView, onRefresh: () -> Unit, onOpen: (AgendaView) -> 
     }
 
     val shape = RoundedCornerShape(24.dp)
-    val listed = view.events.take(MAX_LISTED)
-    val dayStart = view.day.atStartOfDay(zone).toInstant().toEpochMilli()
     Column(
         modifier = modifier
             .fillMaxWidth()
             .glass(shape)
-            .clickable { onOpen(view) }
             .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        AgendaSection(view, MAX_LISTED, onOpen)
+        if (tomorrow != null) {
+            Box(Modifier.fillMaxWidth().padding(vertical = 4.dp).height(1.dp).background(CardTextMuted.copy(alpha = 0.3f)))
+            AgendaSection(tomorrow, MAX_LISTED_TOMORROW, onOpen)
+        }
+    }
+}
+
+/** Kopfzeile (Tag und Datum) mit den Terminen eines Tages; Tippen öffnet die Tagesansicht des Kalenders. */
+@Composable
+private fun AgendaSection(view: AgendaView, maxListed: Int, onOpen: (AgendaView) -> Unit) {
+    val context = LocalContext.current
+    val locale = remember { Locale.getDefault() }
+    val zone = remember { ZoneId.systemDefault() }
+    val timeFormat = remember(context) { DateFormat.getTimeFormat(context) }
+    val dateFormat = remember(locale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale) }
+    val allDayLabel = stringResource(R.string.calendar_all_day)
+    val ongoingLabel = stringResource(R.string.agenda_ongoing)
+    val untitled = stringResource(R.string.calendar_untitled)
+    val listed = view.events.take(maxListed)
+    val dayStart = view.day.atStartOfDay(zone).toInstant().toEpochMilli()
+    Column(
+        modifier = Modifier.fillMaxWidth().clickable { onOpen(view) },
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -113,9 +136,9 @@ fun AgendaCard(view: AgendaView, onRefresh: () -> Unit, onOpen: (AgendaView) -> 
                 title = event.title.ifBlank { untitled },
             )
         }
-        if (view.events.size > MAX_LISTED) {
+        if (view.events.size > maxListed) {
             Text(
-                text = stringResource(R.string.agenda_more, view.events.size - MAX_LISTED),
+                text = stringResource(R.string.agenda_more, view.events.size - maxListed),
                 style = MaterialTheme.typography.labelMedium,
                 color = CardTextMuted,
             )

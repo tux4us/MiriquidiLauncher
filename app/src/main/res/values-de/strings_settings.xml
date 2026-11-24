@@ -76,4 +76,26 @@
     <string name="support_prompt_note">Die Funktionen bleiben mit und ohne Spende gleich. Die Spende läuft über buymeacoffee.com im Browser.</string>
     <string name="support_prompt_donate">Spenden</string>
     <string name="support_prompt_later">Nicht jetzt</string>
+    <string name="settings_home_tomorrow_title">Termine von morgen anzeigen</string>
+    <string name="settings_home_tomorrow_text">Die Termin-Card zeigt zusätzlich die Termine des folgenden Tages. Benötigt die Terminübersicht.</string>
+    <string name="settings_home_weather_title">Wetter-Card anzeigen</string>
+    <string name="settings_home_weather_text">Aktuelle Werte mit passendem animiertem Hintergrund. Nutzt die Wetterdaten der Wetter-Scope (Netzwerkzugriff).</string>
+    <string name="settings_home_messages_title">Card für ungelesene Nachrichten anzeigen</string>
+    <string name="settings_home_messages_text">Zeigt ungelesene Gespräche aus Nextcloud Talk. Benötigt ein eingerichtetes Konto in der Chat-Scope.</string>
+    <string name="settings_home_messages_preview_title">Absender und Text anzeigen</string>
+    <string name="settings_home_messages_preview_text">Ausgeschaltet erscheinen nur Gespräch und Anzahl.</string>
+    <string name="home_messages_title">Ungelesene Nachrichten</string>
+    <string name="home_messages_more">+ %1$d weitere Gespräche</string>
+    <string name="home_weather_empty">Wetter wird geladen …</string>
+    <string name="home_weather_range">%1$d° / %2$d°</string>
+    <string name="home_weather_wind">%1$d km/h</string>
+    <string name="home_weather_rain">Regen %1$d %%</string>
+    <plurals name="home_messages_count">
+        <item quantity="one">%1$d ungelesene Nachricht</item>
+        <item quantity="other">%1$d ungelesene Nachrichten</item>
+    </plurals>
+    <string name="settings_section_appearance">Darstellung</string>
+    <string name="settings_menu_opacity_title">Deckkraft der Scope-Übersicht</string>
+    <string name="settings_menu_opacity_text">Niedrige Werte lassen das Hintergrundbild stärker durchscheinen, hohe Werte machen das Menü besser lesbar.</string>
+    <string name="settings_menu_opacity_reset">Standard wiederherstellen</string>
 </resources>

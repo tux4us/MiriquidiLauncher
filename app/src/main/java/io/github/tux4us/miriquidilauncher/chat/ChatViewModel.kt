@@ -21,8 +21,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -48,6 +52,11 @@ enum class ChatNoticeKind {
     ATTACH_TOO_LARGE,
     ATTACH_FAILED,
     NOTIFY_DENIED,
+    FORWARDED,
+    FORWARD_FAILED,
+    REACTION_FAILED,
+    REMINDER_CREATED,
+    REMINDER_FAILED,
 }
 
 data class ChatNotice(val kind: ChatNoticeKind)
@@ -101,6 +110,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Der Server hat die Zugangsdaten abgelehnt: Bis zum nächsten Öffnen der Seite oder Anmelden wird nicht erneut gefragt. */
     private var authBroken = false
+    private var homeRequested = false
+    private var lastHomeRefresh = 0L
     private var loopJob: Job? = null
     private val cacheLock = Mutex()
 
@@ -139,7 +150,35 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             }
             tryOpenPending(final = false)
             restartLoop()
+            if (homeRequested && !active) {
+                homeRequested = false
+                refreshHome()
+            }
         }
+    }
+
+    /**
+     * Gespräche mit ungelesenen Nachrichten für die Card der Startseite. Das Laden der Zugangsdaten und des Zwischenspeichers
+     * sowie die Aktualisierung gehen über [refreshHome]; solange der Messenger sichtbar ist, aktualisiert seine eigene Schleife.
+     */
+    val homeUnread: StateFlow<List<ChatRoom>> = _state
+        .map { s -> s.rooms.filter { it.unread > 0 || it.unreadMention } }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /** Aktualisiert die Raumliste für die Card der Startseite, höchstens einmal pro halber Minute und nur mit Konto. */
+    fun refreshHome() {
+        if (active) return
+        if (!loaded) {
+            homeRequested = true
+            loadAccount()
+            return
+        }
+        if (remote == null || authBroken) return
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastHomeRefresh < HOME_MIN_MS) return
+        lastHomeRefresh = now
+        viewModelScope.launch { refreshRoomsNow(quiet = true) }
     }
 
     // endregion
@@ -163,7 +202,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /** `true` bei Erfolg. */
-    private suspend fun refreshRoomsNow(): Boolean {
+    private suspend fun refreshRoomsNow(quiet: Boolean = false): Boolean {
         val r = remote ?: return false
         _state.update { it.copy(roomsLoading = true) }
         return try {
@@ -182,7 +221,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             throw e
         } catch (e: ChatHttpException) {
             _state.update { it.copy(roomsLoading = false, offline = true) }
-            if (e.code == 401 || e.code == 403) authLost() else notice(ChatNoticeKind.LOAD_FAILED)
+            if (e.code == 401 || e.code == 403) authLost() else if (!quiet) notice(ChatNoticeKind.LOAD_FAILED)
             false
         } catch (e: IOException) {
             _state.update { it.copy(roomsLoading = false, offline = true) }
@@ -388,6 +427,83 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         val again = o.copy(state = OutgoingState.SENDING)
         _state.update { s -> s.copy(outbox = s.outbox.map { if (it.localId == localId) again else it }) }
         deliver(again)
+    }
+
+    private fun updateMessage(id: Long, change: (ChatMessage) -> ChatMessage) {
+        _state.update { s -> s.copy(messages = s.messages.map { if (it.id == id) change(it) else it }) }
+    }
+
+    /**
+     * Reagiert mit [emoji] auf [message] oder nimmt die eigene Reaktion zurück. Die Anzeige ändert sich sofort und wird bei
+     * einem Fehler zurückgesetzt. Reaktionen anderer erscheinen beim nächsten Laden des Gesprächs.
+     */
+    fun react(message: ChatMessage, emoji: String) {
+        val room = _state.value.openRoom ?: return
+        val r = remote ?: return
+        if (room.readOnly || !ChatApi.isValidReaction(emoji)) return
+        val add = emoji !in message.reactionsSelf
+        updateMessage(message.id) { ChatLogic.applyReaction(it, emoji, add) }
+        viewModelScope.launch {
+            try {
+                r.react(room.token, message.id, emoji, add)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ChatHttpException) {
+                // 409: Die Reaktion besteht bereits, wie angezeigt.
+                if (add && e.code == 409) return@launch
+                updateMessage(message.id) { ChatLogic.applyReaction(it, emoji, !add) }
+                if (e.code == 401 || e.code == 403) authLost() else notice(ChatNoticeKind.REACTION_FAILED)
+            } catch (e: IOException) {
+                updateMessage(message.id) { ChatLogic.applyReaction(it, emoji, !add) }
+                notice(ChatNoticeKind.REACTION_FAILED)
+            }
+        }
+    }
+
+    /** Sendet den Text von [message] (und Links der Anhänge) als neue Nachricht in das Gespräch [targetToken]. */
+    fun forward(message: ChatMessage, targetToken: String) {
+        val r = remote ?: return
+        if (!ChatApi.isSafeToken(targetToken)) return
+        val text = ChatLogic.forwardText(message)
+        if (text.isEmpty()) return notice(ChatNoticeKind.FORWARD_FAILED)
+        viewModelScope.launch {
+            try {
+                r.send(targetToken, text, null, UUID.randomUUID().toString().replace("-", ""))
+                notice(ChatNoticeKind.FORWARDED)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ChatHttpException) {
+                if (e.code == 401 || e.code == 403) authLost() else notice(ChatNoticeKind.FORWARD_FAILED)
+            } catch (e: IOException) {
+                notice(ChatNoticeKind.FORWARD_FAILED)
+            }
+        }
+    }
+
+    /** Legt im Nextcloud-Kalender einen Termin ab [startMillis] an, der auf [message] verweist. */
+    fun createReminder(message: ChatMessage, startMillis: Long) {
+        val r = remote ?: return
+        val c = credentials ?: return
+        val room = _state.value.openRoom ?: return
+        val text = ChatLogic.forwardText(message)
+        if (text.isEmpty()) return notice(ChatNoticeKind.REMINDER_FAILED)
+        val summary = ChatReminder.summary(text, room.name)
+        val description = ChatReminder.description(text, message.actorName, room.name)
+        val link = ChatReminder.talkLink(c.baseUrl, room.token, message.id)
+        viewModelScope.launch {
+            try {
+                r.createCalendarEvent(c.userId, UUID.randomUUID().toString() + "@miriquidilauncher") { uid ->
+                    ChatReminder.buildIcs(uid, summary, description, link, startMillis, System.currentTimeMillis())
+                }
+                notice(ChatNoticeKind.REMINDER_CREATED)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ChatHttpException) {
+                if (e.code == 401 || e.code == 403) authLost() else notice(ChatNoticeKind.REMINDER_FAILED)
+            } catch (e: IOException) {
+                notice(ChatNoticeKind.REMINDER_FAILED)
+            }
+        }
     }
 
     fun discard(localId: String) {
@@ -759,6 +875,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         ChatForeground.active = false
+        ChatForeground.visible = false
         super.onCleared()
     }
 
@@ -788,5 +905,6 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private companion object {
         const val LIST_REFRESH_MS = 30_000L
         const val MIN_POLL_MS = 1_000L
+        const val HOME_MIN_MS = 15_000L
     }
 }

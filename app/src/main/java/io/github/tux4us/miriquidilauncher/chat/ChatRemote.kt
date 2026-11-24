@@ -73,6 +73,52 @@ class ChatRemote(
         request("POST", ChatApi.readUrl(baseUrl, token), ChatApi.encodeRead(lastReadId), TIMEOUT_MS)
     }
 
+    /** Fügt die Reaktion [emoji] hinzu ([add]) oder nimmt die eigene zurück. */
+    suspend fun react(token: String, messageId: Long, emoji: String, add: Boolean) {
+        require(ChatApi.isSafeToken(token) && ChatApi.isValidReaction(emoji) && messageId > 0)
+        if (add) {
+            request("POST", ChatApi.reactionUrl(baseUrl, token, messageId), ChatApi.encodeReaction(emoji), TIMEOUT_MS)
+        } else {
+            request("DELETE", ChatApi.reactionDeleteUrl(baseUrl, token, messageId, emoji), null, TIMEOUT_MS)
+        }
+    }
+
+    /**
+     * Legt über CalDAV einen Termin im Standardkalender („personal“, sonst dem ersten) an. [buildIcs] bekommt die
+     * Datei-Kennung (UID) und liefert die iCalendar-Datei. Gibt den Namen des Kalenders zurück.
+     */
+    suspend fun createCalendarEvent(userId: String, uid: String, buildIcs: (String) -> String): String {
+        val home = ChatReminder.calendarHomeUrl(baseUrl, userId)
+        // Die Abfrage der Kalender nutzt PROPFIND, das nicht jede Android-Version über HttpURLConnection sendet. Schlägt sie
+        // fehl oder liefert nichts Lesbares, gilt der Standardkalender „personal“, den Nextcloud für jedes Konto anlegt.
+        val calendars = try {
+            ChatReminder.parseCalendars(
+                call(
+                    "PROPFIND", home,
+                    Payload("application/xml; charset=utf-8", bytes = ChatReminder.PROPFIND_BODY.toByteArray(Charsets.UTF_8)),
+                    TIMEOUT_MS, headers = mapOf("Depth" to "1"),
+                ).body,
+            )
+        } catch (e: ChatHttpException) {
+            if (e.code == 401 || e.code == 403) throw e
+            emptyList()
+        } catch (e: IOException) {
+            emptyList()
+        }
+        val calendar = ChatReminder.pickCalendar(calendars)
+        val folder = if (calendar != null) {
+            ChatReminder.resolveHref(baseUrl, calendar.href) ?: throw IOException("Kalenderadresse nicht erlaubt")
+        } else {
+            home + "personal/"
+        }
+        val url = folder.trimEnd('/') + "/" + ChatReminder.fileName(uid)
+        call(
+            "PUT", url, Payload("text/calendar; charset=utf-8", bytes = buildIcs(uid).toByteArray(Charsets.UTF_8)),
+            TIMEOUT_MS, ifNoneMatch = true,
+        )
+        return calendar?.name ?: "personal"
+    }
+
     /** Ordner für Anhänge laut Server; bei fehlender oder unlesbarer Antwort der Standard „Talk“. */
     suspend fun attachmentFolder(): String {
         val folder = try {
@@ -138,14 +184,17 @@ class ChatRemote(
     private suspend fun request(method: String, url: String, body: String?, readTimeoutMs: Int): Response =
         call(method, url, body?.let { Payload("application/json; charset=utf-8", bytes = it.toByteArray(Charsets.UTF_8)) }, readTimeoutMs)
 
-    private suspend fun call(method: String, url: String, payload: Payload?, readTimeoutMs: Int, ifNoneMatch: Boolean = false): Response =
+    private suspend fun call(
+        method: String, url: String, payload: Payload?, readTimeoutMs: Int, ifNoneMatch: Boolean = false,
+        headers: Map<String, String> = emptyMap(),
+    ): Response =
         suspendCancellableCoroutine { continuation ->
             // Je Anfrage eine eigene Verbindung, damit das Abbrechen des Pollings keine gleichzeitige Sendung trifft.
             val holder = AtomicReference<HttpURLConnection?>()
             continuation.invokeOnCancellation { holder.get()?.disconnect() }
             executor.execute {
                 try {
-                    val response = execute(method, url, payload, readTimeoutMs, holder, ifNoneMatch)
+                    val response = execute(method, url, payload, readTimeoutMs, holder, ifNoneMatch, headers)
                     if (continuation.isActive) continuation.resume(response)
                 } catch (e: Throwable) {
                     if (continuation.isActive) continuation.resumeWithException(e)
@@ -155,7 +204,7 @@ class ChatRemote(
 
     private fun execute(
         method: String, url: String, payload: Payload?, readTimeoutMs: Int,
-        holder: AtomicReference<HttpURLConnection?>, ifNoneMatch: Boolean,
+        holder: AtomicReference<HttpURLConnection?>, ifNoneMatch: Boolean, headers: Map<String, String>,
     ): Response {
         var target = URL(url)
         val host = target.host
@@ -172,6 +221,7 @@ class ChatRemote(
                 connection.setRequestProperty("Accept", "application/json")
                 connection.setRequestProperty("User-Agent", USER_AGENT)
                 if (ifNoneMatch) connection.setRequestProperty("If-None-Match", "*")
+                headers.forEach { (k, v) -> connection.setRequestProperty(k, v) }
                 if (payload != null) {
                     connection.doOutput = true
                     connection.setRequestProperty("Content-Type", payload.contentType)
@@ -211,14 +261,34 @@ class ChatRemote(
             connection.requestMethod = method
         } catch (e: ProtocolException) {
             try {
-                val field = HttpURLConnection::class.java.getDeclaredField("method")
-                field.isAccessible = true
-                field.set(connection, method)
+                forceMethod(connection, method)
             } catch (t: ReflectiveOperationException) {
                 throw IOException("Methode $method nicht unterstützt", t)
             } catch (t: RuntimeException) {
                 throw IOException("Methode $method nicht unterstützt", t)
             }
+        }
+    }
+
+    private fun forceMethod(connection: HttpURLConnection, method: String) {
+        val field = HttpURLConnection::class.java.getDeclaredField("method")
+        field.isAccessible = true
+        field.set(connection, method)
+        // Android: HTTPS-Verbindungen leiten an eine innere Verbindung weiter, die das Feld selbst liest.
+        var type: Class<*>? = connection.javaClass
+        while (type != null) {
+            val inner = try {
+                type.getDeclaredField("delegate").also { it.isAccessible = true }.get(connection) as? HttpURLConnection
+            } catch (e: ReflectiveOperationException) {
+                null
+            } catch (e: RuntimeException) {
+                null
+            }
+            if (inner != null) {
+                field.set(inner, method)
+                break
+            }
+            type = type.superclass
         }
     }
 

@@ -22,11 +22,20 @@ private val GlassBase = GlassTone.copy(alpha = 0.50f)
  * Grundfläche mit Verlauf: unten fast deckend, nach oben zunehmend durchsichtig. Für Panels, die direkt über
  * anderen Bedienelementen (z. B. dem Suchfeld) aufklappen, damit die unterste Reihe gut lesbar bleibt.
  */
-internal val GlassBaseFadingUp: Brush = Brush.verticalGradient(
-    0f to GlassTone.copy(alpha = 0.30f),
-    0.55f to GlassTone.copy(alpha = 0.55f),
-    1f to GlassTone.copy(alpha = 0.88f),
-)
+internal val GlassBaseFadingUp: Brush = glassBaseFadingUp(0.55f)
+
+/**
+ * Wie [GlassBaseFadingUp] mit einstellbarer Deckkraft [opacity] (0 bis 1) in der Mitte des Verlaufs; bei 0,55 entspricht
+ * das genau dem Standard (oben 0,30, Mitte 0,55, unten 0,88). Unten bleibt die Fläche stets dichter als oben.
+ */
+internal fun glassBaseFadingUp(opacity: Float): Brush {
+    val p = opacity.coerceIn(0f, 1f)
+    return Brush.verticalGradient(
+        0f to GlassTone.copy(alpha = p * 0.30f / 0.55f),
+        0.55f to GlassTone.copy(alpha = p),
+        1f to GlassTone.copy(alpha = (p * 1.6f).coerceAtMost(1f)),
+    )
+}
 
 /** Glanzlicht oben, Schatten unten: lässt die Fläche leicht erhaben wirken. */
 private val GlassSheen = Brush.verticalGradient(

@@ -114,7 +114,7 @@ object GalleryImages {
         return rotate(bitmap, orientation)
     }
 
-    private fun decodeUri(context: Context, uri: Uri, maxDimension: Int): Bitmap? {
+    internal fun decodeUri(context: Context, uri: Uri, maxDimension: Int): Bitmap? {
         val resolver = context.contentResolver
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }

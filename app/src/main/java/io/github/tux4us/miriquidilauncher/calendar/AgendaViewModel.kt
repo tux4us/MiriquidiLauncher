@@ -4,6 +4,7 @@ package io.github.tux4us.miriquidilauncher.calendar
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.tux4us.miriquidilauncher.home.HomeCardsStore
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlinx.coroutines.Job
@@ -18,6 +19,8 @@ data class AgendaUiState(
     val permissionGranted: Boolean = false,
     /** `null`, solange nichts angezeigt werden soll oder die Termine noch nicht gelesen sind. */
     val view: AgendaView? = null,
+    /** Zusätzlicher Abschnitt „Morgen“, solange [view] der heutige Tag ist und die Option eingeschaltet ist. */
+    val tomorrow: AgendaView? = null,
 )
 
 /**
@@ -29,6 +32,8 @@ class AgendaViewModel(application: Application) : AndroidViewModel(application) 
 
     private val store = AgendaStore(application)
     private val repository = CalendarRepository(application)
+    private val homeStore = HomeCardsStore(application)
+    private var showTomorrow = false
 
     private val _state = MutableStateFlow(AgendaUiState(permissionGranted = repository.hasPermission()))
     val state: StateFlow<AgendaUiState> = _state.asStateFlow()
@@ -44,6 +49,17 @@ class AgendaViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    init {
+        viewModelScope.launch {
+            homeStore.settings.collect { settings ->
+                if (settings.tomorrow != showTomorrow) {
+                    showTomorrow = settings.tomorrow
+                    refresh()
+                }
+            }
+        }
+    }
+
     fun setEnabled(value: Boolean) {
         viewModelScope.launch { store.setEnabled(value) }
     }
@@ -53,16 +69,19 @@ class AgendaViewModel(application: Application) : AndroidViewModel(application) 
         val granted = repository.hasPermission()
         val enabled = _state.value.enabled
         if (!enabled || !granted) {
-            _state.update { it.copy(permissionGranted = granted, view = null) }
+            _state.update { it.copy(permissionGranted = granted, view = null, tomorrow = null) }
             return
         }
         _state.update { it.copy(permissionGranted = true) }
         val zone = ZoneId.systemDefault()
         val now = ZonedDateTime.now(zone)
         val day = HomeAgenda.targetDay(now)
+        val withTomorrow = showTomorrow && day == now.toLocalDate()
         loadJob = viewModelScope.launch {
-            val events = repository.load(day, day, zone)
-            _state.update { current -> if (current.enabled) current.copy(view = HomeAgenda.select(events, now)) else current }
+            val events = repository.load(day, if (withTomorrow) day.plusDays(1) else day, zone)
+            val view = HomeAgenda.select(events, now)
+            val tomorrow = if (withTomorrow) HomeAgenda.selectDay(events, day.plusDays(1), now) else null
+            _state.update { current -> if (current.enabled) current.copy(view = view, tomorrow = tomorrow) else current }
         }
     }
 }

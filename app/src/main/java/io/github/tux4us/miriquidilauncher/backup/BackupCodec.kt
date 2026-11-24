@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.backup
 
+import io.github.tux4us.miriquidilauncher.home.HomeCardsSettings
 import io.github.tux4us.miriquidilauncher.calculator.CalcCodec
 import io.github.tux4us.miriquidilauncher.camera.CameraSettingsCodec
 import io.github.tux4us.miriquidilauncher.data.AppGroup
@@ -146,6 +147,9 @@ object BackupCodec {
             sb.append(",\n  \"notesSettings\": {\"sort\": ${str(sort)}, \"ascending\": ${n.ascending}}")
         }
         data.agendaEnabled?.let { sb.append(",\n  \"agendaEnabled\": ").append(it) }
+        data.homeCards?.let { h ->
+            sb.append(",\n  \"homeCards\": {\"tomorrow\": ${h.tomorrow}, \"messages\": ${h.messages}, \"messagesText\": ${h.messagesText}, \"weather\": ${h.weather}, \"menuOpacity\": ${h.menuOpacity}}")
+        }
         data.dogs?.let { sb.append(",\n  \"dogs\": ").append(DogCodec.encode(it)) }
         data.music?.let { sb.append(",\n  \"music\": ").append(MusicCodec.encodeBackup(it)) }
         data.webApps?.let { apps ->
@@ -237,6 +241,16 @@ object BackupCodec {
             camera = root["camera"].asObject()?.let { parseCamera(it) },
             notesSettings = root["notesSettings"].asObject()?.let { parseNotesSettings(it) },
             agendaEnabled = root["agendaEnabled"] as? Boolean,
+            homeCards = root["homeCards"].asObject()?.let { o ->
+                HomeCardsSettings(
+                    tomorrow = o["tomorrow"] as? Boolean ?: false,
+                    messages = o["messages"] as? Boolean ?: false,
+                    messagesText = o["messagesText"] as? Boolean ?: true,
+                    weather = o["weather"] as? Boolean ?: false,
+                    menuOpacity = (o["menuOpacity"].asDouble()?.toFloat() ?: HomeCardsSettings.DEFAULT_MENU_OPACITY)
+                        .coerceIn(HomeCardsSettings.MIN_MENU_OPACITY, HomeCardsSettings.MAX_MENU_OPACITY),
+                )
+            },
             dogs = root["dogs"].asObject()?.let { DogCodec.fromMap(it) },
             music = root["music"].asObject()?.let { MusicCodec.decodeBackup(it) },
             webApps = root["webApps"].asArray()?.let { array -> parseWebApps(array) },

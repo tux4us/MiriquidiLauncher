@@ -21,7 +21,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -118,7 +122,9 @@ internal fun GalleryViewer(state: GalleryUiState, viewModel: GalleryViewModel, c
         onDismissRequest = { viewModel.back() },
         properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
     ) {
-        Box(Modifier.fillMaxSize().background(Color.Black)) {
+        FitDialogWindow()
+        val (measureWindow, overshoot) = rememberDialogOvershoot()
+        Box(Modifier.fillMaxSize().then(measureWindow).background(Color.Black)) {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -137,7 +143,7 @@ internal fun GalleryViewer(state: GalleryUiState, viewModel: GalleryViewModel, c
 
             if (showChrome) {
                 Row(
-                    Modifier.align(Alignment.TopCenter).fillMaxWidth().background(ViewerScrim).statusBarsPadding().padding(horizontal = 8.dp),
+                    Modifier.align(Alignment.TopCenter).fillMaxWidth().background(ViewerScrim).windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)).padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     ViewerButton(stringResource(R.string.gallery_viewer_close)) { viewModel.closeViewer() }
@@ -147,13 +153,14 @@ internal fun GalleryViewer(state: GalleryUiState, viewModel: GalleryViewModel, c
                     }
                 }
                 Row(
-                    Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(ViewerScrim).navigationBarsPadding().horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp),
+                    Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(ViewerScrim).windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)).padding(bottom = overshoot).horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(2.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     ViewerButton(if (favorite) "★ " + stringResource(R.string.gallery_unfavorite) else "☆ " + stringResource(R.string.gallery_favorite)) { viewModel.toggleFavorite(entry) }
                     ViewerButton(stringResource(R.string.gallery_share)) { if (!GalleryIntents.share(context, listOf(entry))) viewModel.reportNoApp() }
                     ViewerButton(stringResource(R.string.gallery_info)) { viewModel.showInfo(entry) }
+                    if (!entry.isVideo) ViewerButton(stringResource(R.string.gallery_editor_open)) { viewModel.openEditor(entry) }
                     ViewerButton(stringResource(if (state.slideshow) R.string.gallery_slideshow_stop else R.string.gallery_slideshow_start)) {
                         if (state.slideshow) viewModel.stopSlideshow() else { chrome = false; viewModel.startSlideshow() }
                     }
@@ -165,6 +172,9 @@ internal fun GalleryViewer(state: GalleryUiState, viewModel: GalleryViewModel, c
                             if (!entry.isVideo) {
                                 DropdownMenuItem(text = { Text(stringResource(R.string.gallery_edit)) }, onClick = { more = false; if (!GalleryIntents.edit(context, entry)) viewModel.reportNoApp() })
                                 DropdownMenuItem(text = { Text(stringResource(R.string.gallery_use_as)) }, onClick = { more = false; if (!GalleryIntents.useAs(context, entry)) viewModel.reportNoApp() })
+                            }
+                            if (!entry.isVideo) {
+                                DropdownMenuItem(text = { Text(stringResource(R.string.gallery_metadata)) }, onClick = { more = false; viewModel.openMetadata(entry) })
                             }
                             DropdownMenuItem(text = { Text(stringResource(R.string.gallery_rename)) }, onClick = { more = false; onDialog(GalleryDialog.Rename(entry)) })
                             DropdownMenuItem(text = { Text(stringResource(R.string.gallery_move)) }, onClick = { more = false; onDialog(GalleryDialog.PickAlbum(listOf(entry), move = true)) })

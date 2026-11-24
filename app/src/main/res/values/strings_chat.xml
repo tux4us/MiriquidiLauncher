@@ -73,4 +73,14 @@
     <string name="chat_notify_check_error">Check failed: %1$s</string>
     <string name="chat_notify_check_room">%1$s: unread %2$d, last message id %3$d, baseline %4$d, level %5$d</string>
     <string name="chat_notify_check_fetched">  retrieved %1$d messages, %2$d of them new and from others</string>
+    <string name="chat_copy">Copy</string>
+    <string name="chat_copied">Copied</string>
+    <string name="chat_forward">Forward</string>
+    <string name="chat_forward_title">Forward to …</string>
+    <string name="chat_reminder">Create reminder in calendar</string>
+    <string name="chat_notice_forwarded">The message was forwarded.</string>
+    <string name="chat_notice_forward_failed">The message could not be forwarded.</string>
+    <string name="chat_notice_reaction_failed">The reaction could not be sent.</string>
+    <string name="chat_notice_reminder_created">The reminder was created in your Nextcloud calendar.</string>
+    <string name="chat_notice_reminder_failed">The reminder could not be created. Check that the Calendar app is enabled on your Nextcloud.</string>
 </resources>

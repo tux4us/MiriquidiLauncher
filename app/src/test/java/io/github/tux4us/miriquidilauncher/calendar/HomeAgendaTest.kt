@@ -95,4 +95,20 @@ class HomeAgendaTest {
         assertTrue(view.events.isEmpty())
         assertEquals(LocalDate.of(2026, 10, 6), view.day)
     }
+
+    @Test
+    fun selectDayFiltersTheRequestedDayAndMarksToday() {
+        val now = at(2026, 10, 5, 10)
+        val today = timed(1, at(2026, 10, 5, 12), at(2026, 10, 5, 13))
+        val tomorrow = timed(2, at(2026, 10, 6, 9), at(2026, 10, 6, 10))
+        val events = listOf(today, tomorrow)
+
+        val viewToday = HomeAgenda.selectDay(events, LocalDate.of(2026, 10, 5), now)
+        assertTrue(viewToday.isToday)
+        assertEquals(listOf(today), viewToday.events)
+
+        val viewTomorrow = HomeAgenda.selectDay(events, LocalDate.of(2026, 10, 6), now)
+        assertFalse(viewTomorrow.isToday)
+        assertEquals(listOf(tomorrow), viewTomorrow.events)
+    }
 }

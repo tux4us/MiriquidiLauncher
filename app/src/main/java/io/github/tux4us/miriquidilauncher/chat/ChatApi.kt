@@ -39,6 +39,22 @@ object ChatApi {
 
     fun readUrl(baseUrl: String, token: String): String = chatUrl(baseUrl, token) + "/read"
 
+    /** Adresse der Reaktionen auf die Nachricht [messageId] (POST fügt hinzu, DELETE mit `reaction` in der Abfrage entfernt). */
+    fun reactionUrl(baseUrl: String, token: String, messageId: Long): String =
+        ocs(baseUrl, "apps/spreed/api/v1/reaction/$token/$messageId")
+
+    fun reactionDeleteUrl(baseUrl: String, token: String, messageId: Long, emoji: String): String =
+        reactionUrl(baseUrl, token, messageId) + "?reaction=" + java.net.URLEncoder.encode(emoji, "UTF-8")
+
+    fun encodeReaction(emoji: String): String = "{\"reaction\":${NotesJson.str(emoji)}}"
+
+    /** Emojis, die das Menü zur schnellen Reaktion anbietet. */
+    val QUICK_REACTIONS: List<String> = listOf("👍", "❤️", "😂", "😮", "😢", "🙏")
+
+    /** Ein Emoji als Reaktion: kurz, ohne Steuerzeichen und Leerraum (Talk prüft zusätzlich selbst). */
+    fun isValidReaction(emoji: String): Boolean =
+        emoji.isNotEmpty() && emoji.length <= 16 && emoji.none { it.isWhitespace() || it.code < 32 }
+
     fun capabilitiesUrl(baseUrl: String): String = ocs(baseUrl, "cloud/capabilities")
 
     fun sharesUrl(baseUrl: String): String = ocs(baseUrl, "apps/files_sharing/api/v1/shares")
@@ -226,8 +242,23 @@ object ChatApi {
             reply = reply,
             attachments = files,
             referenceId = o["referenceId"].asString().orEmpty(),
+            reactions = if (deleted) emptyMap() else parseReactions(o["reactions"].asObject()),
+            reactionsSelf = if (deleted) emptySet() else (o["reactionsSelf"].asArray()?.mapNotNull { it.asString() }?.toSet() ?: emptySet()),
         )
     }
+
+    /** Ohne Reaktionen liefert Talk eine leere Liste statt eines Objekts. */
+    private fun parseReactions(map: Map<String, Any?>?): Map<String, Int> {
+        map ?: return emptyMap()
+        val out = LinkedHashMap<String, Int>()
+        for ((emoji, count) in map) {
+            val n = count.asDouble()?.toInt() ?: continue
+            if (n > 0 && isValidReaction(emoji) && out.size < MAX_REACTION_KINDS) out[emoji] = n
+        }
+        return out
+    }
+
+    private const val MAX_REACTION_KINDS = 12
 
     private val FILE_ONLY = Regex("(\\{file[0-9]*\\}\\s*)+")
     private val PLACEHOLDER = Regex("\\{([A-Za-z0-9_\\-]+)\\}")

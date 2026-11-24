@@ -24,6 +24,13 @@ object HomeAgenda {
         if (now.hour >= switchHour) now.toLocalDate().plusDays(1) else now.toLocalDate()
 
     /**
+     * Termine des Tages [day] für den zusätzlichen Abschnitt „Morgen“: ganztägige zuerst, dann nach Beginn;
+     * ohne Filter auf bereits beendete Termine.
+     */
+    fun selectDay(events: List<CalendarEvent>, day: LocalDate, now: ZonedDateTime): AgendaView =
+        AgendaView(day, day == now.toLocalDate(), CalendarMath.eventsOn(events, day, now.zone))
+
+    /**
      * Wählt aus [events] (beliebig viele, auch von anderen Tagen) die Termine des Zieltags aus: ganztägige zuerst,
      * dann nach Beginn. Für den heutigen Tag entfallen Termine, die schon zu Ende sind.
      */

@@ -73,4 +73,14 @@
     <string name="chat_notify_check_error">Prüfung fehlgeschlagen: %1$s</string>
     <string name="chat_notify_check_room">%1$s: ungelesen %2$d, letzte Nachrichten-Id %3$d, Grundlinie %4$d, Stufe %5$d</string>
     <string name="chat_notify_check_fetched">  abgerufen %1$d Nachrichten, davon %2$d neu und von anderen</string>
+    <string name="chat_copy">Kopieren</string>
+    <string name="chat_copied">Kopiert</string>
+    <string name="chat_forward">Weiterleiten</string>
+    <string name="chat_forward_title">Weiterleiten an …</string>
+    <string name="chat_reminder">Erinnerung im Kalender anlegen</string>
+    <string name="chat_notice_forwarded">Die Nachricht wurde weitergeleitet.</string>
+    <string name="chat_notice_forward_failed">Die Nachricht konnte nicht weitergeleitet werden.</string>
+    <string name="chat_notice_reaction_failed">Die Reaktion konnte nicht gesendet werden.</string>
+    <string name="chat_notice_reminder_created">Die Erinnerung wurde im Nextcloud-Kalender angelegt.</string>
+    <string name="chat_notice_reminder_failed">Die Erinnerung konnte nicht angelegt werden. Prüfe, ob die Kalender-App in deiner Nextcloud aktiv ist.</string>
 </resources>

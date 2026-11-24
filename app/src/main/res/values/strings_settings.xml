@@ -76,4 +76,26 @@
     <string name="support_prompt_note">Features stay the same with or without a donation. The donation is made on buymeacoffee.com in your browser.</string>
     <string name="support_prompt_donate">Donate</string>
     <string name="support_prompt_later">Not now</string>
+    <string name="settings_home_tomorrow_title">Show tomorrow\'s events</string>
+    <string name="settings_home_tomorrow_text">The agenda card also lists the events of the following day. Requires the agenda.</string>
+    <string name="settings_home_weather_title">Show weather card</string>
+    <string name="settings_home_weather_text">Current values with a matching animated background. Uses the weather data of the Weather scope (network access).</string>
+    <string name="settings_home_messages_title">Show card for unread messages</string>
+    <string name="settings_home_messages_text">Lists unread conversations from Nextcloud Talk. Requires an account set up in the Chat scope.</string>
+    <string name="settings_home_messages_preview_title">Show sender and text</string>
+    <string name="settings_home_messages_preview_text">When off, only the conversation and the count are shown.</string>
+    <string name="home_messages_title">Unread messages</string>
+    <string name="home_messages_more">+ %1$d more conversations</string>
+    <string name="home_weather_empty">Loading weather …</string>
+    <string name="home_weather_range">%1$d° / %2$d°</string>
+    <string name="home_weather_wind">%1$d km/h</string>
+    <string name="home_weather_rain">Rain %1$d %%</string>
+    <plurals name="home_messages_count">
+        <item quantity="one">%1$d unread message</item>
+        <item quantity="other">%1$d unread messages</item>
+    </plurals>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_menu_opacity_title">Scope overview opacity</string>
+    <string name="settings_menu_opacity_text">Low values let the wallpaper show through more, high values make the menu easier to read.</string>
+    <string name="settings_menu_opacity_reset">Restore default</string>
 </resources>

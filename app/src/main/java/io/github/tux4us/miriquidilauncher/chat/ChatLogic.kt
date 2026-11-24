@@ -74,6 +74,29 @@ object ChatLogic {
         return if (possibleGap) merge(emptyList(), latest) else merge(cached, latest)
     }
 
+    /** Setzt oder nimmt die eigene Reaktion [emoji] an [message] zurück und passt die Anzahl an. */
+    fun applyReaction(message: ChatMessage, emoji: String, add: Boolean): ChatMessage {
+        val counts = LinkedHashMap(message.reactions)
+        val own = LinkedHashSet(message.reactionsSelf)
+        if (add) {
+            if (own.add(emoji)) counts[emoji] = (counts[emoji] ?: 0) + 1
+        } else if (own.remove(emoji)) {
+            val left = (counts[emoji] ?: 1) - 1
+            if (left > 0) counts[emoji] = left else counts.remove(emoji)
+        }
+        return message.copy(reactions = counts, reactionsSelf = own)
+    }
+
+    /**
+     * Text, der beim Weiterleiten oder für eine Erinnerung verwendet wird: der Nachrichtentext, darunter je Anhang eine
+     * Zeile mit Name und (falls bekannt) Link. Leer bei gelöschten und Systemnachrichten.
+     */
+    fun forwardText(message: ChatMessage): String {
+        if (message.kind != ChatMessageKind.TEXT) return ""
+        val files = message.attachments.map { a -> if (a.link != null) "${a.name}: ${a.link}" else a.name }
+        return (listOf(message.text.trim()) + files).filter { it.isNotEmpty() }.joinToString("\n").take(ChatApi.MAX_MESSAGE_CHARS)
+    }
+
     /** Neueste Nachrichten für den Zwischenspeicher. */
     fun cacheSlice(messages: List<ChatMessage>): List<ChatMessage> = messages.takeLast(CACHE_MESSAGES)
 

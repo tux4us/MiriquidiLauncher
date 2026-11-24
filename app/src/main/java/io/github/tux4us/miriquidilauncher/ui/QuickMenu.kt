@@ -205,6 +205,7 @@ fun QuickMenuOverlay(
     actionLabel: String?,
     onEvent: (QuickMenuEvent) -> Unit,
     onItemLongClick: ((Int) -> Unit)? = null,
+    panelOpacity: Float = 0.55f,
 ) {
     val density = LocalDensity.current
     val currentOnEvent by rememberUpdatedState(onEvent)
@@ -241,7 +242,7 @@ fun QuickMenuOverlay(
                     }
                     // Glas-Stil: unten fast deckend, damit die unterste Reihe über dem Suchfeld gut lesbar
                     // bleibt; nach oben zunehmend durchsichtig, sodass das Hintergrundbild durchscheint.
-                    .glass(RoundedCornerShape(28.dp), GlassBaseFadingUp)
+                    .glass(RoundedCornerShape(28.dp), remember(panelOpacity) { glassBaseFadingUp(panelOpacity) })
                     // Tippen auf die Kopfzeile oder das Polster darf das Menü nicht schließen.
                     .pointerInput(Unit) { detectTapGestures { } },
             ) {

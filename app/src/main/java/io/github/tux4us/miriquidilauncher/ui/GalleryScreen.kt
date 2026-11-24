@@ -153,6 +153,21 @@ fun GalleryScreen(viewModel: GalleryViewModel, active: Boolean, modifier: Modifi
 
     GalleryDialogs(state, dialog, viewModel) { dialog = it }
     if (state.viewerIndex != null) GalleryViewer(state, viewModel, context) { dialog = it }
+    val dialogError = state.notice
+        ?.takeIf { it.kind in DIALOG_NOTICE_KINDS }
+        ?.let { galleryNoticeText(it) }
+    state.editing?.let { editing ->
+        GalleryEditor(editing, state.editSaving, dialogError, viewModel::closeEditor) { source, params, copyMetadata ->
+            viewModel.consumeNotice()
+            viewModel.saveEditedCopy(editing, source, params, copyMetadata)
+        }
+    }
+    state.metaEdit?.let { meta ->
+        GalleryMetadataDialog(meta, dialogError, { viewModel.consumeNotice(); viewModel.closeMetadata() }) { old, description, artist, copyright, date, removeGps ->
+            viewModel.consumeNotice()
+            viewModel.saveMetadata(meta.entry, old, description, artist, copyright, date, removeGps)
+        }
+    }
 }
 
 // region Berechtigung und Hinweise --------------------------------------------------------------
@@ -167,7 +182,7 @@ private fun GalleryPermissionCard(onGrantMedia: () -> Unit) {
 
 @Composable
 private fun GalleryNoticeBanner(notice: GalleryNotice, onDismiss: () -> Unit) {
-    val failed = notice.kind != GalleryNoticeKind.DONE && notice.kind != GalleryNoticeKind.CANCELLED
+    val failed = notice.kind !in SUCCESS_NOTICE_KINDS
     Row(
         Modifier.fillMaxWidth().padding(bottom = 8.dp).glass(RoundedCornerShape(14.dp)).padding(start = 14.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -195,7 +210,33 @@ internal fun galleryNoticeText(n: GalleryNotice): String = when (n.kind) {
     GalleryNoticeKind.RENAME_FAILED -> stringResource(R.string.gallery_notice_rename_failed)
     GalleryNoticeKind.NO_APP -> stringResource(R.string.gallery_notice_no_app)
     GalleryNoticeKind.NO_PATH -> stringResource(R.string.gallery_notice_no_path)
+    GalleryNoticeKind.EDIT_SAVED -> stringResource(R.string.gallery_notice_edit_saved)
+    GalleryNoticeKind.EDIT_FAILED -> stringResource(R.string.gallery_notice_edit_failed)
+    GalleryNoticeKind.NEEDS_ANDROID_10 -> stringResource(R.string.gallery_notice_needs_android10)
+    GalleryNoticeKind.META_SAVED -> stringResource(R.string.gallery_notice_meta_saved)
+    GalleryNoticeKind.META_FAILED -> stringResource(R.string.gallery_notice_meta_failed)
+    GalleryNoticeKind.META_UNSUPPORTED -> stringResource(R.string.gallery_notice_meta_unsupported)
+    GalleryNoticeKind.META_DATE_INVALID -> stringResource(R.string.gallery_notice_meta_date_invalid)
+    GalleryNoticeKind.META_UNCHANGED -> stringResource(R.string.gallery_notice_meta_unchanged)
 }
+
+/** Hinweise, die keinen Fehler darstellen. */
+private val SUCCESS_NOTICE_KINDS = setOf(
+    GalleryNoticeKind.DONE,
+    GalleryNoticeKind.CANCELLED,
+    GalleryNoticeKind.EDIT_SAVED,
+    GalleryNoticeKind.META_SAVED,
+    GalleryNoticeKind.META_UNCHANGED,
+)
+
+/** Hinweise, die in Editor und Metadaten-Maske selbst erscheinen, weil die Seite dahinter verdeckt ist. */
+private val DIALOG_NOTICE_KINDS = setOf(
+    GalleryNoticeKind.EDIT_FAILED,
+    GalleryNoticeKind.META_FAILED,
+    GalleryNoticeKind.META_DATE_INVALID,
+    GalleryNoticeKind.CANCELLED,
+    GalleryNoticeKind.NEEDS_ANDROID_11,
+)
 
 // endregion
 

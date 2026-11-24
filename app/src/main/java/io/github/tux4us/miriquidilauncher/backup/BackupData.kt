@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package io.github.tux4us.miriquidilauncher.backup
 
+import io.github.tux4us.miriquidilauncher.home.HomeCardsSettings
 import io.github.tux4us.miriquidilauncher.calculator.CalcPersisted
 import io.github.tux4us.miriquidilauncher.camera.CameraSettings
 import io.github.tux4us.miriquidilauncher.data.AppGroup
@@ -56,6 +57,8 @@ data class BackupData(
     val notesSettings: BackupNotesSettings? = null,
     /** Ob die Terminübersicht auf der Startseite angezeigt wird; nur in der Backup-Datei. */
     val agendaEnabled: Boolean? = null,
+    /** Optionen der Home-Cards (Termine morgen, Nachrichten, Wetter); nur in der Backup-Datei. */
+    val homeCards: HomeCardsSettings? = null,
     /** Hundeprofile mit Fälligkeiten und Angaben der Notfallkarte (persönliche Daten); nur in der Backup-Datei, nie im QR-Code. */
     val dogs: DogData? = null,
     /** Radiosender, Wiedergabelisten, Favoriten und Equalizer der Musik-Scope; Zustimmung und http-Schalter gehören zum Gerät. Nur in der Backup-Datei. */

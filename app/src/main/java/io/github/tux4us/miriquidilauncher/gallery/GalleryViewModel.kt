@@ -13,6 +13,12 @@ import io.github.tux4us.miriquidilauncher.files.NameCheck
 import io.github.tux4us.miriquidilauncher.files.OpKind
 import io.github.tux4us.miriquidilauncher.files.OpResult
 import io.github.tux4us.miriquidilauncher.files.OperationUi
+import io.github.tux4us.miriquidilauncher.gallery.edit.EditParams
+import io.github.tux4us.miriquidilauncher.gallery.edit.GalleryEditStore
+import io.github.tux4us.miriquidilauncher.gallery.edit.ImageRenderer
+import io.github.tux4us.miriquidilauncher.gallery.edit.MetadataFields
+import io.github.tux4us.miriquidilauncher.gallery.edit.MetadataLogic
+import io.github.tux4us.miriquidilauncher.gallery.edit.MetadataPlan
 import java.io.IOException
 import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
@@ -37,12 +43,23 @@ enum class GalleryNoticeKind {
     RENAME_FAILED,
     NO_APP,
     NO_PATH,
+    EDIT_SAVED,
+    EDIT_FAILED,
+    NEEDS_ANDROID_10,
+    META_SAVED,
+    META_FAILED,
+    META_UNSUPPORTED,
+    META_DATE_INVALID,
+    META_UNCHANGED,
 }
 
 /** Hinweis für die Oberfläche: [count] erledigte, [other] fehlgeschlagene Einträge. */
 data class GalleryNotice(val kind: GalleryNoticeKind, val op: OpKind? = null, val count: Int = 0, val other: Int = 0)
 
 data class GalleryInfo(val entry: MediaEntry, val exif: List<Pair<String, String>>)
+
+/** Dialog zum Bearbeiten der Metadaten; [fields] ist `null`, solange die Angaben noch gelesen werden. */
+data class GalleryMetaEdit(val entry: MediaEntry, val fields: MetadataFields?)
 
 data class GalleryUiState(
     /** `null`, solange der Zugriff noch nicht geprüft ist. */
@@ -74,6 +91,11 @@ data class GalleryUiState(
     val trashSelection: Set<String> = emptySet(),
     val operation: OperationUi? = null,
     val notice: GalleryNotice? = null,
+    /** Bild im Editor, sonst `null`. */
+    val editing: MediaEntry? = null,
+    /** Die bearbeitete Kopie wird gerade gespeichert. */
+    val editSaving: Boolean = false,
+    val metaEdit: GalleryMetaEdit? = null,
 )
 
 /**
@@ -323,6 +345,126 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun closeInfo() = _state.update { it.copy(info = null) }
+
+    // endregion
+
+    // region Bildbearbeitung und Metadaten -------------------------------------------------------
+
+    /** Der Editor speichert Kopien über die Mediathek und braucht dafür Android 10 oder neuer. */
+    val canEdit: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+    fun openEditor(entry: MediaEntry) {
+        if (entry.isVideo) return
+        if (!canEdit) {
+            notice(GalleryNotice(GalleryNoticeKind.NEEDS_ANDROID_10))
+            return
+        }
+        stopSlideshow()
+        _state.update { it.copy(editing = entry, editSaving = false, notice = null) }
+    }
+
+    fun closeEditor() = _state.update { it.copy(editing = null, editSaving = false) }
+
+    /**
+     * Rendert [source] mit [params] und legt das Ergebnis als Kopie im Ordner des Originals an. Das Original bleibt
+     * unverändert.
+     */
+    fun saveEditedCopy(entry: MediaEntry, source: android.graphics.Bitmap, params: EditParams, copyMetadata: Boolean) {
+        if (_state.value.editSaving) return
+        _state.update { it.copy(editSaving = true) }
+        viewModelScope.launch {
+            val ok = withContext(Dispatchers.Default) {
+                try {
+                    val rendered = ImageRenderer.render(source, params)
+                    try {
+                        val albumRelative = GalleryLogic.relativeDir(entry.dir, storageRoot()) ?: "Pictures/"
+                        val rel = GalleryLogic.targetRelativePath(albumRelative, false)
+                        GalleryEditStore.saveCopy(getApplication(), entry, rendered, rel, copyMetadata)
+                        true
+                    } finally {
+                        rendered.recycle()
+                    }
+                } catch (e: IOException) {
+                    false
+                } catch (e: OutOfMemoryError) {
+                    false
+                }
+            }
+            if (ok) {
+                _state.update { it.copy(editing = null, editSaving = false, notice = GalleryNotice(GalleryNoticeKind.EDIT_SAVED)) }
+                reload()
+            } else {
+                _state.update { it.copy(editSaving = false, notice = GalleryNotice(GalleryNoticeKind.EDIT_FAILED)) }
+            }
+        }
+    }
+
+    /** Öffnet die Metadaten-Bearbeitung; die Angaben werden im Hintergrund gelesen. */
+    fun openMetadata(entry: MediaEntry) {
+        if (!GalleryEditStore.canEditMetadata(entry)) {
+            notice(GalleryNotice(GalleryNoticeKind.META_UNSUPPORTED))
+            return
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            unsupported()
+            return
+        }
+        _state.update { it.copy(metaEdit = GalleryMetaEdit(entry, null), notice = null) }
+        viewModelScope.launch {
+            val fields = withContext(Dispatchers.IO) { GalleryEditStore.readMetadata(getApplication(), entry) }
+            _state.update { s -> if (s.metaEdit?.entry?.key == entry.key) s.copy(metaEdit = GalleryMetaEdit(entry, fields)) else s }
+        }
+    }
+
+    fun closeMetadata() = _state.update { it.copy(metaEdit = null) }
+
+    /**
+     * Schreibt die geänderten Angaben in die Originaldatei. Das System fragt vorher nach der Erlaubnis; ohne Zustimmung
+     * bleibt die Datei unverändert.
+     */
+    fun saveMetadata(
+        entry: MediaEntry,
+        old: MetadataFields,
+        description: String,
+        artist: String,
+        copyright: String,
+        dateText: String,
+        removeGps: Boolean,
+    ) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            unsupported()
+            return
+        }
+        val plan = MetadataLogic.plan(old, description, artist, copyright, dateText, removeGps, ZoneId.systemDefault())
+        when (plan) {
+            MetadataPlan.InvalidDate -> notice(GalleryNotice(GalleryNoticeKind.META_DATE_INVALID))
+            is MetadataPlan.Ok -> {
+                if (plan.isEmpty) {
+                    _state.update { it.copy(metaEdit = null, notice = GalleryNotice(GalleryNoticeKind.META_UNCHANGED)) }
+                    return
+                }
+                val sender = try {
+                    GalleryRepository.writeRequest(getApplication(), listOf(entry))
+                } catch (e: RuntimeException) {
+                    notice(GalleryNotice(GalleryNoticeKind.META_FAILED))
+                    return
+                }
+                askConsent(sender) {
+                    val ok = withContext(Dispatchers.IO) { GalleryEditStore.writeMetadata(getApplication(), entry, plan) }
+                    _state.update {
+                        it.copy(
+                            metaEdit = null,
+                            notice = GalleryNotice(if (ok) GalleryNoticeKind.META_SAVED else GalleryNoticeKind.META_FAILED),
+                        )
+                    }
+                    if (ok) {
+                        reload()
+                        if (_state.value.info?.entry?.key == entry.key) showInfo(entry)
+                    }
+                }
+            }
+        }
+    }
 
     // endregion
 
